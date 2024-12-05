@@ -24,18 +24,19 @@ export default function Navbar() {
 
     return (
         <div
-            className={`fixed top-0 flex bg-midnight h-full flex-col justify-center items-center transition-all duration-300 ${
-                isHovered ? "w-1/5" : "w-16"
-            }`}
+            className={`fixed top-0 flex h-full flex-col justify-center items-center transition-all duration-300 font-mono z-50
+                ${isHovered ? "w-1/5" : "w-16"}
+                bg-gradient-to-r from-midnight via-20% via-midnight to-transparent"
+                `}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
             <div className="flex flex-col h-64 justify-evenly items-center w-full transition-all duration-300">
                 {icons.map((icon) => {
                     return (
-                        <button key={icon.name} className="flex items-center justify-start w-full p-2 hover:bg-slate-500 transition-all duration-300">
+                        <button key={icon.name} className="flex items-center justify-start w-full p-2 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10">
                             <img className="h-7 w-7" src={icon.icon} alt={icon.name} />
-                            {isHovered && <span className="ml-2 text-white">{icon.name}</span>}
+                            <span className="ml-2 text-white">{icon.name}</span>
                         </button>
                     );
                 })}

@@ -5,6 +5,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+      mono: ['JetBrains Mono', 'monospace'],
+    },
       colors: {
         'midnight': '#474746',
         'midnight-text': '#BDBDBD'
