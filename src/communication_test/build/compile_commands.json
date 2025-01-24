@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/a/EIP/CAMI-Desktop/src/communication_test/build",
+  "command": "/usr/bin/c++ -DNAPI_VERSION=4 -Daddon_EXPORTS -I/home/a/EIP/CAMI-Desktop/src/communication_test/node_modules/node-api-headers/include -I/home/a/EIP/CAMI-Desktop/src/communication_test/node_modules/node-addon-api -I/home/a/EIP/CAMI-Desktop/src/communication_test/include -DBUILDING_NODE_EXTENSION -O3 -DNDEBUG -std=gnu++20 -fPIC -o CMakeFiles/addon.dir/src/plugin_impl.cpp.o -c /home/a/EIP/CAMI-Desktop/src/communication_test/src/plugin_impl.cpp",
+  "file": "/home/a/EIP/CAMI-Desktop/src/communication_test/src/plugin_impl.cpp",
+  "output": "CMakeFiles/addon.dir/src/plugin_impl.cpp.o"
+}
+]

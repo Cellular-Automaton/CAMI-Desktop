@@ -1,16 +1,41 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
-const { simulate_lenia } = require('./communication_test/build/Release/addon.node');  // Load the .node file
-import path from 'node:path';
-import started from 'electron-squirrel-startup';
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (started) {
-  app.quit();
-}
+//address of native addon
+console.log("eagreag")
 
-ipcMain.handle('call-simulate-lenia', async () => {
-  try {
-    var tab = new Float64Array([
+
+
+onmessage = async function (e) {
+    console.log("azer");
+  if (e.data === 'start') {
+    console.log("azzezer");
+    try {
+            postMessage({ type: 'invokeElectron', method: 'callSimulateLenia' });
+//      const result = await window.electron.callSimulateLenia();  // Call the main process
+//      console.log(result);
+//      postMessage(result);  // Send the result back to the worker
+    } catch (error) {
+      console.error('Error in worker:', error);
+      postMessage('Error: ' + error.message);
+    }
+  }
+};
+
+//const {simulate_lenia} = require("path").resolve(__dirname, "./communication_test/build/Release/addon.node");
+//const {simulate_lenia} = require()
+//const {simulate_lenia} = require("./communication_test/build/Release/addon.node");
+
+//postMessage("test");
+/*
+const {add} = require('./Nodejs-Napi-Addon-Using-Cmake/build/Release/addon.node'); //Calling functions of native addon
+var result = add(3,4);
+
+postMessage(result);
+*/
+//address of native addon
+
+
+/*
+var tab = new Float64Array([
      0, 0, 0, 0, 0, 0, 0.1, 0.14, 0.1, 0, 0, 0.03, 0.03, 0, 0, 0.3, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0,   0,    0,   0, 0, 0,    0,    0, 0, 0,   0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0,   0,    0,   0, 0, 0,    0,    0, 0, 0,   0, 0, 0, 0, 0, 0 ,
@@ -198,67 +223,16 @@ ipcMain.handle('call-simulate-lenia', async () => {
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])
-    const n1 = new Number(13)
-    const n2 = new Number(0.5)
-    const n3 = new Number(0.15)
-    const n4 = new Number(0.15)
-    const n5 = new Number(0.015)
-    const n6 = new Number(57)
-    const n7 = new Number(68)
-    var result = simulate_lenia(tab, n1.valueOf(), n2.valueOf(), n3.valueOf(), n4.valueOf(), n5.valueOf(), n6.valueOf(), n7.valueOf());
-      console.log(result);
-    return result;// Call the native function
-  } catch (error) {
-    console.error('Error calling simulate_lenia:', error);
-    throw error;
-  }
-});
+const n1 = new Number(13)
+const n2 = new Number(0.5)
+const n3 = new Number(0.15)
+const n4 = new Number(0.15)
+const n5 = new Number(0.015)
+const n6 = new Number(57)
+const n7 = new Number(68)
+var result = simulate_lenia(tab, n1.valueOf(), n2.valueOf(), n3.valueOf(), n4.valueOf(), n5.valueOf(), n6.valueOf(), n7.valueOf()); //console.log(result);//communicating with main process of electron app.
+//var result = simulate_lenia(tab, n1, new Number(0.5), new Number(0.15), new Number(0.15), new Number(0.015)); //console.log(result);//communicating with main process of electron app.
 
-const createWindow = () => {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    minHeight: 600,
-    minWidth: 800,
-    webPreferences: {
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-        nodeIntegration: true,
-        nodeIntegrationInWorker: true,
-    },
-    autoHideMenuBar: true,
-    // frame: false Pour être frameless
-  });
+postMessage(result);
+    */
 
-  // and load the index.html of the app.
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
-};
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  createWindow();
-
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
-});
-
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.

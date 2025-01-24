@@ -34,7 +34,8 @@
     "postcss": "^8.4.49",
     "postcss-loader": "^8.1.1",
     "style-loader": "^3.3.4",
-    "tailwindcss": "^3.4.15"
+    "tailwindcss": "^3.4.15",
+    "webpack-node-externals": "^3.0.0"
   },
   "keywords": [],
   "author": {
@@ -51,6 +52,7 @@
     "@tailwindcss/typography": "^0.5.15",
     "babylonjs": "^7.43.0",
     "electron-squirrel-startup": "^1.0.1",
+    "path": "^0.12.7",
     "pixi.js": "^7.4.2",
     "react": "^18.3.1",
     "react-babylonjs": "^3.2.2",

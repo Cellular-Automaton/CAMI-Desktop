@@ -1,0 +1,3 @@
+/home/a/EIP/CAMI-Desktop/src/communication_test/build/CMakeFiles/addon.dir
+/home/a/EIP/CAMI-Desktop/src/communication_test/build/CMakeFiles/edit_cache.dir
+/home/a/EIP/CAMI-Desktop/src/communication_test/build/CMakeFiles/rebuild_cache.dir
