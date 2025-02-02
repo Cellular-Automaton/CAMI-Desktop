@@ -15,7 +15,7 @@ export default function App() {
                 <div className="flex-grow h-full w-full pl-16">
                     <Routes>
                         {/* <Route path="/main_window" element={<Home />} /> */}
-                        <Route path="/main_window" element={<Playground />} />
+                        <Route path="/main_window" element={<Home/>} />
                     </Routes>
                 </div>
             </div>

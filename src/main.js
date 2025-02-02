@@ -8,8 +8,9 @@ if (started) {
   app.quit();
 }
 
-ipcMain.handle('call-simulate-lenia', async () => {
+ipcMain.handle('call-simulate-lenia', async (event, params) => {
   try {
+    console.log('Paramètres reçus:', params);
     var tab = new Float64Array([
      0, 0, 0, 0, 0, 0, 0.1, 0.14, 0.1, 0, 0, 0.03, 0.03, 0, 0, 0.3, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0,   0,    0,   0, 0, 0,    0,    0, 0, 0,   0, 0, 0, 0, 0, 0, 0,

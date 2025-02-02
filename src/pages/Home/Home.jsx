@@ -1,12 +1,31 @@
 import React from "react";
+import { useEffect, useState} from "react";
 import Swipe from "../../components/Swipe/Swipe.jsx";
 import {fakeSimulations, fakeFavorites, fakeNew} from "../../../assets/data/fakeSimulation.jsx";
 
 export default function Home() {
+    const [simulationResult, setSimulationResult] = useState("Loading...");
+
+    useEffect(() => {
+        const handleSimulation = async () => {
+            try {
+                console.log("here");
+                const params = ["test"];
+                const response = await window.electron.callSimulateLenia(params);
+                console.log("respone home.jsx:", response);
+                setSimulationResult("whynot"); // Affiche "whynot" si tout fonctionne bien
+            } catch (error) {
+                console.error("Erreur lors de l'appel IPC :", error);
+                setSimulationResult("error"); // Affiche "error" en cas d'échec
+            }
+        };
+
+        handleSimulation();
+    }, []);
     return (
         <div className="flex flex-col gap-8 bg-midnight h-full w-full p-5 max-w-full font-mono">
             <section id="welcome" className="my-5">
-                <h1 className="text-white text-4xl text-left">Welcome Guest !</h1>
+                <h1 className="text-white text-4xl text-left">{simulationResult}</h1>
             </section>
             <section id="last_simulations" className="flex flex-col w-full gap-2 my-3">
                 <h2 className="text-midnight-text text-3xl text-left">Last Simulations</h2>
