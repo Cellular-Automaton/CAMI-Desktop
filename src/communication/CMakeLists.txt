@@ -8,15 +8,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 include_directories(${CMAKE_JS_INC})
-include_directories("include")
+include_directories(include/)
 
-file(GLOB SOURCE_FILES "src/plugin_impl.cpp" "include/*.hh")
+#file(GLOB SOURCE_FILES "src/plugin_impl.cpp" "include/*.hh")
 
 add_library(lenia SHARED IMPORTED)
 set_target_properties( lenia PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/libs/cami-core.so)
 #set_property(TARGET lenia PROPERTY IMPORTED_LOCATION "./libs/cami-core")
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
+
+
+add_library(${PROJECT_NAME} SHARED
+    src/init.cpp
+    src/Wrappers/wrapper_gol.cpp
+    src/Wrappers/wrapper_lenia.cpp
+    #    ${SOURCE_FILES}
+    ${CMAKE_JS_SRC}
+)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 target_link_libraries(${PROJECT_NAME} lenia)
@@ -27,5 +36,10 @@ execute_process(COMMAND node -p "require('node-addon-api').include"
 string(REPLACE "\n" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
 string(REPLACE "\"" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${NODE_ADDON_API_DIR})
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+    include/
+    include/Plugins/
+    include/Wrappers/)
 add_definitions(-DNAPI_VERSION=4)
 

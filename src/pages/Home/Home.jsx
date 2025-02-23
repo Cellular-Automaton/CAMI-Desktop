@@ -11,12 +11,12 @@ export default function Home() {
             try {
                 console.log("here");
                 const params = ["test"];
-                const response = await window.electron.callSimulateLenia(params);
+                const response = await window.electron.callSimulateGol(params);
                 console.log("respone home.jsx:", response);
-                setSimulationResult("whynot"); // Affiche "whynot" si tout fonctionne bien
+                setSimulationResult("whynot");
             } catch (error) {
                 console.error("Erreur lors de l'appel IPC :", error);
-                setSimulationResult("error"); // Affiche "error" en cas d'échec
+                setSimulationResult("error");
             }
         };
 
