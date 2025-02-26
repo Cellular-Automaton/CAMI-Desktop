@@ -1,0 +1,66 @@
+name: Build/release
+
+on:
+  release:
+    types: [published]
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # not package for mac
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v4
+        # with:
+          # node-version: 10
+
+      - name: install dependencies
+        run: npm install
+
+      - name: publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run publish
+
+      - name: publish & upload artifact
+        uses: nanoufo/action-upload-artifacts-and-release-assets@v2
+        with:
+          path: |
+            out/make/**/*.zip
+            out/make/**/*.exe
+            out/make/**/*.deb
+            out/make/**/*.rpm
+          if-no-files-found: warn
+          upload-release-files: true
+          release-upload-url: ${{ github.event.release.upload_url }}
+
+      # - name: Upload artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: cami-artifact-${{matrix.os}}
+      #     path: |
+      #       out/make/**/*.zip
+      #       out/make/**/*.exe
+      #       out/make/**/*.deb
+      #       out/make/**/*.rpm
+      #     if-no-files-found: warn
+
+      # - name: upload artifact
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ github.token }}
+      #   with:
+      #     upload_url: ${{ github.event.release.upload_url }}
+      #     asset_path: ./bin/azblogfilter.linux-amd64.tar.gz
+      #     asset_name: azblogfilter.linux-amd64.tar.gz
+      #     asset_content_type: application/gzip

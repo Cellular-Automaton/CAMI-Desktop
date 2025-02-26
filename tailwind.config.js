@@ -5,9 +5,14 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+      mono: ['JetBrains Mono', 'monospace'],
+    },
       colors: {
         'midnight': '#474746',
-        'midnight-text': '#BDBDBD'
+        'midnight-opacity': '#47474650',
+        'midnight-text': '#BDBDBD',
+        'midnight-purple': '#7F6EEE'
       }
     },
   },
