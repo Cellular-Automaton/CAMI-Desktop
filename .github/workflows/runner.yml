@@ -24,6 +24,6 @@ jobs:
       run: |
         sudo apt update
         sudo apt install nodejs
-        npm install --save-dev --save-exact prettier
+        npm i
     - name: run linter
-      run: prettier --check `find src -name '*.js'`
+      run: npm run lint
