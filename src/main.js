@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-const { simulate_gol } = require('./communication/build/Release/addon.node');  // Load the .node file
-import path from 'node:path';
+const { simulate_gol } = require('./communication/algorithms/GameOfLifeAddon.node');
 import started from 'electron-squirrel-startup';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -9,17 +8,15 @@ if (started) {
 }
 
 ipcMain.handle('call-simulate-gol', async (event, params) => {
+  console.log(params);
   try {
-    console.log('Paramètres reçus:', params);
-    var tab = new Uint32Array([0, 0, 0, 0, 0,
-                               0, 0, 1, 0, 0,
-                               0, 0, 1, 0, 0,
-                               0, 0, 1, 0, 0,
-                               0, 0, 0, 0, 0])
-      const n1 = new Number(5)
-      const n2 = new Number(5)
-    var result = simulate_gol(tab, n1.valueOf(), n2.valueOf());
-      console.log(result);
+    const table = params[0];
+    const x = params[1];
+    const y = params[2];
+
+    console.log(table, x, y);
+    const result = simulate_gol(table, x.valueOf(), y.valueOf());
+    console.log(result);
     return result;// Call the native function
   } catch (error) {
     console.error('Error calling simulate_gol:', error);

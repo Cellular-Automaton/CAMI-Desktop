@@ -22,6 +22,10 @@ module.exports = {
         test: /\.node$/,
         use: 'node-loader',
       },
+      {
+        test: /\.worker\.js$/,
+        use: { loader: 'worker-loader' }
+      },
     ],
   },
 };
