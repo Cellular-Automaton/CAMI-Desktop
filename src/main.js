@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-const { simulate_gol } = require('./communication/algorithms/GameOfLifeAddon.node');
+const { simulate_gol } = require('./algorithms/GameOfLifeAddon.node');
 import started from 'electron-squirrel-startup';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.

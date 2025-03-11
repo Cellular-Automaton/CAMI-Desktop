@@ -3,20 +3,24 @@ import { Engine, UniversalCamera, Scene, HemisphericLight } from "react-babylonj
 import { Vector3 } from "@babylonjs/core";
 import * as BABYLON from "babylonjs";
 import Cell from "../../classes/Cell.jsx";
+import SimulationPlayer from "../../components/SimulationPlayer/SimulationPlayer.jsx";
 
 export default function Playground() {
     const cameraRef = useRef(null);
     const sceneRef = useRef(null);
-    const [gridSize, setGridSize] = useState(10);
-    const defaultHorizontal = 1;
-    const defaultVertical = 0.6;
+    const isDrawingRef = useRef(false);
+    
     const [keysPressed, setKeysPressed] = useState({});
     const [container, setContainer] = useState(null);
     const [cells, setCells] = useState([]);
     const [isEditable, setIsEditable] = useState(true);
-    const [intervalId, setIntervalId] = useState(null);
-    const isDrawingRef = useRef(false);
+    const [gridSize, setGridSize] = useState(10);
+    const [intervalId, setIntervalId] = useState(-1);
+    const [isPlaying, setIsPlaying] = useState(false);
 
+    const defaultHorizontal = 1;
+    const defaultVertical = 0.6;
+    
     const onCameraCreated = (camera) => {
         cameraRef.current = camera;
         setupCamera(camera);
@@ -88,17 +92,18 @@ export default function Playground() {
         setKeysPressed((prevKeys) => ({ ...prevKeys, [e.key]: false }));
     }
 
-    const onStartSimulation = async () => {
-        // Call the native function
-        //setIsEditable(false);
-        //cells.map((cell) => cell.setDownAction());
-        await callSimulation();
-        setIntervalId(setInterval(callSimulation, 150));
+    const onStartSimulation = () => {
+        const id = setInterval(callSimulation, 150);
+        setIntervalId(id);
+        setIsPlaying(true);
     }
 
     const onStopSimulation = () => {
-        clearInterval(intervalId);
-        setIntervalId(null);
+        if (intervalId != -1) {
+            clearInterval(intervalId);
+            setIntervalId(-1);
+            setIsPlaying(false);
+        }
     }
 
     useEffect(() => {
@@ -144,6 +149,7 @@ export default function Playground() {
     const updateCells = (newTable) => {
         cells.forEach((cell, index) => {
             cell.setCurrentState(newTable[index]);
+            cell.updateCell();
         });
     };
 
@@ -160,7 +166,10 @@ export default function Playground() {
                         */}
                         <div id="size" className="flex flex-col w-full">
                             <label className="text-midnight-text">Size</label>
-                            <input className="text-black" type="number" max={50} value={gridSize} min={5} onChange={(e) => {setGridSize(e.target.value)}} onKeyDown={(e) => {if (e.key == "Enter") createGrid(gridSize, gridSize)}} disabled={!isEditable}/>
+                            <input 
+                                className="text-black" type="number" 
+                                max={50} min={5} value={gridSize} disabled={!isEditable}
+                                onChange={(e) => {setGridSize(e.target.value), createGrid(e.target.value, e.target.value)}}/>
                         </div>
                     </div>
                     <div id="start" className="flex justify-center">
@@ -171,12 +180,11 @@ export default function Playground() {
                     </div>
                 </div>
             </div>
-            <div id="Player" className={`${isEditable ? 'flex flex-col absolute' : 'hidden'} justify-center items-center w-full bg-black bg-opacity-50 min-h-32 max-h-44 bottom-4 px-4 rounded-lg`}>
-                <button className="flex flex-col justify-center items-center w-3/4 h-10 bg-midnight-purple text-midnight-text rounded-lg"
-                    onClick={onStopSimulation} disabled={!isEditable}>
-                    Stop
-                </button>
-            </div>
+            <SimulationPlayer 
+                onStartSimulation={onStartSimulation} 
+                onStopSimulation={onStopSimulation}
+                isPlaying={isPlaying}
+            />
             <div id="canvas" className='flex flex-col h-full w-full' onWheel={zoomCamera} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
                 <Engine antialias adaptToDeviceRatio canvasId="babylonJS">
                     <Scene id="scene" onCreated={(scene) => { sceneRef.current = scene; setContainer(new BABYLON.AssetContainer(sceneRef.current)) }}>
@@ -186,5 +194,5 @@ export default function Playground() {
                 </Engine>
             </div>
         </div>
-    )
+    );
 }
