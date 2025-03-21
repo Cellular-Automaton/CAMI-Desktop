@@ -41,7 +41,7 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  mainWindow.loadURL("http://localhost:3000#/main_window");
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();

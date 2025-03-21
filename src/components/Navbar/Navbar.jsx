@@ -22,6 +22,22 @@ const icons = [
 export default function Navbar() {
     const [isHovered, setIsHovered] = useState(false);
 
+    const handleRedirect = (iconName) => {
+        switch (iconName) {
+            case "Home":
+                window.location.href = "/main_window";
+                break;
+            case "Community":
+                window.location.href = "/test";
+                break;
+            case "Settings":
+                window.location.href = "/settings";
+                break;
+            default:
+                break;
+        }
+    };
+
     return (
         <div
             className={`fixed top-0 flex h-full flex-col justify-center items-center transition-all duration-300 font-mono z-50
@@ -34,7 +50,8 @@ export default function Navbar() {
             <div className="flex flex-col h-64 justify-evenly items-center w-full transition-all duration-300">
                 {icons.map((icon) => {
                     return (
-                        <button key={icon.name} className="flex items-center justify-start w-full p-2 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10">
+                        <button key={icon.name} className="flex items-center justify-start w-full p-2 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10"
+                            onClick={() => handleRedirect(icon.name)}>
                             <img className="h-7 w-7" src={icon.icon} alt={icon.name} />
                             <span className="ml-2 text-white">{icon.name}</span>
                         </button>

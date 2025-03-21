@@ -156,7 +156,7 @@ export default function Playground() {
     return (
         <div id="playground" className='flex flex-col h-full w-full relative'>
             <div className="flex flex-col justify-center absolute right-4 w-1/4 h-full bg-transparent z-50 pointer-events-none">
-                <div id="configurationPanel" className="flex flex-col w-full bg-midnight-opacity p-4 rounded-lg font-mono gap-10 pointer-events-auto">
+                <div id="configuration-panel" className="flex flex-col w-full bg-midnight-opacity p-4 rounded-lg font-mono gap-10 pointer-events-auto">
                     <div id="configurations" className="flex flex-col gap-4 ">
                         {/* 
                             Ask to the app all the configuartion elements of the simulation such as : Size, Rules, etc...
