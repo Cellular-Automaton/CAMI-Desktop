@@ -32,16 +32,14 @@ const createWindow = () => {
     minHeight: 600,
     minWidth: 800,
     webPreferences: {
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-        nodeIntegration: true,
-        nodeIntegrationInWorker: true,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
     },
     autoHideMenuBar: true,
     // frame: false Pour être frameless
   });
 
-  // and load the index.html of the app.
-  mainWindow.loadURL("http://localhost:3000#/main_window");
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  console.log(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();

@@ -3,6 +3,7 @@ import SettingImage from "../../../assets/images/settings.svg";
 import HomeImage from "../../../assets/images/home.svg";
 import CommunityImage from "../../../assets/images/link.svg";
 import "./Navbar.css";
+import { useNavigate } from "react-router-dom";
 
 const icons = [
     {
@@ -17,21 +18,36 @@ const icons = [
         name: "Settings",
         icon: SettingImage
     },
+    {
+        name: "Playground",
+        icon: SettingImage
+    },
+    {
+        name: "Information",
+        icon: HomeImage
+    },
 ];
 
 export default function Navbar() {
     const [isHovered, setIsHovered] = useState(false);
+    const navigate = useNavigate();
 
     const handleRedirect = (iconName) => {
         switch (iconName) {
             case "Home":
-                window.location.href = "/main_window";
+                navigate("/Home");
                 break;
             case "Community":
-                window.location.href = "/test";
+                navigate("/Community");
                 break;
             case "Settings":
-                window.location.href = "/settings";
+                navigate("/Settings");
+                break;
+            case "Playground":
+                navigate("/Playground");
+                break;
+            case "Information":
+                navigate("/Information");
                 break;
             default:
                 break;

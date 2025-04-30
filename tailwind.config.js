@@ -12,7 +12,8 @@ module.exports = {
         'midnight': '#242423',
         'midnight-opacity': '#47474650',
         'midnight-text': '#BDBDBD',
-        'midnight-purple': '#7F6EEE'
+        'midnight-purple': '#7F6EEE',
+        'midnight-purple-shadow': '#9a8df2'
       }
     },
   },

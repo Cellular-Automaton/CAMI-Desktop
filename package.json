@@ -44,19 +44,16 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@babylonjs/core": "^7.43.0",
-    "@babylonjs/gui": "^7.43.0",
-    "@pixi/react": "^7.1.2",
+    "@babylonjs/core": "^8.1.1",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.9",
     "@tailwindcss/typography": "^0.5.15",
-    "babylonjs": "^7.43.0",
+    "babylonjs": "^8.1.1",
     "electron-squirrel-startup": "^1.0.1",
+    "motion": "^12.6.3",
     "node-addon-api": "^8.3.1",
     "path": "^0.12.7",
-    "pixi.js": "^7.4.2",
     "react": "^18.3.1",
-    "react-babylonjs": "^3.2.2",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.0.2"
   }

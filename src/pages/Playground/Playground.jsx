@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Engine, UniversalCamera, Scene, HemisphericLight } from "react-babylonjs";
 import { Vector3 } from "@babylonjs/core";
 import * as BABYLON from "babylonjs";
 import Cell from "../../classes/Cell.jsx";
@@ -21,6 +20,16 @@ export default function Playground() {
     const defaultHorizontal = 1;
     const defaultVertical = 0.6;
     
+    const createScene = () => {
+        const canva = document.getElementById("canvas");
+        const engine = new BABYLON.Engine(canva, true);
+        const scene = new BABYLON.Scene(engine);
+        const camera = new BABYLON.UniversalCamera("camera1", new Vector3(0, 0, -5), scene);
+        const light = new BABYLON.HemisphericLight("light1", new Vector3(0, 1, 0), scene);
+
+        setupCamera(camera);
+    }
+
     const onCameraCreated = (camera) => {
         cameraRef.current = camera;
         setupCamera(camera);
@@ -185,14 +194,8 @@ export default function Playground() {
                 onStopSimulation={onStopSimulation}
                 isPlaying={isPlaying}
             />
-            <div id="canvas" className='flex flex-col h-full w-full' onWheel={zoomCamera} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
-                <Engine antialias adaptToDeviceRatio canvasId="babylonJS">
-                    <Scene id="scene" onCreated={(scene) => { sceneRef.current = scene; setContainer(new BABYLON.AssetContainer(sceneRef.current)) }}>
-                        <UniversalCamera name="camera1" position={new Vector3(0, 0, -5)} onCreated={onCameraCreated} />
-                        <HemisphericLight name="light1" intensity={2} direction={Vector3.Up()} />
-                    </Scene>
-                </Engine>
-            </div>
+            <canvas id="canvas" className='flex flex-col h-full w-full' onWheel={zoomCamera} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
+            </canvas>
         </div>
     );
 }
