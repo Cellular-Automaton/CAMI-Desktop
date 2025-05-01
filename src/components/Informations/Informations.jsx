@@ -28,13 +28,13 @@ const Informations = ({algorithm, onCloseCallback}) => {
     };
 
     return (
-        <div id="container" className="flex flex-col h-full w-full relative bg-midnight p-5">
+        <div id="container" className="flex flex-col max-h-screen min-h-screen w-full relative bg-midnight p-5 z-50">
 
             {/* CLOSE BUTTON */}
             <button 
-                className="absolute flex bg-midnight rounded-full grow-0
+                className="fixed flex bg-midnight rounded-full grow-0
                     shrink-0 shadow-md shadow-midnight-purple-shadow h-10 w-10 items-center p-1
-                    top-5 left-5 hover:bg-midnight-purple
+                    top-10 left-25 hover:bg-midnight-purple
                     transition ease-in-out duration-300"
                      onClick={() => {onCloseCallback(), resetScroll()}}>
                 <img src={close} alt="Close" className="h-10 w-10"/>
@@ -46,7 +46,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
                     <div id="algorithm-infos" className="flex flex-col justify-center items-center w-full h-3/4 gap-2 p-4 rounded-md overflow-hidden bg-midnight-opacity shadow-md shadow-midnight-purple-shadow mb-5">
 
                         <div id={"image-container"} className="flex flex-col justify-center items-center w-full h-3/5 gap-3 transition ease-in-out duration-150 overflow-hidden">
-                            <img src={algorithm.image} alt="Algorithm" className="h-full w-full object-cover"/>
+                            <img src={algorithm.image} alt="Algorithm" className="h-full w-full object-cover z-50"/>
                         </div>
 
                         <div id="title" className="flex flex-row w-full text-4xl font-bold text-midnight-text">

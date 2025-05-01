@@ -4,67 +4,44 @@ import comment from "../../../assets/images/comment.svg";
 import like from "../../../assets/images/like.svg";
 import download from "../../../assets/images/download.svg";
 import Tag from "../Tags/Chip.jsx";
+import star from "../../../assets/images/star.svg";
 
 
-const AlgorithmCard = ({algorithm, onClickCallback}) => {
-    const onMouseEnter = () => {
-        const imageContainer = document.getElementById("image-container-" + algorithm.id);
+const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
+    const onMouseEnter = (e) => {
+        const target = e.currentTarget;
+        const imageContainer = target.querySelector("#image-container");
 
         imageContainer.classList.remove("blur-sm");
     };
     
-    const onMouseLeave = () => {
-        const imageContainer = document.getElementById("image-container-" + algorithm.id);
-        const container = document.getElementById("container-" + algorithm.id);
+    const onMouseLeave = (e) => {
+        const target = e.currentTarget;
+        const imageContainer = target.querySelector("#image-container");
 
         imageContainer.classList.add("blur-sm");
-        container.style.transform = `rotateX(0deg) rotateY(0deg)`;
-    };
-
-    const onMouseMove = (event) => {
-        const container = document.getElementById("container-" + algorithm.id);
-        const scrollY = container.scrollY;
-        const width = container.offsetWidth;
-        const height = container.offsetHeight;
-        const centerX = container.offsetLeft + container.offsetWidth / 2;
-        const centerY = (container.offsetTop + scrollY) + container.offsetHeight / 2;
-        const mouseX = event.clientX - centerX;
-        const mouseY = event.clientY - centerY;
-        const rotateX = (10 * mouseY / (height / 2)).toFixed(2);
-        const rotateY = (-1 * 10 * mouseX / (width / 2)).toFixed(2);
-        // Scroll must be take into account
-        container.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    };
-
-    const handleRippleEffect = (event) => {
-        const ripple = document.createElement('div');
-        const size = Math.max(event.currentTarget.clientWidth, event.currentTarget.clientHeight);
-        const rect = event.currentTarget.getBoundingClientRect();
-
-        ripple.className = 'ripple';
-        ripple.style.width = ripple.style.height = `${size}px`;
-        ripple.style.left = `${event.clientX - rect.left - size / 2}px`;
-        ripple.style.top = `${event.clientY - rect.top - size / 2}px`;
-        event.currentTarget.appendChild(ripple);
-
-        setTimeout(() => {
-            ripple.remove();
-        }, 600);
     };
 
     return (
         <button
-            id={"container-" + algorithm.id} 
+            id={"container"} 
             className="flex flex-col relative bg-midnight-opacity rounded-md shadow-lg 
-                shadow-midnight-purple-shadow w-80 h-72 overflow-hidden transition 
+                shadow-midnight-purple-shadow min-w-80 max-w-80 max-h-72 transition 
                 ease-in-out duration-750 hover:shadow-xl hover:shadow-midnight-purple-shadow
                 cursor-pointer"
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            onMouseMove={onMouseMove}
-            onClick={() => {handleRippleEffect, onClickCallback(algorithm)}}>
+            onClick={() => {onClickCallback(algorithm)}}>
 
-            <div id={"image-container-" + algorithm.id} className="flex flex-col blur-sm justify-center items-center w-full h-3/5 gap-3 transition ease-in-out duration-150">
+            {
+                favorite && (
+                    <button className="absolute top-2 right-2 z-10">
+                        <img src={star} alt="Favorite" className="h-7 w-7"/>
+                    </button>
+                )
+            }
+
+            <div id={"image-container"} className="flex flex-col blur-sm justify-center items-center w-full h-3/5 gap-3 transition ease-in-out duration-150">
                 <img src={algorithm.image} alt="Algorithm" className="h-full w-full object-cover"/>
             </div>
 
@@ -73,7 +50,7 @@ const AlgorithmCard = ({algorithm, onClickCallback}) => {
                     {algorithm.title}
                 </div>
 
-                <div id={"tags-container-" + algorithm.id} className="flex flex-row justify-start items-center w-full h-1/4 gap-1 pb-2">
+                <div id={"tags-container"} className="flex flex-row justify-start items-center w-full h-1/4 gap-1 pb-2">
                     {algorithm.tags.map((tag) => (
                         <Tag key={tag} tagName={tag}/>
                     ))}

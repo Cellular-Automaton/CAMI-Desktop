@@ -196,7 +196,7 @@ export default function Community() {
     };
 
     return (
-        <div id="community" className="flex flex-col relative gap-2 bg-midnight h-full w-full font-mono ">
+        <div id="community" className="flex flex-col relative gap-2 bg-midnight h-full w-full font-mono">
             <div id="search-bar" className="flex flex-row bg-transparent h-20 w-full p-1 justify-center items-center">
                 <div className="flex flex-row w-full h-full p-2 justify-center items-center gap-6">
                     <div id="search" className="flex flex-row items-center h-full w-fit p-2 gap-2">
