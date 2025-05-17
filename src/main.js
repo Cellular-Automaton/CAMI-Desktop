@@ -11,8 +11,8 @@ import {plugins, load_starting_plugin} from './plugins_handling.js';
 
 await load_starting_plugin()
 
-
 ipcMain.handle('call-simulate-gol', async (event, params) => {
+  console.log(params);
   try {
     console.log('Paramètres reçus:', params);
     var tab = new Uint32Array([0, 0, 0, 0, 0,
@@ -25,7 +25,7 @@ ipcMain.handle('call-simulate-gol', async (event, params) => {
 
       var result = plugins[0].simulate_gol(tab, n1.valueOf(), n2.valueOf());
       console.log(result);
-    return [];// Call the native function
+    return result; //Call the native function
   } catch (error) {
     console.error('Error calling simulate_gol:', error);
     throw error;
@@ -52,8 +52,8 @@ const createWindow = () => {
     // frame: false Pour être frameless
   });
 
-  // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  console.log(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();

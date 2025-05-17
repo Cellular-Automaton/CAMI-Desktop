@@ -28,15 +28,6 @@
 
 import './index.jsx';
 
-async function callElectronAPI() {
-    try {
-
-        const result = await window.electron.callSimulateGol();
-        console.log('Result from Electron API:', result);
-    } catch (error) {
-        console.error('Error calling Electron API:', error);
-    }
-}
 
 //callElectronAPI();
 

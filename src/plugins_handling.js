@@ -7,8 +7,12 @@ const plugins = []
 
 async function load_starting_plugin() {
 
- if (app.isPackaged) {
-    const pluginsPath = path.join(process.resourcesPath, 'Plugins/');
+    const pluginsPath = "";
+    if (app.isPackaged) {
+    pluginsPath = path.join(process.resourcesPath, 'Plugins/');
+    } else {
+    pluginsPath = path.join(app.getAppPath(), 'Plugins');
+    }
     console.log(pluginsPath)
     await fs.promises.access(pluginsPath)
     const files = await fs.promises.readdir(pluginsPath)
@@ -19,21 +23,6 @@ async function load_starting_plugin() {
         console.log(full_path);
         const tmp = __non_webpack_require__(full_path)
         plugins.push(tmp);
-    }
-  } else {
-    const pluginsPath = './Plugins/';
-    console.log(pluginsPath)
-
-    await fs.promises.access(pluginsPath)
-    const files = await fs.promises.readdir(pluginsPath)
-    for (const file of files) {
-        console.log(file);
-        await fs.promises.access(path.join(pluginsPath, file))
-        const full_path = path.join(pluginsPath, file);
-        console.log(full_path);
-        const tmp = __non_webpack_require__(full_path)
-        plugins.push(tmp);
-    }
     }
 } ;
 
