@@ -1,11 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 const { simulate_gol } = require('./algorithms/GameOfLifeAddon.node');
-import started from 'electron-squirrel-startup';
-
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (started) {
-  app.quit();
-}
 
 ipcMain.handle('call-simulate-gol', async (event, params) => {
   console.log(params);
@@ -32,7 +26,8 @@ const createWindow = () => {
     minHeight: 600,
     minWidth: 800,
     webPreferences: {
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      nodeIntegration: true
     },
     autoHideMenuBar: true,
     // frame: false Pour être frameless

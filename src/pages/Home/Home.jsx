@@ -20,6 +20,11 @@ export default function Home() {
 
     useEffect(() => {
         setSentence(welcomeSentences[Math.floor(Math.random() * welcomeSentences.length)]);
+
+        async function fetchData() {
+            await getAlgorithms();
+        }
+        fetchData();
     }, []);
 
     const openInformationPanel = (algorithm) => {
@@ -68,6 +73,22 @@ export default function Home() {
         homeContainer.classList.remove("h-screen");
         homeContainer.classList.remove("overflow-hidden");
         setIsInformationPanelOpen(false);
+    };
+
+    const getAlgorithms = async () => {
+        try {
+            const response = await fetch('http://localhost:4000/api/automaton', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': 'localhost:4000'
+                }
+            });
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error("Error fetching algorithms:", error);
+        }
     };
 
     return (

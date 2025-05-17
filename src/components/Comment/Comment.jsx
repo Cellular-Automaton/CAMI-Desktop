@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-
 import like from "../../../assets/images/like.svg";
 import dislike from "../../../assets/images/dislike.svg";
 
