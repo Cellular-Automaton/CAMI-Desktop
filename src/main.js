@@ -1,14 +1,16 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
-import started from 'electron-squirrel-startup';
+//import started from 'electron-squirrel-startup';
 import {plugins, load_starting_plugin} from './plugins_handling.js';
+
+
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+/*if (started) {
+  app.quit();
+}*/
 
 await load_starting_plugin()
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (started) {
-  app.quit();
-}
 
 ipcMain.handle('call-simulate-gol', async (event, params) => {
   try {
@@ -23,7 +25,7 @@ ipcMain.handle('call-simulate-gol', async (event, params) => {
 
       var result = plugins[0].simulate_gol(tab, n1.valueOf(), n2.valueOf());
       console.log(result);
-    return result;// Call the native function
+    return [];// Call the native function
   } catch (error) {
     console.error('Error calling simulate_gol:', error);
     throw error;
@@ -43,6 +45,8 @@ const createWindow = () => {
     minWidth: 800,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      contextIsolation: true,
+      nodeIntegration: false,
     },
     autoHideMenuBar: true,
     // frame: false Pour être frameless
