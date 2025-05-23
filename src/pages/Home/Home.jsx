@@ -1,25 +1,36 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useEffect, useState} from "react";
 import HorizontalScroll from "../../components/HorizontalScroll/HorizontalScroll.jsx";
 import Informations from "../../components/Informations/Informations.jsx";
 import {fakeData, favoriteFakeData} from "../../../assets/data/fakeData.jsx";
 import gol from "../../../assets/images/gol.gif";
+import { UserContext } from "../../contexts/UserContext.jsx";
 
 const welcomeSentences = [
-    "Hello [User]! Hope you're having a fantastic day! 🌞",
-    "Hi [User]! Hope you're having a great day so far. 😊",
-    "Hi [User]! Ready to bring some cells to life? 🧬",
-    "Welcome, [User]! Ready to explore the magic of cellular algorithms? ✨",
-    "Hello [User]! Let's make some digital life happen! 🌱"
-]
+        `Hello$USER! Hope you're having a fantastic day! 🌞`,
+        `Hi$USER! Hope you're having a great day so far. 😊`,
+        `Hi$USER! Ready to bring some cells to life? 🧬`,
+        `Welcome$USER! Ready to explore the magic of cellular algorithms? ✨`,
+        `Hello$USER! Let's make some digital life happen! 🌱`
+    ];
 
 export default function Home() {
+    const { user, loggedIn } = useContext(UserContext);
     const [isInformationPanelOpen, setIsInformationPanelOpen] = useState(false);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState({});
     const [sentence, setSentence] = useState(welcomeSentences[Math.floor(Math.random() * welcomeSentences.length)]);
 
+    // Replace $USER with the username
+    const replaceUserInSentence = (sentence) => {
+        if (loggedIn) {
+            console.log(user);
+            return sentence.replace("$USER",  " " + user.username);
+        }
+        return sentence.replace("$USER",  "");
+    }
+
     useEffect(() => {
-        setSentence(welcomeSentences[Math.floor(Math.random() * welcomeSentences.length)]);
+        setSentence(replaceUserInSentence(welcomeSentences[Math.floor(Math.random() * welcomeSentences.length)]));
 
         async function fetchData() {
             await getAlgorithms();

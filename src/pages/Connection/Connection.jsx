@@ -1,14 +1,21 @@
 import React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import  Lenia from "../../../assets/images/lenia.gif";
 import close from "../../../assets/images/close.svg";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../contexts/UserContext.jsx";
+
+import bcrypt from "bcryptjs";
+import axios from "axios";
 
 export default function Connection() {
+    const { user, login } = useContext(UserContext);
     const [isSignIn, setIsSignIn] = useState(true);
+    const navigate = useNavigate();
 
-    const onSignUp = (formData) => {
+    const onSignUp = async (formData) => {
         const url = "http://localhost:4000/api/user";
-        const data = {
+        var data = {
             username: formData.get("username"),
             email: formData.get("email"),
             password: formData.get("password")
@@ -45,28 +52,43 @@ export default function Connection() {
         }
 
         // Crypt the password
-        const hashedPassword = new Buffer.from(data.password).toString('base64');
-
-        // Send the data to the server
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({...data, password: hashedPassword})
-        })
-        .then(response => {
-            if (response.ok) {
-                // Handle successful signup
-                console.log("Signup successful");
-            } else {
-                // Handle errors
-                console.error("Signup failed");
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
+        var hashedPassword = "";
+        await bcrypt.hash(data.password, 10).then(hash => {
+            hashedPassword = hash;
+        }).catch(err => {
+            console.error("Error hashing password:", err);
+            return;
         });
+
+        // Check if the email is valid
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(data.email)) {
+            document.getElementById("signup-error-email").classList.remove("hidden");
+            document.getElementById("signup-email").classList.add("bg-midnight-red");
+            document.getElementById("signup-email").classList.remove("bg-midnight");
+            return;
+        } else {
+            document.getElementById("signup-error-email").classList.add("hidden");
+            document.getElementById("signup-email").classList.remove("bg-midnight-red");
+            document.getElementById("signup-email").classList.add("bg-midnight");
+        }
+
+        const body = {
+            user: {
+                ...data,
+                password: hashedPassword,
+                verified: false,
+                user_role: "user"
+            }
+        };
+        
+        try {
+            await login(body);
+            navigate("/Home");
+        } catch (error) {
+            console.error("Error logging in:", error);
+            return;
+        }
     }
 
     const onSignIn = (formData) => {
@@ -75,8 +97,9 @@ export default function Connection() {
             email: formData.get("email"),
             password: formData.get("password")
         }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (data.email === "") {
+        if (data.email === "" || emailRegex.test(data.email) === false) {
             document.getElementById("signin-error-email").classList.remove("hidden");
             document.getElementById("signin-email").classList.add("bg-midnight-red");
             document.getElementById("signin-email").classList.remove("bg-midnight");
@@ -97,6 +120,8 @@ export default function Connection() {
             document.getElementById("signin-password").classList.remove("bg-midnight-red");
             document.getElementById("signin-password").classList.add("bg-midnight");
         }
+
+        // Check password to connect.
     }
 
     return (
