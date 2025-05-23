@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import close from "../../../assets/images/close.svg";
 import like from "../../../assets/images/like.svg";
 import dislike from "../../../assets/images/dislike.svg";
@@ -6,10 +6,12 @@ import Chip from "../Tags/Chip.jsx";
 import view from "../../../assets/images/view.svg";
 import download from "../../../assets/images/download.svg";
 import Comment from "../Comment/Comment.jsx";
+import { UserContext } from "../../contexts/UserContext.jsx";
 
 const Informations = ({algorithm, onCloseCallback}) => {
     const [isAlgorithmPresent, setIsAlgorithmPresent] = useState(false);
-    
+    const { user, loggedIn } = useContext(UserContext);
+
     useEffect(() => {
         if (algorithm !== null && algorithm !== undefined && Object.keys(algorithm).length !== 0) {
             setIsAlgorithmPresent(true);
@@ -102,22 +104,28 @@ const Informations = ({algorithm, onCloseCallback}) => {
                             {/*{algorithm.comments.lenght}*/}96 comments
                         </div>
 
-                        <div id="own-comment" className="flex flex-col w-full pb-5 gap-2">
-                            <input 
-                            type="text" placeholder="Write a comment..."
-                            className="w-full h-full text-sm bg-midnight-opacity rounded-sm p-2 text-midnight-text placeholder:text-midnight-text border-t-0 border-l-0 border-r-0"/>
+                        {
+                            loggedIn ?
+                                <div id="own-comment" className="relative flex flex-col w-full pb-5 gap-2">
+                                    <input 
+                                    type="text" placeholder="Write a comment..."
+                                    className="w-full h-full text-sm bg-midnight-opacity rounded-sm p-2 text-midnight-text placeholder:text-midnight-text border-t-0 border-l-0 border-r-0"/>
 
-                            <div id="button" className="flex flex-row justify-end w-full gap-2 text-midnight-text">
-                                <button className="flex justify-center items-center rounded-md px-5 hover:bg-midnight-opacity
-                                    transition ease-in-out duration-300">
-                                        Cancel
-                                </button>
-                                <button className="flex justify-center text-white bg-midnight-purple-shadow items-center rounded-md px-5 py-2
-                                    transition ease-in-out duration-300">
-                                        Post a comment
-                                </button>
-                            </div>
-                        </div>
+                                    <div id="button" className="flex flex-row justify-end w-full gap-2 text-midnight-text">
+                                        <button className="flex justify-center items-center rounded-md px-5 hover:bg-midnight-opacity
+                                            transition ease-in-out duration-300">
+                                                Cancel
+                                        </button>
+                                        <button className="flex justify-center text-white bg-midnight-purple-shadow items-center rounded-md px-5 py-2
+                                            transition ease-in-out duration-300">
+                                                Post a comment
+                                        </button>
+                                    </div>
+                                </div>
+                            :
+                            null
+                        }
+
 
                         {/* Comment list */}
                         <div id="comment-list" className="flex flex-col justify-start items-start w-full gap-2">
