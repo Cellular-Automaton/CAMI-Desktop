@@ -2,8 +2,7 @@ import React from "react";
 import Home from "./pages/Home/Home.jsx";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { useLocation } from "react-router-dom";
+import { SimulationProvider, useSimulation } from "./contexts/SimulationContext.jsx";
 
 import Navbar from "./components/Navbar/Navbar.jsx";
 import Playground from "./pages/Playground/Playground.jsx";
@@ -26,10 +25,14 @@ export default function App() {
                 <div className="flex-grow h-full w-full pl-16">
                     <Routes>
                         <Route path="/Home" element={<Home />} />
-                        <Route path="/Playground" element={<Playground/>} />
+                        <Route path="/Playground" 
+                            element={
+                                <SimulationProvider>
+                                    <Playground/>
+                                </SimulationProvider>
+                            }/>
                         <Route path="/Information" element={<SimulationInformation/>} />
                         <Route path="/Community" element={<Community/>} />
-                        <Route path="/Information" element={<Community/>} />
                         <Route path="/Connection" element={<Connection/>} />
                         <Route path="/*" element={<NotFound/>}/>
                     </Routes>

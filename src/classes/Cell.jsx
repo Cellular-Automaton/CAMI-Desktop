@@ -1,104 +1,67 @@
-import { Vector3 } from "@babylonjs/core";
-import * as BABYLON from "babylonjs";
-import { hexToBabylonColor3 } from "../utils/ColorConverter.jsx";
+import React from "react";
+import {Graphics} from "pixi.js";
+import { useEffect, useRef } from "react";
 
 export default class Cell {
-    constructor(x, y, id, state, currentScene, isDrawingRef) {
+    constructor(x, y, id, type, sceneRef, isDrawingRef) {
         this.x = x;
         this.y = y;
-        this.cell = BABYLON.MeshBuilder.CreateBox("cell", {width: 0.1, height: 0.1, depth: 0.01}, currentScene.current);
-        this.cell.position = new Vector3(this.x, this.y, 0);
-        this.cell.material = new BABYLON.StandardMaterial("mat", currentScene.current);
-        this.states = {};
+        this.gap = 10;
+        this.size = 100;
+        this.shape = new Graphics();
+        this.id = id;
+        this.type = type;
+        this.sceneRef = sceneRef;
+        this.isDrawingRef = isDrawingRef;
+        this.color = 0xFFFFFF;
+        this.shape.interactive = true;
+        this.shape.buttonMode = true;
+        this.state = 0; // 0: dead, 1: alive
 
-        this._id = id;
-        this._oldState = state;
-        this._currentState = state;
-        this._stateIndex = 0;
-        this._configureStates = {"hover": ["0x0000FF", -1], "creation": ["0x88364D", -1]};
-        this._isDrawingRef = isDrawingRef;
-        this.updateCell();
+        this.setInterations();
     }
 
-    /*
-     * Allows to set all the states that a cell can have
-     * @param {Object} states - The states must be like this {"name": "color"} with the color in hexadecimal
-     */
-    setStates(states) {
-        this.states = states;
-        const stateKeys = Object.keys(this.states);
-        this._currentState = stateKeys[0];
-        this.oldState = this.currentState;
-        
-        this.updateCell();
-    }
-
-    /*
-     * Allows to register an action manager to the cell
-     * @param {Object}
-     */
-    registerActionManager(actionManager) {
-        this.cell.actionManager = actionManager;
+    draw() {
+        this.shape.clear();
+        this.shape.rect((this.x * (this.size + this.gap)) , (this.y * (this.size + this.gap)) + 10, this.size, this.size);
+        this.shape.fill(this.color);
     }
 
     setUpAction() {
-        this.cell.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, () => {
-            this.oldState = this.currentState;
-            this.currentState = "hover";
-            this.updateCell();
-        }));
-        this.cell.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, () => {
-            this.currentState = this.oldState;
-            this.oldState = "hover";
-            this.updateCell();
-        }));
-        this.cell.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnLeftPickTrigger, () => {
-            this.oldState = this.currentState;
-            const stateKeys = Object.keys(this.states);
-            this._stateIndex = (this._stateIndex + 1) % stateKeys.length;
-            this._currentState = stateKeys[this._stateIndex];
-            this._isDrawingRef.current = true;
-            this.updateCell();
-        }));
-        this.cell.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, () => {
-            this._isDrawingRef.current = false;
-            this.updateCell();
-        }));
+        // Set up actions for the cell
     }
 
-    setDownAction() {
-        this.cell.actionManager = null;
-    }
-
-    /*
-     * Allows to update the cell with the current state
-     */
     updateCell() {
-        const allStates = { ...this.states, ...this._configureStates };
-
-        const color = allStates[this._currentState][0];
-        this.cell.material.diffuseColor = hexToBabylonColor3(color);
+        // Update the cell's visual representation
     }
 
-    /*
-     * Allows to get state of a cell with a number
-     */
+    setState(state) {
+        this.state = state;
+        this.color = state == 0 ? 0xFFFFFF : 0x000000 ; // Black for dead, white for alive
+        this.draw();
+    }
+
     getCurrentState() {
-        return this.states[this._currentState][1];
+        return this.state;
     }
 
-    /*
-     *
-     */
-    setCurrentState(numberState) {
-        const stateKeys = Object.keys(this.states);
+    setInterations() {
+        this.shape.on("pointerdown", (event) => {
+            this.color = this.color === 0x000000 ? 0xFFFFFF : 0x000000;
+            this.draw();
+            this.state = this.state == 0 ? 1 : 0; // Toggle state between dead (0) and alive (1)
+        });
 
-        for (let index = 0; index < stateKeys.length; index++) {
-            if (this.states[stateKeys[index]][1] === numberState) {
-                this._currentState = stateKeys[index];
-                break;
-            }
-        }
-        this.updateCell();
+        this.shape.on("pointerover", (event) => {
+            this.shape.alpha = 0.5;
+            this.shape.tint = 0xFF0000; // Change color on hover
+            this.draw();
+        });
+
+        this.shape.on("pointerout", (event) => {
+            this.shape.alpha = 1;
+            this.shape.tint = 0xFFFFFF;
+            this.draw();
+        });
     }
 }

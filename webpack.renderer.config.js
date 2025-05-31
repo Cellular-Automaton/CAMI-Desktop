@@ -1,3 +1,4 @@
+const { resolve } = require('path');
 const rules = require('./webpack.rules');
 
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
