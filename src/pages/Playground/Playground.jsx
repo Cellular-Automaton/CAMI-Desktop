@@ -135,9 +135,15 @@ export default function Playground() {
 
     const callSimulation = async () => {
         try {
-            const table = new Uint32Array(createSimulationTable());
-            const parameters = [table, new Number(gridSize), new Number(gridSize)];
-            const response = await window.electron.callSimulateGol(parameters);
+
+            //const table = new Uint32Array(createSimulationTable());
+            const table = [0, 0, 0, 0, 0,
+                               0, 0, 1, 0, 0,
+                               0, 0, 1, 0, 0,
+                               0, 0, 1, 0, 0,
+                               0, 0, 0, 0, 0]
+            const parameters = [0, table, 5, 5];
+            const response = await window.electron.callPlugin(parameters);
 
             updateCells(response);
             console.log("response ipc Playground.jsx:", response);

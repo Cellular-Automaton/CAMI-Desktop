@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
 //import started from 'electron-squirrel-startup';
-import {plugins, load_starting_plugin} from './plugins_handling.js';
+import {load_starting_plugin, load_plugins_params} from './plugins_handling.js';
 
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -10,31 +10,9 @@ import {plugins, load_starting_plugin} from './plugins_handling.js';
 }*/
 
 await load_starting_plugin()
+load_plugins_params()
 
-ipcMain.handle('call-simulate-gol', async (event, params) => {
-  console.log(params);
-  try {
-    console.log('Paramètres reçus:', params);
-    var tab = new Uint32Array([0, 0, 0, 0, 0,
-                               0, 0, 1, 0, 0,
-                               0, 0, 1, 0, 0,
-                               0, 0, 1, 0, 0,
-                               0, 0, 0, 0, 0])
-      const n1 = new Number(5)
-      const n2 = new Number(5)
 
-      var result = plugins[0].simulate_gol(tab, n1.valueOf(), n2.valueOf());
-      console.log(result);
-    return result; //Call the native function
-  } catch (error) {
-    console.error('Error calling simulate_gol:', error);
-    throw error;
-  }
-});
-
-ipcMain.on('add-plugin', args => {
-
-});
 
 const createWindow = () => {
   // Create the browser window.
@@ -46,7 +24,7 @@ const createWindow = () => {
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       contextIsolation: true,
-      nodeIntegration: false,
+      nodeIntegration: true,
     },
     autoHideMenuBar: true,
     // frame: false Pour être frameless
