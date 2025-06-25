@@ -102,10 +102,10 @@ ipcMain.on('save-json', (event, data) => {
   }
 });
 
-ipcMain.handle('open-dialog', async () => {
+ipcMain.handle('open-dialog', async (e, fileExtension) => {
   const {canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
     properties: ['openFile'],
-    filters: [{ name: 'JSON Files', extensions: ['json'] }]
+    filters: [{ name: 'Files', extensions: fileExtension.split(" ") }]
   });
 
   if (canceled) {
@@ -115,6 +115,10 @@ ipcMain.handle('open-dialog', async () => {
   return filePaths[0];
 });
 
-ipcMain.handle('load-file', async (event, filePath) => {
+ipcMain.handle('load-text-file', async (event, filePath) => {
   return fs.promises.readFile(filePath, 'utf-8');
+});
+
+ipcMain.handle('load-file', async (event, filePath) => {
+  return fs.promises.readFile(filePath);
 });

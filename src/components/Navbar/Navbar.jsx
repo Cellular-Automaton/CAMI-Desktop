@@ -1,8 +1,10 @@
 import React, { useState, useContext } from "react";
+
 import SettingImage from "../../../assets/images/settings.svg";
 import HomeImage from "../../../assets/images/home.svg";
 import CommunityImage from "../../../assets/images/link.svg";
-import login from "../../../assets/images/login.svg";
+import LoginImage from "../../../assets/images/login.svg";
+import AddImage from "../../../assets/images/add.svg";
 import nopicture from "../../../assets/images/nopicture.svg";
 
 import "./Navbar.css";
@@ -34,6 +36,7 @@ export default function Navbar() {
     const { user, loggedIn, logout } = useContext(UserContext);
 
     const handleRedirect = (iconName) => {
+        console.log("Redirecting to:", iconName);
         switch (iconName) {
             case "Home":
                 navigate("/Home");
@@ -50,6 +53,8 @@ export default function Navbar() {
             case "Information":
                 navigate("/Information");
                 break;
+            case "Submission":
+                navigate("/Submission");
             default:
                 break;
         }
@@ -76,7 +81,7 @@ export default function Navbar() {
                     ) : (
                         <button className="flex items-center justify-start w-full p-2 pb-5 pt-5 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10"
                             onClick={() => {navigate("/Connection")}}>
-                            <img className="h-7 w-7" src={login} alt="Login" />
+                            <img className="h-7 w-7" src={LoginImage} alt="Login" />
                             <span className="text-white">Login</span>
                         </button>
                     )
@@ -91,6 +96,17 @@ export default function Navbar() {
                         </button>
                     );
                 })}
+                {
+                    !loggedIn ?
+                        null 
+                    : (
+                        <button className="flex items-center justify-start w-full p-2 pb-5 pt-5 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10"
+                            onClick={() => navigate("/Submission")}>
+                            <img className="h-7 w-7" src={AddImage} alt="Submission" />
+                            <span className="ml-2 text-white">Submission</span>
+                        </button>
+                    )
+                }
             </div>
         </div>
     );

@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electron', {
   send: (channel, data) => { ipcRenderer.send(channel, data); },
   receive: (channel, func) => { ipcRenderer.on(channel, (event, ...args) => func(...args)); },
 
-  openDialog: () => ipcRenderer.invoke('open-dialog'),
+  openDialog: (fileExtension) => ipcRenderer.invoke('open-dialog', fileExtension),
   loadFile: (filePath) => ipcRenderer.invoke('load-file', filePath),
+  loadTextFile: (filePath) => ipcRenderer.invoke('load-text-file', filePath)
 });

@@ -43,10 +43,10 @@ export const SimulationProvider = ({ children }) => {
     };
 
     const importSimulation = async () => {
-        const filePath = await window.electron.openDialog();
+        const filePath = await window.electron.openDialog("json");
 
         if (filePath) {
-            const data = await window.electron.loadFile(filePath);
+            const data = await window.electron.loadTextFile(filePath);
             const parsedData = JSON.parse(data);
             console.log("Imported Data:", parsedData);
             setImportedData(parsedData);
