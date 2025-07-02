@@ -15,7 +15,7 @@ const welcomeSentences = [
     ];
 
 export default function Home() {
-    const { user, loggedIn } = useContext(UserContext);
+    const { userData, loggedIn } = useContext(UserContext);
     const [isInformationPanelOpen, setIsInformationPanelOpen] = useState(false);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState({});
     const [sentence, setSentence] = useState(welcomeSentences[Math.floor(Math.random() * welcomeSentences.length)]);
@@ -23,8 +23,8 @@ export default function Home() {
     // Replace $USER with the username
     const replaceUserInSentence = (sentence) => {
         if (loggedIn) {
-            console.log(user);
-            return sentence.replace("$USER",  " " + user.username);
+            console.log(userData);
+            return sentence.replace("$USER",  " " + userData.username);
         }
         return sentence.replace("$USER",  "");
     }

@@ -33,7 +33,7 @@ const icons = [
 export default function Navbar() {
     const [isHovered, setIsHovered] = useState(false);
     const navigate = useNavigate();
-    const { user, loggedIn, logout } = useContext(UserContext);
+    const { userData, loggedIn, logout } = useContext(UserContext);
 
     const handleRedirect = (iconName) => {
         console.log("Redirecting to:", iconName);
@@ -75,7 +75,7 @@ export default function Navbar() {
                     loggedIn ? (
                         <button className="flex items-center justify-start w-full p-2 pb-5 pt-5 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10"
                             onClick={() => {logout(), navigate(0)}}>
-                            <img className="h-7 w-7" src={user.img == null ? nopicture : user.img} alt="User picture" />
+                            <img className="h-7 w-7" src={userData.img == null ? nopicture : userData.img} alt="User picture" />
                             <span className="ml-2 text-white">Logout</span>
                         </button>
                     ) : (

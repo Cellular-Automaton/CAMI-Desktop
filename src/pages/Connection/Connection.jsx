@@ -7,51 +7,31 @@ import { UserContext } from "../../contexts/UserContext.jsx";
 
 import bcrypt from "bcryptjs";
 import axios from "axios";
+import { APIContext } from "../../contexts/APIContext.jsx";
 
 export default function Connection() {
-    const { user, login } = useContext(UserContext);
+    const { userData, setUser } = useContext(UserContext);
+    const { login, signUp } = useContext(APIContext);
+    const [SignInForm, setSignInForm] = useState({
+        email: "",
+        password: ""
+    });
+    const [SignUpForm, setSignUpForm] = useState({
+        username: "",
+        email: "",
+        password: "",
+        confirm: ""
+    });
     const [isSignIn, setIsSignIn] = useState(true);
     const navigate = useNavigate();
 
     const onSignUp = async (formData) => {
-        const url = "http://localhost:4000/api/user";
         var data = {
             username: formData.get("username"),
             email: formData.get("email"),
             password: formData.get("password")
         }
-        var flag = false;
 
-        Object.keys(data).forEach(element =>  {
-            if (element === "confirm") 
-                return;
-            if (data[element] === "") {
-                document.getElementById(`signup-error-${element}`).classList.remove("hidden");
-                document.getElementById(`signup-${element}`).classList.add("bg-midnight-red");
-                document.getElementById(`signup-${element}`).classList.remove("bg-midnight");
-                flag = true;
-            } else {
-                document.getElementById(`signup-error-${element}`).classList.add("hidden");
-                document.getElementById(`signup-${element}`).classList.remove("bg-midnight-red");
-                document.getElementById(`signup-${element}`).classList.add("bg-midnight");
-            }
-        });
-
-        if (flag)
-            return;
-
-        if (data.password !== formData.get("confirm")) {
-            document.getElementById("signup-error-confirm").classList.remove("hidden");
-            document.getElementById("signup-confirm").classList.add("bg-midnight-red");
-            document.getElementById("signup-confirm").classList.remove("bg-midnight");
-            return;
-        } else {
-            document.getElementById("signup-error-confirm").classList.add("hidden");
-            document.getElementById("signup-confirm").classList.remove("bg-midnight-red");
-            document.getElementById("signup-confirm").classList.add("bg-midnight");
-        }
-
-        // Crypt the password
         var hashedPassword = "";
         await bcrypt.hash(data.password, 10).then(hash => {
             hashedPassword = hash;
@@ -59,19 +39,6 @@ export default function Connection() {
             console.error("Error hashing password:", err);
             return;
         });
-
-        // Check if the email is valid
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(data.email)) {
-            document.getElementById("signup-error-email").classList.remove("hidden");
-            document.getElementById("signup-email").classList.add("bg-midnight-red");
-            document.getElementById("signup-email").classList.remove("bg-midnight");
-            return;
-        } else {
-            document.getElementById("signup-error-email").classList.add("hidden");
-            document.getElementById("signup-email").classList.remove("bg-midnight-red");
-            document.getElementById("signup-email").classList.add("bg-midnight");
-        }
 
         const body = {
             user: {
@@ -82,46 +49,36 @@ export default function Connection() {
             }
         };
         
-        try {
-            await login(body);
+        signUp(body).then((response) => {
+            const data = response.data;
+            setUser(data);
             navigate("/Home");
-        } catch (error) {
-            console.error("Error logging in:", error);
+        }).catch((error) => {
+            console.error("Error signing up:", error);
             return;
-        }
+        });
     }
 
     const onSignIn = (formData) => {
-        const url = "https://localhost:3000/api/user";
         const data = {
             email: formData.get("email"),
             password: formData.get("password")
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (data.email === "" || emailRegex.test(data.email) === false) {
-            document.getElementById("signin-error-email").classList.remove("hidden");
-            document.getElementById("signin-email").classList.add("bg-midnight-red");
-            document.getElementById("signin-email").classList.remove("bg-midnight");
+        if (!emailRegex.test(data.email)) {
+            console.error("Invalid email format");
             return;
-        } else {
-            document.getElementById("signin-error-email").classList.add("hidden");
-            document.getElementById("signin-email").classList.remove("bg-midnight-red");
-            document.getElementById("signin-email").classList.add("bg-midnight");
         }
 
-        if (data.password === "") {
-            document.getElementById("signin-error-password").classList.remove("hidden");
-            document.getElementById("signin-password").classList.add("bg-midnight-red");
-            document.getElementById("signin-password").classList.remove("bg-midnight");
-            return;
-        } else {
-            document.getElementById("signin-error-password").classList.add("hidden");
-            document.getElementById("signin-password").classList.remove("bg-midnight-red");
-            document.getElementById("signin-password").classList.add("bg-midnight");
-        }
-
-        // Check password to connect.
+        login(data).then((response) => {
+            const data = response.data;
+            setUserData(data);
+            console.log("Login successful:", data);
+            navigate("/Home");
+        }).catch((error) => {
+            console.error("Error logging in:", error);
+        });
     }
 
     return (
@@ -150,7 +107,7 @@ export default function Connection() {
                                     <p className="text-midnight-text text-center text-sm">Enter your credentials to access your account</p>
                                 </div>
 
-                                <form action={onSignIn} onSubmit={ (e) => {
+                                <form onSubmit={ (e) => {
                                     const formData = new FormData(e.target);
 
                                     e.preventDefault();
@@ -160,7 +117,7 @@ export default function Connection() {
                                     <div className="flex flex-col items-center justify-center w-full gap-2">
                                         <h2 className="text-midnight-text text-md text-left w-full">Email</h2>
                                         <div className="flex flex-col items-center justify-center w-full">
-                                            <input id="signin-email"
+                                            <input id="signin-email" required
                                                 name="email" type="text" placeholder="Enter your email" 
                                                 className="w-full border-none h-10 p-2 rounded-md bg-midnight text-midnight-text"/>
                                             <p id="signin-error-email" className="text-midnight-red text-sm hidden text-left">Email is not valid</p>
@@ -169,7 +126,7 @@ export default function Connection() {
                                     <div className="flex flex-col items-center justify-center w-full gap-2">
                                         <h2 className="text-midnight-text text-md text-left w-full">Password</h2>
                                         <div className="flex flex-col items-center justify-center w-full">
-                                            <input id="signin-password"
+                                            <input id="signin-password" required
                                                 name="password" type="password" placeholder="Enter your password" 
                                                 className="w-full border-none h-10 p-2 rounded-md bg-midnight text-midnight-text"/>
                                             <p id="signin-error-password" className="text-midnight-red text-sm hidden text-left">Password is not valid</p>
@@ -177,13 +134,12 @@ export default function Connection() {
                                     </div>
 
                                     <button type="submit" className="w-full h-10 p-2 mt-5 rounded-md bg-midnight-purple text-white font-bold">Sign In</button>
+                                    <div className="flex flex-col items-center justify-end w-full h-full mt-5 gap-2">
+                                        <p className="text-midnight-text text-center">Don't have an account? 
+                                            <a href="#/Connection" className="text-midnight-purple font-bold" onClick={() => setIsSignIn(false)}> Sign Up</a>
+                                        </p>
+                                    </div>
                                 </form>
-
-                                <div className="flex flex-col items-center justify-end w-full h-full mt-5 gap-2">
-                                    <p className="text-midnight-text text-center">Don't have an account? 
-                                        <a href="#/Connection" className="text-midnight-purple font-bold" onClick={() => setIsSignIn(false)}> Sign Up</a>
-                                    </p>
-                                </div>
                             </div>
                         </div>
                     :
@@ -201,7 +157,7 @@ export default function Connection() {
                                     <p className="text-midnight-text text-center text-sm">Enter your credentials to create an account</p>
                                 </div>
 
-                                <form action={onSignUp} onSubmit={(e) => {
+                                <form onSubmit={(e) => {
                                     const formData = new FormData(e.target);
                                     e.preventDefault();
                                     onSignUp(formData);

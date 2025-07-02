@@ -4,48 +4,36 @@ import axios from "axios";
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const url = "http://localhost:4000/api/user";
-    const [user, setUser] = useState({
+    const [userData, setUserData] = useState({
         user_id: null,
-        username: null,
+        username: null, 
         img: null,
         email: null,
         token: null,
     });
     const [loggedIn, setLoggedIn] = useState(false);
-    
+    const setToken = (token) => {
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
 
-    const login = async (userData) => {
-        // Temporary Waiting the backend route for login
-        await axios.post(url, userData).then((response) => {
-            if (response.status === 201) {
-                const { user_id, username, img, email, token } = response.data.data;
-                
-                setUser({
-                    user_id,
-                    username,
-                    img,
-                    email,
-                    token,
-                });
-                
-                localStorage.setItem("token", token);
-                axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-                setLoggedIn(true);
-            } else {
-                console.error("Login failed");
-                throw new Error(response.data.message);
-            }
-        })
-    };
+    const setUser = async (user) => {
+        setUserData({
+            user_id: user.user_id,
+            username: user.username,
+            email: user.email,
+            img: user.img || null,
+            token: user.token || null,
+        });
+        setLoggedIn(true);
+    }
 
     const logout = () => {
         setUser({
             id: null,
             username: null,
-            img: null,
+            //img: null,
             email: null,
-            token: null,
+            //token: null,
         });
 
         localStorage.removeItem("token");
@@ -54,7 +42,7 @@ export const UserProvider = ({ children }) => {
     };
 
     return (
-        <UserContext.Provider value={{ user, login, logout, loggedIn }}>
+        <UserContext.Provider value={{ userData, setUser, logout, loggedIn }}>
             {children}
         </UserContext.Provider>
     );
