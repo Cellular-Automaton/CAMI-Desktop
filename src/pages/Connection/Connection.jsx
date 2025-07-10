@@ -64,16 +64,14 @@ export default function Connection() {
             const user = response.user;
             const token = response.token;
             const userInfo = {
-                email: user.email,
-                user_id: user.user_id,
+                email: user.mail,
+                user_id: user.id,
                 username: user.username,
                 img: user.img || null,
                 token: token
             };
-            console.log("Login response:", response);
             setUser(userInfo);
             setToken(token);
-            console.log("Login successful:", userInfo);
             navigate("/Home");
         }).catch((error) => {
             console.error("Error logging in:", error);

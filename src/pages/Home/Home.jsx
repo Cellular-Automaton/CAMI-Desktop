@@ -4,7 +4,10 @@ import HorizontalScroll from "../../components/HorizontalScroll/HorizontalScroll
 import Informations from "../../components/Informations/Informations.jsx";
 import {fakeData, favoriteFakeData} from "../../../assets/data/fakeData.jsx";
 import gol from "../../../assets/images/gol.gif";
+import spinner from "../../../assets/images/spinner.svg";
+
 import { UserContext } from "../../contexts/UserContext.jsx";
+import { APIContext } from "../../contexts/APIContext.jsx";
 
 const welcomeSentences = [
         `Hello$USER! Hope you're having a fantastic day! 🌞`,
@@ -16,9 +19,14 @@ const welcomeSentences = [
 
 export default function Home() {
     const { userData, loggedIn } = useContext(UserContext);
+    const { getAlgorithms } = useContext(APIContext);
     const [isInformationPanelOpen, setIsInformationPanelOpen] = useState(false);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState({});
     const [sentence, setSentence] = useState(welcomeSentences[Math.floor(Math.random() * welcomeSentences.length)]);
+
+    const [recentAlgorithms, setRecentAlgorithms] = useState([]);
+    const [newAlgorithms, setNewAlgorithms] = useState([]);
+    const [favoriteAlgorithms, setFavoriteAlgorithms] = useState([]);
 
     // Replace $USER with the username
     const replaceUserInSentence = (sentence) => {
@@ -31,6 +39,12 @@ export default function Home() {
 
     useEffect(() => {
         setSentence(replaceUserInSentence(welcomeSentences[Math.floor(Math.random() * welcomeSentences.length)]));
+
+        // Get algorithms from the API
+        getAlgorithms().then((algorithms) => {
+            console.log("Fetched algorithms:", algorithms);
+            setRecentAlgorithms(algorithms.slice(0, 5));
+        })
     }, []);
 
     const openInformationPanel = (algorithm) => {
@@ -89,16 +103,47 @@ export default function Home() {
             </section>
             <section id="last_simulations" className="flex flex-col gap-2 my-3">
                 <h2 className="text-midnight-text text-3xl text-left">Last Simulations</h2>
-                <HorizontalScroll algorithms={fakeData} onClickCallback={openInformationPanel} />
+
+                {
+                    recentAlgorithms.length === 0 ?
+                        <div className="flex justify-center items-center h-10 w-full">
+                            <img src={spinner} alt="Loading..." className="animate-spin h-10 w-10" />
+                        </div>
+                        :
+                        <HorizontalScroll algorithms={recentAlgorithms} onClickCallback={openInformationPanel} />
+                }
+
             </section>
             <section id="new_algorithms" className="flex flex-col gap-2 my-3">
                 <h2 className="text-midnight-text text-3xl text-left">New Algorithms</h2>
-                <HorizontalScroll algorithms={fakeData} onClickCallback={openInformationPanel} />
+
+                {
+                    recentAlgorithms.length === 0 ?
+                        <div className="flex justify-center items-center h-10 w-full">
+                            <img src={spinner} alt="Loading..." className="animate-spin h-10 w-10" />
+                        </div>
+                        :
+                        <HorizontalScroll algorithms={newAlgorithms} onClickCallback={openInformationPanel} />
+                }
             </section>
-            <section id="favorites" className="flex flex-col gap-2 my-3">
-                <h2 className="text-midnight-text text-3xl text-left">Favorites</h2>
-                <HorizontalScroll algorithms={favoriteFakeData} onClickCallback={openInformationPanel} favorite={true}/>
-            </section>
+
+            {
+                loggedIn ?
+
+                <section id="favorites" className="flex flex-col gap-2 my-3">
+                    <h2 className="text-midnight-text text-3xl text-left">Favorites</h2>
+                    {
+                        favoriteAlgorithms.length === 0 ?
+                            <div className="flex justify-center items-center h-10 w-full">
+                                <img src={spinner} alt="Loading..." className="animate-spin h-10 w-10" />
+                            </div>
+                            :
+                            <HorizontalScroll algorithms={favoriteAlgorithms} onClickCallback={openInformationPanel} favorite={true}/>
+                    }
+                </section>
+                :
+                null
+            }
 
             {/* INFORMATION PANEL :) */}
             <div id="information-panel"

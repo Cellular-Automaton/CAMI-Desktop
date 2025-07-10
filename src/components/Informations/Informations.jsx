@@ -8,12 +8,15 @@ import download from "../../../assets/images/download.svg";
 import Comment from "../Comment/Comment.jsx";
 import spinner from "../../../assets/images/spinner.svg";
 import { UserContext } from "../../contexts/UserContext.jsx";
+import { APIContext } from "../../contexts/APIContext.jsx";
+import { v4 as uuidv4, parse as uuidParse } from "uuid";
 
 const Informations = ({algorithm, onCloseCallback}) => {
     const [isAlgorithmPresent, setIsAlgorithmPresent] = useState(false);
     const [isCommentFetchComplete, setIsCommentFetchComplete] = useState(false);
     const [comments, setComments] = useState([]);
-    const { user, loggedIn } = useContext(UserContext);
+    const { userData, loggedIn } = useContext(UserContext);
+    const { addAlgorithmComment } = useContext(APIContext);
 
     useEffect(() => {
         if (algorithm !== null && algorithm !== undefined && Object.keys(algorithm).length !== 0) {
@@ -31,6 +34,39 @@ const Informations = ({algorithm, onCloseCallback}) => {
             }, 200);
         }
     };
+
+    const onSubmitComment = (formData) => {
+        // Convert user_id and algorithm_id to hexadecimal strings
+        console.log("User ID:", userData.user_id);
+        console.log("Algorithm ID:", algorithm.id);
+        console.log(userData);
+        console.log(algorithm);
+        const postedByBinary = uuidParse(userData.user_id);
+        const algorithmBinary = uuidParse(algorithm.automaton_id);
+
+        const postedByHex = Buffer.from(postedByBinary).toString('hex');
+        const algorithmHex = Buffer.from(algorithmBinary).toString('hex');
+
+        console.log("Posted By Hex:", postedByHex);
+        console.log("Algorithm Hex:", algorithmHex);
+        const commentData = {
+            comment : {
+                user_id: postedByHex,
+                algorithm_id: algorithmHex,
+                contents: formData.get("comment")
+            }
+        };
+
+        // Call the API to add the comment
+        addAlgorithmComment(commentData)
+            .then((response) => {
+                console.log("Comment added successfully:", response);
+                // Optionally, you can update the UI or state here
+            })
+            .catch((error) => {
+                console.error("Error adding comment:", error);
+            });
+    }
 
     return (
         <div id="container" className="flex flex-col max-h-screen min-h-screen w-full relative bg-midnight p-5 z-50">
@@ -106,22 +142,23 @@ const Informations = ({algorithm, onCloseCallback}) => {
 
                         {
                             loggedIn ?
-                                <div id="own-comment" className="relative flex flex-col w-full pb-5 gap-2">
+                                <form id="own-comment" className="relative flex flex-col w-full pb-5 gap-2" 
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        const formData = new FormData(e.target);
+                                        onSubmitComment(formData);
+                                    }}>
                                     <input 
-                                    type="text" placeholder="Write a comment..."
+                                    type="text" placeholder="Write a comment..." name="comment"
                                     className="w-full h-full text-sm bg-midnight-opacity rounded-sm p-2 text-midnight-text placeholder:text-midnight-text border-t-0 border-l-0 border-r-0"/>
 
                                     <div id="button" className="flex flex-row justify-end w-full gap-2 text-midnight-text">
-                                        <button className="flex justify-center items-center rounded-md px-5 hover:bg-midnight-opacity
-                                            transition ease-in-out duration-300">
-                                                Cancel
-                                        </button>
                                         <button className="flex justify-center text-white bg-midnight-purple-shadow items-center rounded-md px-5 py-2
                                             transition ease-in-out duration-300">
                                                 Post a comment
                                         </button>
                                     </div>
-                                </div>
+                                </form>
                             :
                             null
                         }

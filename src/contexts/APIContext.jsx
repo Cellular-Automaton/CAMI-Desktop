@@ -49,8 +49,22 @@ export const APIProvider = ({ children }) => {
         }
     }
 
+    const addAlgorithmComment = async (commentData) => {
+        const url = `${apiUrl}/comment`;
+
+        console.log("Comment Data:", commentData);
+        try {
+            const response = await axios.post(url, commentData);
+            const data = response.data;
+            return data;
+        } catch (error) {
+            alert("Failed to add comment. Please try again. : " + error.message);
+            throw error;
+        }
+    };
+
     return (
-        <APIContext.Provider value={{ apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms }}>
+        <APIContext.Provider value={{ apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms, addAlgorithmComment }}>
             {children}
         </APIContext.Provider>
     );
