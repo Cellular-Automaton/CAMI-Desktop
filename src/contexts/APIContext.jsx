@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { createContext, useContext, useState } from "react";
 
 export const APIContext = createContext();
@@ -9,20 +10,10 @@ export const APIProvider = ({ children }) => {
         const url = `${apiUrl}/login`;
 
         try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
-            if (!response.ok) {
-                throw new Error("Login failed");
-            }
-            const data = await response.json();
+            const response = await axios.post(url, formData);
+            const data = response.data;
             return data;
         } catch (error) {
-            console.error("Error during login:", error);
             alert("Login failed. Please try again. : " + error.message);
             throw error;
         }
@@ -31,21 +22,13 @@ export const APIProvider = ({ children }) => {
     const signUp = async (formData) => {
         const url = `${apiUrl}/user`;
         try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
-            if (!response.ok) {
-                throw new Error("Sign up failed");
-            }
-            const data = await response.json();
+            const response = await axios.post(url, formData);
+            const data = response.data;
             return data;
         } catch (error) {
-            console.error("Error during sign up:", error);
-            alert("Sign up failed. Please try again. : " + error.message);
+            if (error.response && error.response.status === 422) {
+                alert("Username or email already exists. Please try again with different credentials.");
+            }
             throw error;
         }
     };
@@ -54,8 +37,20 @@ export const APIProvider = ({ children }) => {
         const url = `${apiUrl}/automaton`;
     }
 
+    const getAlgorithms = async () => {
+        const url = `${apiUrl}/automaton`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            alert("Failed to fetch algorithms. Please try again. : " + error.message);
+            throw error;
+        }
+    }
+
     return (
-        <APIContext.Provider value={{ apiUrl, setApiUrl, login, signUp }}>
+        <APIContext.Provider value={{ apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms }}>
             {children}
         </APIContext.Provider>
     );

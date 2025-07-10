@@ -12,15 +12,21 @@ export const UserProvider = ({ children }) => {
         token: null,
     });
     const [loggedIn, setLoggedIn] = useState(false);
+
     const setToken = (token) => {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        localStorage.setItem("token", token);
+        setUserData((prevData) => ({
+            ...prevData,
+            token: token,
+        }));
     }
 
     const setUser = async (user) => {
         setUserData({
-            user_id: user.user_id,
-            username: user.username,
-            email: user.email,
+            user_id: user.user_id || null,
+            username: user.username || null,
+            email: user.email || null,
             img: user.img || null,
             token: user.token || null,
         });
@@ -42,7 +48,7 @@ export const UserProvider = ({ children }) => {
     };
 
     return (
-        <UserContext.Provider value={{ userData, setUser, logout, loggedIn }}>
+        <UserContext.Provider value={{ userData, setUser, logout, loggedIn, setToken }}>
             {children}
         </UserContext.Provider>
     );

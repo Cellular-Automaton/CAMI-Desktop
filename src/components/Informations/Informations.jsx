@@ -6,10 +6,13 @@ import Chip from "../Tags/Chip.jsx";
 import view from "../../../assets/images/view.svg";
 import download from "../../../assets/images/download.svg";
 import Comment from "../Comment/Comment.jsx";
+import spinner from "../../../assets/images/spinner.svg";
 import { UserContext } from "../../contexts/UserContext.jsx";
 
 const Informations = ({algorithm, onCloseCallback}) => {
     const [isAlgorithmPresent, setIsAlgorithmPresent] = useState(false);
+    const [isCommentFetchComplete, setIsCommentFetchComplete] = useState(false);
+    const [comments, setComments] = useState([]);
     const { user, loggedIn } = useContext(UserContext);
 
     useEffect(() => {
@@ -48,7 +51,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
                     <div id="algorithm-infos" className="flex flex-col justify-center items-center w-full h-3/4 gap-2 p-4 rounded-md overflow-hidden bg-midnight-opacity shadow-md shadow-midnight-purple-shadow mb-5">
 
                         <div id={"image-container"} className="flex flex-col justify-center items-center w-full h-3/5 gap-3 transition ease-in-out duration-150 overflow-hidden">
-                            <img src={algorithm.image} alt="Algorithm" className="h-full w-full object-cover z-50"/>
+                            <img src={algorithm.image ? algorithm.image : "https://asset.gecdesigns.com/img/background-templates/gradient-triangle-abstract-background-template-10032405-1710079376651-cover.webp"} alt="Algorithm" className="h-full w-full object-cover z-50"/>
                         </div>
 
                         <div id="title" className="flex flex-row w-full text-4xl font-bold text-midnight-text">
@@ -80,7 +83,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
                             </div>
                         </div>
 
-                        <div id="tags" className="flex flex-row justify-start w-full font-bold text-midnight-text gap-2 pb-2">
+                        {/* <div id="tags" className="flex flex-row justify-start w-full font-bold text-midnight-text gap-2 pb-2">
                             {
                                 isAlgorithmPresent ? 
                                     algorithm.tags.map((tag) => (
@@ -88,13 +91,10 @@ const Informations = ({algorithm, onCloseCallback}) => {
                                     )) :
                                     null
                             }
-                        </div>
+                        </div> */}
                         
                         <div id="description" className="flex flex-row justify-start w-full h-fit text-sm font-bold text-midnight-text text-justify pb-5">
-                            {/* {algorithm.description} */}
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas purus metus, scelerisque ut facilisis accumsan, dictum vitae ligula. Duis placerat malesuada vehicula. Proin lobortis ornare metus eu tempus. Aliquam dolor purus, auctor sit amet varius id, rutrum ac eros. Donec eu vulputate odio. Ut posuere venenatis convallis. Aenean at metus arcu. Ut molestie, mi ac mollis cursus, nisi est fringilla est, eget fringilla leo justo non mi. Donec vulputate aliquet arcu, eget cursus nulla lobortis ac.
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas purus metus, scelerisque ut facilisis accumsan, dictum vitae ligula. Duis placerat malesuada vehicula. Proin lobortis ornare metus eu tempus. Aliquam dolor purus, auctor sit amet varius id, rutrum ac eros. Donec eu vulputate odio. Ut posuere venenatis convallis. Aenean at metus arcu. Ut molestie, mi ac mollis cursus, nisi est fringilla est, eget fringilla leo justo non mi. Donec vulputate aliquet arcu, eget cursus nulla lobortis ac.
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas purus metus, scelerisque ut facilisis accumsan, dictum vitae ligula. Duis placerat malesuada vehicula. Proin lobortis ornare metus eu tempus. Aliquam dolor purus, auctor sit amet varius id, rutrum ac eros. Donec eu vulputate odio. Ut posuere venenatis convallis. Aenean at metus arcu. Ut molestie, mi ac mollis cursus, nisi est fringilla est, eget fringilla leo justo non mi. Donec vulputate aliquet arcu, eget cursus nulla lobortis ac.
+                            {algorithm.description}
                         </div>
 
                     </div>
@@ -130,14 +130,18 @@ const Informations = ({algorithm, onCloseCallback}) => {
                         {/* Comment list */}
                         <div id="comment-list" className="flex flex-col justify-start items-start w-full gap-2">
                             {
-                                Array.from({ length: 10 }, (_, index) => (
-                                    <Comment key={index} comment={
-                                        {
-                                            image: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84527d8f19d83899b2e76a33aa",
-                                            body : "Amazing implementation! The way the patterns evolve is truly fascinating. Great job on optimizing the performance as well."
-                                        }
-                                    }/>
-                                ))
+                                !isCommentFetchComplete ? 
+                                    <div id="loading-spinner" className="flex h-full w-full justify-center items-center">
+                                        <img src={spinner} alt="Loading..." className="animate-spin size-10" />
+                                    </div>
+                                    :
+                                    <div id="results" className="flex flex-row flex-wrap gap-x-8 gap-y-4 h-full w-full p-5 max-w-full font-mono justify-center overflow-y-auto">
+                                        {comments.map((comment) => {
+                                            return (
+                                                <Comment key={comment.id} comment={comment} />
+                                            )
+                                        })}
+                                    </div>
                             }
                         </div>
                     </div>
@@ -152,7 +156,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
                         </div>
                         <div id="parameters-list" className="flex flex-col justify-start items-start w-full gap-2 text-sm font-bold text-midnight-text">
                             {
-
+                                algorithm.contents
                             }
                         </div>
                     </div>

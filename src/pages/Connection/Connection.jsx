@@ -6,22 +6,11 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext.jsx";
 
 import bcrypt from "bcryptjs";
-import axios from "axios";
 import { APIContext } from "../../contexts/APIContext.jsx";
 
 export default function Connection() {
-    const { userData, setUser } = useContext(UserContext);
+    const { setUser, setToken } = useContext(UserContext);
     const { login, signUp } = useContext(APIContext);
-    const [SignInForm, setSignInForm] = useState({
-        email: "",
-        password: ""
-    });
-    const [SignUpForm, setSignUpForm] = useState({
-        username: "",
-        email: "",
-        password: "",
-        confirm: ""
-    });
     const [isSignIn, setIsSignIn] = useState(true);
     const navigate = useNavigate();
 
@@ -72,9 +61,19 @@ export default function Connection() {
         }
 
         login(data).then((response) => {
-            const data = response.data;
-            setUserData(data);
-            console.log("Login successful:", data);
+            const user = response.user;
+            const token = response.token;
+            const userInfo = {
+                email: user.email,
+                user_id: user.user_id,
+                username: user.username,
+                img: user.img || null,
+                token: token
+            };
+            console.log("Login response:", response);
+            setUser(userInfo);
+            setToken(token);
+            console.log("Login successful:", userInfo);
             navigate("/Home");
         }).catch((error) => {
             console.error("Error logging in:", error);

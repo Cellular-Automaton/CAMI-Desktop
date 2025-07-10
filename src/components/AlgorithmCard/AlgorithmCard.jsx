@@ -28,7 +28,7 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
             className="flex flex-col relative bg-midnight-opacity rounded-md shadow-lg 
                 shadow-midnight-purple-shadow min-w-80 max-w-80 max-h-72 transition 
                 ease-in-out duration-750 hover:shadow-xl hover:shadow-midnight-purple-shadow
-                cursor-pointer"
+                cursor-pointer overflow-hidden"
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
             onClick={() => {onClickCallback(algorithm)}}>
@@ -41,8 +41,8 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
                 )
             }
 
-            <div id={"image-container"} className="flex flex-col blur-sm justify-center items-center w-full h-3/5 gap-3 transition ease-in-out duration-150">
-                <img src={algorithm.image} alt="Algorithm" className="h-full w-full object-cover"/>
+            <div id={"image-container"} className="flex flex-col blur-sm justify-center items-center w-full h-3/5 gap-3 transition ease-in-out duration-150 overflow-hidden">
+                <img src={algorithm.image ? algorithm.image : "https://asset.gecdesigns.com/img/background-templates/gradient-triangle-abstract-background-template-10032405-1710079376651-cover.webp"} alt="Algorithm" className="h-full w-full object-cover overflow-hidden"/>
             </div>
 
             <div id="text-container" className="flex flex-col justify-center items-center w-full h-2/5 gap-2 p-4">
@@ -50,11 +50,11 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
                     {algorithm.title}
                 </div>
 
-                <div id={"tags-container"} className="flex flex-row justify-start items-center w-full h-1/4 gap-1 pb-2">
+                {/* <div id={"tags-container"} className="flex flex-row justify-start items-center w-full h-1/4 gap-1 pb-2">
                     {algorithm.tags.map((tag) => (
                         <Tag key={tag} tagName={tag}/>
                     ))}
-                </div>
+                </div> */}
 
                 <div id="statistics" className="flex flex-row justify-evenly w-full h-1/4 text-sm font-bold text-midnight-text">
                     <div id="view" className="flex flex-row justify-center items-center gap-1">
