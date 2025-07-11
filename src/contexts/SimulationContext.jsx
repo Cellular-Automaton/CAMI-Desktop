@@ -24,9 +24,11 @@ export const SimulationProvider = ({ children }) => {
 
     const getSimulationData = async (gridSize) => {
         try {
-            const table = new Uint32Array(cellInstances.map(cell => cell.state));
-            const parameters = [table, new Number(gridSize), new Number(gridSize)];
-            setResponse(await window.electron.callSimulateGol(parameters));
+            const table = cellInstances.map(cell => cell.state);
+            const parameters = [1, table, 13, 0.5, 0.15, 0.15, 0.015, new Number(gridSize), new Number(gridSize)];
+            //const parameters = [0, table, new Number(gridSize), new Number(gridSize)];
+            const response = await window.electron.callPlugin(parameters);
+            setResponse(response);
         } catch (error) {
             console.error("IPC Call error :", error);
         }

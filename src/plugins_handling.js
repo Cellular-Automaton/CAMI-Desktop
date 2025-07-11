@@ -28,6 +28,7 @@ async function load_starting_plugin() {
         const tmp = __non_webpack_require__(full_path)
         plugins.push([tmp_name, tmp]);
     }
+    console.log("Plugins loaded:", plugins);
 } ;
 
 function load_plugins_params() {
@@ -110,10 +111,10 @@ ipcMain.handle('call-plugin', async (event, params) =>{
     var types = [];
     var converted = []
 
-
+    console.log("rest", rest);
     for (const obj of plugins_parameters[params[0]])
         types.push(obj.split(':')[1]);
-
+    console.log(types);
     for (const [i, obj] of types.entries()) {
         if (obj == "Array")
             converted.push(new Array(rest[i]))
@@ -132,6 +133,7 @@ ipcMain.handle('call-plugin', async (event, params) =>{
         if (obj == "Number")
             converted.push(new Number(rest[i]).valueOf())
     }
+    console.log("Converted parameters:", converted);
     return plugins[params[0]][1].simulate(...converted);
 });
 

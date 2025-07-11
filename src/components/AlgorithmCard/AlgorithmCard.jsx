@@ -47,7 +47,7 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
 
             <div id="text-container" className="flex flex-col justify-center items-center w-full h-2/5 gap-2 p-4">
                 <div id="title" className="flex flex-row justify-start w-full h-2/4 text-l font-bold text-midnight-text">
-                    {algorithm.title}
+                    {algorithm.name}
                 </div>
 
                 {/* <div id={"tags-container"} className="flex flex-row justify-start items-center w-full h-1/4 gap-1 pb-2">

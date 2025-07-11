@@ -2,7 +2,9 @@ import React, {useEffect, useRef, useState, useContext } from "react";
 import {Application, Container} from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import Cell from "../../classes/Cell.jsx";
+import RangedCell from "../../classes/RangeCell.jsx";
 import {SimulationContext} from "../../contexts/SimulationContext.jsx";
+import chroma from "chroma-js";
 
 export default function TwoDDisplay({gridSize, setGridSize}) {
     const appRef = useRef(null);
@@ -12,6 +14,7 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
         importedData, setImportedData
     } = useContext(SimulationContext);
     const [shouldUpdate, setShouldUpdate] = useState(true);
+    const colorScale = chroma.scale(['#FFFFFF','#fdeff9', '#ec38bc', '#7303c0', '#03001e', '#000000']).domain([0, 0.05, 0.4, 0.6, 0.95, 1]);
 
     useEffect(() => {
         init().then(() => {
@@ -19,6 +22,7 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
         }).catch((error) => {
             console.error("Error initializing PixiJS Application:", error);
         });
+        console.log("Color scale initialized:", colorScale(0.5).hex());
     }, []);
 
     useEffect(() => {
@@ -110,9 +114,9 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
 
         console.log("Creating grid with size:", gSize);
         for (let i = 0; i < gSize * gSize; i += 1) {
-            const cell = new Cell(
+            const cell = new RangedCell(
                 (i % gSize), Math.floor(i / gSize),
-                i, "default", appRef, null
+                i, "default", appRef, null, colorScale
             );
             containerRef.current.addChild(cell.shape);
             setCellInstances(prev => [...prev, cell]);
@@ -154,9 +158,9 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
         setShouldUpdate(false);
         setGridSize(gSize);
         for (let i = 0; i < importedData.length; i += 1) {
-            const cell = new Cell(
+            const cell = new RangedCell(
                 (i % gSize), Math.floor(i / gSize),
-                i, "default", appRef, null
+                i, "default", appRef, null, colorScale
             );
             cell.setState(importedData[i]);
             containerRef.current.addChild(cell.shape);

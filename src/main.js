@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'node:path';
+import fs from 'node:fs';
 //import started from 'electron-squirrel-startup';
 import {load_starting_plugin, load_plugins_params, test_simulate_gol_test} from './plugins_handling.js';
 

@@ -92,7 +92,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
 
                         <div id="title" className="flex flex-row w-full text-4xl font-bold text-midnight-text">
                             <p className="w-full">
-                                {algorithm.title}
+                                {algorithm.name}
                             </p>
 
                             <div id="algorithm-like" className="flex flex-row w-full justify-end gap-2 text-sm font-bold text-midnight-text">

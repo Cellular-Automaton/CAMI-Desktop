@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import Cell from "../../classes/Cell.jsx";
 import SimulationPlayer from "../../components/SimulationPlayer/SimulationPlayer.jsx";
 import TwoDDisplay from "../../components/2DDisplay/2DDisplay.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
@@ -18,6 +17,11 @@ export default function Playground() {
     useEffect(() => {
         return () => {
             clearAll(); // Clear all when the component unmounts
+        }
+        return () => {
+            if (isSimulationRunning) {
+                stopSimulation();
+            }
         }
     }, []);
 
