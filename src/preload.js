@@ -16,4 +16,6 @@ contextBridge.exposeInMainWorld('electron', {
   deletePlugin: (params) => ipcRenderer.invoke('delete-plugin', params),
   getParametersNames: (params) => ipcRenderer.invoke('get-parameters-names', params),
   getParametersTypes: (params) => ipcRenderer.invoke('get-parameters-types', params),
+  getParametersTypes: (params) => ipcRenderer.invoke('get-plugin-id-by-name', params),
+  getParametersTypes: (params) => ipcRenderer.invoke('get-plugin-names', params),
 });

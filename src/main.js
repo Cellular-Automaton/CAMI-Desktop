@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
 //import started from 'electron-squirrel-startup';
-import {load_starting_plugin, load_plugins_params} from './plugins_handling.js';
+import {load_starting_plugin, load_plugins_params, test_simulate_gol_test} from './plugins_handling.js';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 /*if (started) {
@@ -10,6 +10,7 @@ import {load_starting_plugin, load_plugins_params} from './plugins_handling.js';
 
 await load_starting_plugin()
 load_plugins_params()
+//test_simulate_gol_test()
 
 let mainWindow;
 

@@ -1,4 +1,4 @@
-export {load_starting_plugin, load_plugins_params};
+export {load_starting_plugin, load_plugins_params, test_simulate_gol_test};
 import fs from 'node:fs';
 import path from 'node:path';
 const { app, ipcMain } = require('electron');
@@ -17,21 +17,38 @@ async function load_starting_plugin() {
     await fs.promises.access(pluginsPath)
     const files = await fs.promises.readdir(pluginsPath)
     for (const file of files) {
+        if (!file.endsWith(".node"))
+            continue;
         console.log(file);
         await fs.promises.access(path.join(pluginsPath, file))
         const full_path = path.join(pluginsPath, file);
         console.log(full_path);
+        const tmp_name = file.slice(0, -5);
+        console.log(tmp_name);
         const tmp = __non_webpack_require__(full_path)
-        plugins.push(tmp);
+        plugins.push([tmp_name, tmp]);
     }
 } ;
 
 function load_plugins_params() {
-    for (const obj of plugins) {
+    for (const [_, obj] of plugins) {
         var tmp = obj.get_params();
         plugins_parameters.push(tmp);
     }
 };
+
+function test_simulate_gol_test() {
+    var tab = new Uint32Array([0, 0, 0, 0, 0,
+                               0, 0, 1, 0, 0,
+                               0, 0, 1, 0, 0,
+                               0, 0, 1, 0, 0,
+                               0, 0, 0, 0, 0])
+    const n12 = new Number(5)
+    const n23 = new Number(5)
+    console.log(plugins[0][1].simulate(tab, n12.valueOf(), n23.valueOf()))
+
+
+}
 
 ipcMain.handle('get-parameters-types', async (event, params) => {
     var result = [];
@@ -46,6 +63,24 @@ ipcMain.handle('get-parameters-names', async (event, params) => {
         result.push(obj.split(':')[0]);
     return result;
 });
+
+ipcMain.handle('get-plugin-id-by-name', async(event, params) => {
+    var i = 0;
+    for (const [name, _] of plugins) {
+        if (name == params[0])
+            return i;
+        i++;
+    }
+    return -1;
+})
+
+ipcMain.handle('get-plugin-names', async(event, params) => {
+    var i = [];
+    for (const [name, _] of plugins) {
+        i.push(name);
+    }
+    return i;
+})
 
 
 ipcMain.handle('delete-plugin', async (event, param) => {
@@ -97,7 +132,7 @@ ipcMain.handle('call-plugin', async (event, params) =>{
         if (obj == "Number")
             converted.push(new Number(rest[i]).valueOf())
     }
-    return plugins[params[0]].simulate(...converted);
+    return plugins[params[0]][1].simulate(...converted);
 });
 
 ipcMain.handle('call-simulate-gol', async (event, params) => {
