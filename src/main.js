@@ -1,27 +1,17 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
-const { simulate_gol } = require('./algorithms/GameOfLifeAddon.node');
+import { app, BrowserWindow, ipcMain } from 'electron';
+import path from 'node:path';
+//import started from 'electron-squirrel-startup';
+import {load_starting_plugin, load_plugins_params} from './plugins_handling.js';
 
-const fs = require('fs');
-const path = require('path');
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+/*if (started) {
+  app.quit();
+}*/
+
+await load_starting_plugin()
+load_plugins_params()
 
 let mainWindow;
-
-ipcMain.handle('call-simulate-gol', async (event, params) => {
-  console.log(params);
-  try {
-    const table = params[0];
-    const x = params[1];
-    const y = params[2];
-
-    console.log(table, x, y);
-    const result = simulate_gol(table, x.valueOf(), y.valueOf());
-    console.log(result);
-    return result;// Call the native function
-  } catch (error) {
-    console.error('Error calling simulate_gol:', error);
-    throw error;
-  }
-});
 
 const createWindow = () => {
   // Create the browser window.
