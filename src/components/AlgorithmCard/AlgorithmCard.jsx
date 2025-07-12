@@ -56,7 +56,7 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
                     ))}
                 </div> */}
 
-                <div id="statistics" className="flex flex-row justify-evenly w-full h-1/4 text-sm font-bold text-midnight-text">
+                {/* <div id="statistics" className="flex flex-row justify-evenly w-full h-1/4 text-sm font-bold text-midnight-text">
                     <div id="view" className="flex flex-row justify-center items-center gap-1">
                         <p>1.5k{algorithm.view}</p>
                         <img src={view} alt="View" className="h-5 w-5"/>
@@ -73,7 +73,7 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
                         <p>1.5k{algorithm.comment}</p>
                         <img src={comment} alt="Comment" className="h-5 w-5"/>
                     </div>
-                </div>
+                </div> */}
             </div>
         </button>
     )

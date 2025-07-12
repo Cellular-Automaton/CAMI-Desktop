@@ -1,18 +1,24 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import gol from "../../../assets/images/gol2.gif";
 import { toast } from "react-toastify";
+import { APIContext } from "../../contexts/APIContext.jsx";
 
 function Submission() {
     const [form, setForm] = useState({
         name: "",
         description: "",
         image: null,
-        file: null,
+        automaton_node: null,
+        automaton_lib: null,
+        automaton_exp: null,
     });
     const [filePaths, setFilePaths] = useState({
-        automaton: "",
+        automaton_node: "",
+        automaton_lib: "",
+        automaton_exp: "",
         image: ""
     });
+    const { addAlgorithm } = useContext(APIContext);
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -24,7 +30,7 @@ function Submission() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!form.name || !form.description || !form.file) {
+        if (!form.name || !form.description || !form.automaton_exp || !form.automaton_lib || !form.automaton_node) {
             toast.error("Please fill in all fields and select a file.", {
                 position: "top-right",
                 autoClose: 5000,
@@ -36,8 +42,11 @@ function Submission() {
             });
             return;
         }
-        alert(`Name: ${form.name}\nDescription: ${form.description}\nFile: ${form.file ? form.file.name : "No file selected"}`);
         // Send to the API
+        addAlgorithm(form).then((response) => {
+        }).catch((error) => {
+            console.error("Error adding algorithm:", error);
+        });
     };
 
     const handleRemoveFile = () => {
@@ -47,17 +56,17 @@ function Submission() {
         }));
     }
 
-    const handleImportFile = async () => {
-        const filePath = await window.electron.openDialog("node");
+    const handleImportFile = async (extension) => {
+        const filePath = await window.electron.openDialog(extension);
         if (!filePath || filePath == null) return;
         setFilePaths((prev) => ({
             ...prev,
-            automaton: filePath,
+            [`automaton_${extension}`]: filePath,
         }));
         const file = await window.electron.loadFile(filePath);
         setForm((prev) => ({
             ...prev,
-            file: file,
+            [`automaton_${extension}`]: file,
         }));
     }
 
@@ -189,10 +198,10 @@ function Submission() {
 
                         <h2 className="text-yellow-200 text-center text-xl mb-5">! Automaton must have .node extension !</h2>
                         {
-                            !form.file ?
+                            !form.automaton_node ?
                                 <button
                                     type="button"
-                                    onClick={handleImportFile}
+                                    onClick={() => handleImportFile("node")}
                                     className="bg-midnight-purple text-white w-full py-2 px-4 rounded hover:bg-midnight-purple-dark"
                                 >
                                     Import file
@@ -201,7 +210,61 @@ function Submission() {
                             <div className="flex flex-row w-full justify-between items-center my-2 p-2 h-16 bg-midnight-opacity rounded">
                                 <p>
                                     <span className="text-sm text-center max-w-xs overflow-hidden text-ellipsis">
-                                        {filePaths.automaton.split("\\").pop()}
+                                        {filePaths.automaton_node.split("\\").pop()}
+                                    </span>
+                                </p>
+                                <button onClick={handleRemoveFile} type="button" className="hover:bg-red-500 rounded w-1/12 h-full">X</button>
+                            </div>
+                        }
+                    </div>
+
+                    <div>
+                        <label className="w-full justify-center flex flex-col items-center">
+                            <span className="w-full text-left">Automaton:</span>
+                        </label>
+
+                        <h2 className="text-yellow-200 text-center text-xl mb-5">! Automaton must have .lib extension !</h2>
+                        {
+                            !form.automaton_lib ?
+                                <button
+                                    type="button"
+                                    onClick={() => handleImportFile("lib")}
+                                    className="bg-midnight-purple text-white w-full py-2 px-4 rounded hover:bg-midnight-purple-dark"
+                                >
+                                    Import file
+                                </button>
+                            :
+                            <div className="flex flex-row w-full justify-between items-center my-2 p-2 h-16 bg-midnight-opacity rounded">
+                                <p>
+                                    <span className="text-sm text-center max-w-xs overflow-hidden text-ellipsis">
+                                        {filePaths.automaton_lib.split("\\").pop()}
+                                    </span>
+                                </p>
+                                <button onClick={handleRemoveFile} type="button" className="hover:bg-red-500 rounded w-1/12 h-full">X</button>
+                            </div>
+                        }
+                    </div>
+
+                    <div>
+                        <label className="w-full justify-center flex flex-col items-center">
+                            <span className="w-full text-left">Automaton:</span>
+                        </label>
+
+                        <h2 className="text-yellow-200 text-center text-xl mb-5">! Automaton must have .exp extension !</h2>
+                        {
+                            !form.automaton_exp ?
+                                <button
+                                    type="button"
+                                    onClick={() => handleImportFile("exp")}
+                                    className="bg-midnight-purple text-white w-full py-2 px-4 rounded hover:bg-midnight-purple-dark"
+                                >
+                                    Import file
+                                </button>
+                            :
+                            <div className="flex flex-row w-full justify-between items-center my-2 p-2 h-16 bg-midnight-opacity rounded">
+                                <p>
+                                    <span className="text-sm text-center max-w-xs overflow-hidden text-ellipsis">
+                                        {filePaths.automaton_exp.split("\\").pop()}
                                     </span>
                                 </p>
                                 <button onClick={handleRemoveFile} type="button" className="hover:bg-red-500 rounded w-1/12 h-full">X</button>

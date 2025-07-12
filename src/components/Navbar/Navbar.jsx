@@ -23,10 +23,6 @@ const icons = [
     {
         name: "Settings",
         icon: SettingImage
-    },
-    {
-        name: "Playground",
-        icon: SettingImage
     }
 ];
 

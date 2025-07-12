@@ -69,7 +69,7 @@ export const APIProvider = ({ children }) => {
         }
     };
 
-    const addAlgorithm = async (algorithmData) => {
+    const addAlgorithm = async (algorithmForm) => {
         const url = `${apiUrl}/automaton`;
     }
 
@@ -94,7 +94,7 @@ export const APIProvider = ({ children }) => {
     }
 
     const addAlgorithmComment = async (commentData) => {
-        const url = `${apiUrl}/comment`;
+        const url = `${apiUrl}/automaton_comment`;
 
         console.log("Comment Data:", commentData);
         try {
@@ -124,8 +124,19 @@ export const APIProvider = ({ children }) => {
         }
     };
 
+    const getAlgorithmComments = async (algorithmId) => {
+        const url = `${apiUrl}/automaton_comment/automaton/${algorithmId}`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    };
+
     return (
-        <APIContext.Provider value={{ apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms, addAlgorithmComment }}>
+        <APIContext.Provider value={{ apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms, addAlgorithmComment, getAlgorithmComments }}>
             {children}
         </APIContext.Provider>
     );

@@ -1,23 +1,31 @@
 import React, {useState} from "react";
 import like from "../../../assets/images/like.svg";
 import dislike from "../../../assets/images/dislike.svg";
+import { formatDistance } from "date-fns";
 
 const Comment = ({ comment, reply }) => {
     const [isResponsesLoaded, setIsResponsesLoaded] = useState(false);
 
+    const test = () => {
+        console.log("Commentaire", comment);
+    }
     return (
         <div className="flex flex-col w-full gap-2 p-2">
             <div id="author" className="flex flex-row justify-start items-baseline w-full gap-2 text-sm font-bold text-midnight-text">
-                <img src={comment.image} alt="Author" className="h-10 w-10 rounded-full"/>
-                <p>Author</p>
-                <p className="text-xs">13 minutes ago</p>
+                {
+                    comment.image ?
+                    <img src={comment.image} alt="Author" className="h-10 w-10 rounded-full"/>
+                    : <div className="h-10 w-10 rounded-full bg-midnight-purple"></div>
+                }
+                <p>{comment.posted_by.username}</p>
+                <p className="text-xs">{formatDistance(new Date(comment.inserted_at), new Date(), { addSuffix: true })}</p>
             </div>
 
             <div id="text" className="flex flex-row justify-start items-start w-full text-sm font-bold text-midnight-text overflow-hidden text-justify">
-                {comment.body}
+                {comment.contents}
             </div>
 
-            <div id="reaction" className="w-full flex flex-row justify-start items-center gap-2 text-sm font-bold text-midnight-text">
+            {/* <div id="reaction" className="w-full flex flex-row justify-start items-center gap-2 text-sm font-bold text-midnight-text">
                 <button id="comment-like" className="flex flex-row items-center rounded-md hover:bg-midnight transition ease-in-out duration-300 h-10 p-2 gap-2">
                     <img src={like} alt="Like" className="h-7 w-7"/>
                     <p>80</p>
@@ -32,9 +40,9 @@ const Comment = ({ comment, reply }) => {
                             <p>Reply</p>
                         </button>
                 }
-            </div>
+            </div> */}
             
-            {
+            {/* {
                 reply === true ? null :
                     <div id="responses" className="flex flex-col w-full gap-2 text-sm font-bold text-midnight-purple">
                         <button className="flex items-center w-fit rounded-md hover:bg-midnight transition ease-in-out duration-300 h-10 p-2"
@@ -55,9 +63,9 @@ const Comment = ({ comment, reply }) => {
                                         ))
                                     }
                                 </div> : null
-                        }
+                        } 
                     </div>
-            }
+            } */}
         </div>
     );
 };

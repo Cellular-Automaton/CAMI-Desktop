@@ -7,11 +7,11 @@ import view from "../../../assets/images/view.svg";
 import download from "../../../assets/images/download.svg";
 import Comment from "../Comment/Comment.jsx";
 import spinner from "../../../assets/images/spinner.svg";
-import { v4 as uuidv4, parse as uuidParse } from "uuid";
 import { UserContext } from "../../contexts/UserContext.jsx";
 import { APIContext } from "../../contexts/APIContext.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 
 const Informations = ({algorithm, onCloseCallback}) => {
@@ -20,17 +20,17 @@ const Informations = ({algorithm, onCloseCallback}) => {
     const [comments, setComments] = useState([]);
     const [isAlgorithmInstalled, setIsAlgorithmInstalled] = useState(false);
     const { userData, loggedIn } = useContext(UserContext);
-    const { addAlgorithmComment } = useContext(APIContext);
+    const { addAlgorithmComment, getAlgorithmComments } = useContext(APIContext);
     const { setSelectedAlgorithm } = useContext(SimulationContext);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (algorithm !== null && algorithm !== undefined && Object.keys(algorithm).length !== 0) {
             setIsAlgorithmPresent(true);
+            fetchComments();
         } else {
             setIsAlgorithmPresent(false);
         }
-        console.log("Algorithm in Informations:", algorithm);
         window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
             if (isInstalled) {
                 console.log("Algorithm is installed");
@@ -40,6 +40,12 @@ const Informations = ({algorithm, onCloseCallback}) => {
                 setIsAlgorithmInstalled(false);
             }
         })
+
+        if (algorithm === null || algorithm === undefined || Object.keys(algorithm).length === 0) {
+            console.log("Algorithm is present:", algorithm);
+            // Fetch comments for the algorithm
+            
+        }
     }, [algorithm]);
 
     const resetScroll = () => {
@@ -51,24 +57,23 @@ const Informations = ({algorithm, onCloseCallback}) => {
         }
     };
 
+    const fetchComments = () => {
+        getAlgorithmComments(algorithm.automaton_id)
+            .then((fetchedComments) => {
+                setComments(fetchedComments);
+                setIsCommentFetchComplete(true);
+            })
+            .catch((error) => {
+                console.error("Error fetching comments:", error);
+                toast.error("Failed to fetch comments.");
+            });
+    };
+
     const onSubmitComment = (formData) => {
-        // Convert user_id and algorithm_id to hexadecimal strings
-        console.log("User ID:", userData.user_id);
-        console.log("Algorithm ID:", algorithm.id);
-        console.log(userData);
-        console.log(algorithm);
-        const postedByBinary = uuidParse(userData.user_id);
-        const algorithmBinary = uuidParse(algorithm.automaton_id);
-
-        const postedByHex = Buffer.from(postedByBinary).toString('hex');
-        const algorithmHex = Buffer.from(algorithmBinary).toString('hex');
-
-        console.log("Posted By Hex:", postedByHex);
-        console.log("Algorithm Hex:", algorithmHex);
         const commentData = {
-            comment : {
-                user_id: postedByHex,
-                algorithm_id: algorithmHex,
+            automaton_comment : {
+                posted_by: userData.user_id,
+                automaton_id: algorithm.automaton_id,
                 contents: formData.get("comment")
             }
         };
@@ -77,11 +82,15 @@ const Informations = ({algorithm, onCloseCallback}) => {
         addAlgorithmComment(commentData)
             .then((response) => {
                 console.log("Comment added successfully:", response);
-                // Optionally, you can update the UI or state here
+                // Reset the form
+                document.getElementById("own-comment").reset();
+                fetchComments();
+
             })
             .catch((error) => {
                 console.error("Error adding comment:", error);
             });
+
     }
 
     const handleLaunchAlgorithm = () => {
@@ -103,10 +112,9 @@ const Informations = ({algorithm, onCloseCallback}) => {
             </button>
 
             <div id="information-container" className="flex flex-row justify-center w-full h-full gap-5 p-4 scroll-smooth">
-                <div id="algorithm" className="h-full w-fit px-5 gap-5 overflow-y-scroll">
+                <div id="algorithm" className="h-full w-4/5 px-5 gap-5 overflow-y-scroll">
 
                     <div id="algorithm-infos" className="flex flex-col justify-center items-center w-full h-3/4 gap-2 p-4 rounded-md overflow-hidden bg-midnight-opacity shadow-md shadow-midnight-purple-shadow mb-5">
-
                         <div id={"image-container"} className="flex flex-col justify-center items-center w-full h-3/5 gap-3 transition ease-in-out duration-150 overflow-hidden">
                             <img src={algorithm.image ? algorithm.image : "https://asset.gecdesigns.com/img/background-templates/gradient-triangle-abstract-background-template-10032405-1710079376651-cover.webp"} alt="Algorithm" className="h-full w-full object-cover z-50"/>
                         </div>
@@ -116,7 +124,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
                                 {algorithm.name}
                             </p>
 
-                            <div id="algorithm-like" className="flex flex-row w-full justify-end gap-2 text-sm font-bold text-midnight-text">
+                            {/* <div id="algorithm-like" className="flex flex-row w-full justify-end gap-2 text-sm font-bold text-midnight-text">
                                 <button id="algorithm-dislike" className="flex flex-row items-center rounded-md hover:bg-midnight transition ease-in-out duration-300 h-10 p-2 gap-2">
                                     <img src={like} alt="Like" className="h-7 w-7"/>
                                     <p>1k</p>
@@ -125,11 +133,11 @@ const Informations = ({algorithm, onCloseCallback}) => {
                                     <img src={dislike} alt="Dislike" className="h-7 w-7"/>
                                     <p>3</p>
                                 </button>
-                            </div>
+                            </div> */}
 
                         </div>
 
-                        <div id="statistics" className="flex flex-row justify-start w-full text-sm font-bold text-midnight-text gap-4">
+                        {/* <div id="statistics" className="flex flex-row justify-start w-full text-sm font-bold text-midnight-text gap-4">
                             <div id="view" className="flex flex-row justify-center items-center gap-1">
                                 <img src={view} alt="View" className="h-7 w-7"/>
                                 <p>2k{algorithm.view}</p>
@@ -138,7 +146,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
                                 <img src={download} alt="Download" className="h-7 w-7"/>
                                 <p>898{algorithm.download}</p>
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* <div id="tags" className="flex flex-row justify-start w-full font-bold text-midnight-text gap-2 pb-2">
                             {
@@ -158,7 +166,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
 
                     <div id="comments" className="flex flex-col justify-center items-center w-full gap-2 p-4 rounded-md overflow-hidden bg-midnight-opacity shadow-md shadow-midnight-purple-shadow mb-5">
                         <div id="comment-title" className="flex flex-row justify-start w-full text-2xl font-bold text-midnight-text">
-                            {/*{algorithm.comments.lenght}*/}96 comments
+                            {comments.length} Comments
                         </div>
 
                         {
