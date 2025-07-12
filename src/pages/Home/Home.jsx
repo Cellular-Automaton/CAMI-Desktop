@@ -44,7 +44,9 @@ export default function Home() {
         getAlgorithms().then((algorithms) => {
             console.log("Fetched algorithms:", algorithms);
             setRecentAlgorithms(algorithms.slice(0, 5));
-        })
+        }).catch((error) => {
+            console.error("Error fetching recent algorithms:", error);
+        });
     }, []);
 
     const openInformationPanel = (algorithm) => {
