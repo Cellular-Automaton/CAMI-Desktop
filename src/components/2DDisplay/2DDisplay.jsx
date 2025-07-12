@@ -22,7 +22,6 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
         }).catch((error) => {
             console.error("Error initializing PixiJS Application:", error);
         });
-        console.log("Color scale initialized:", colorScale(0.5).hex());
     }, []);
 
     useEffect(() => {
@@ -110,9 +109,6 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
     const createGrid = (gSize) => {
         containerRef.current.removeChildren();
         setCellInstances([]);
-        console.log(cellInstances.length);
-
-        console.log("Creating grid with size:", gSize);
         for (let i = 0; i < gSize * gSize; i += 1) {
             const cell = new RangedCell(
                 (i % gSize), Math.floor(i / gSize),
@@ -120,7 +116,6 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
             );
             containerRef.current.addChild(cell.shape);
             setCellInstances(prev => [...prev, cell]);
-            console.log(i, cellInstances[i]);
         }
     };
 

@@ -3,6 +3,7 @@ import Home from "./pages/Home/Home.jsx";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { SimulationProvider, useSimulation } from "./contexts/SimulationContext.jsx";
+import { ToastContainer } from "react-toastify";
 
 import Navbar from "./components/Navbar/Navbar.jsx";
 import Playground from "./pages/Playground/Playground.jsx";
@@ -24,20 +25,33 @@ export default function App() {
                 <div className="fixed h-full top-0 left-0 w-16 bg-midnight"></div>
                 <Navbar />
                 <div className="flex-grow h-full w-full pl-16">
-                    <Routes>
-                        <Route path="/Home" element={<Home />} />
-                        <Route path="/Playground" 
-                            element={
-                                <SimulationProvider>
-                                    <Playground/>
-                                </SimulationProvider>
-                            }/>
-                        <Route path="/Information" element={<SimulationInformation/>} />
-                        <Route path="/Community" element={<Community/>} />
-                        <Route path="/Connection" element={<Connection/>} />
-                        <Route path="/Submission" element={<Submission/>} />
-                        <Route path="/*" element={<NotFound/>}/>
-                    </Routes>
+                    <ToastContainer 
+                        position="top-right"
+                        autoClose={5000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        theme="dark"
+                        toastStyle={{ backgroundColor: "#242423", color: "#ffffff" }}
+                    />
+                    <SimulationProvider>
+                        <Routes>
+                            <Route path="/Home" element={<Home />} />
+                            <Route path="/Playground" 
+                                element={
+                                        <Playground/>
+                                }/>
+                            <Route path="/Information" element={<SimulationInformation/>} />
+                            <Route path="/Community" element={<Community/>} />
+                            <Route path="/Connection" element={<Connection/>} />
+                            <Route path="/Submission" element={<Submission/>} />
+                            <Route path="/*" element={<NotFound/>}/>
+                        </Routes>
+                    </SimulationProvider>
                 </div>
             </div>
         </Router>

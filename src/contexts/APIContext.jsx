@@ -1,5 +1,7 @@
 import axios from "axios";
 import React, { createContext, useContext, useState } from "react";
+import { toast } from "react-toastify";
+
 
 export const APIContext = createContext();
 
@@ -12,9 +14,26 @@ export const APIProvider = ({ children }) => {
         try {
             const response = await axios.post(url, formData);
             const data = response.data;
+            toast.success("Login successful!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
             return data;
         } catch (error) {
-            alert("Login failed. Please try again. : " + error.message);
+            toast.error("Login failed. Please try again." + error.message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
             throw error;
         }
     };
@@ -24,10 +43,27 @@ export const APIProvider = ({ children }) => {
         try {
             const response = await axios.post(url, formData);
             const data = response.data;
+            toast.success("Account created successfully!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
             return data;
         } catch (error) {
             if (error.response && error.response.status === 422) {
-                alert("Username or email already exists. Please try again with different credentials.");
+                toast.error("Username or email already exists. Please try again with different credentials.", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "dark",
+                });
             }
             throw error;
         }
@@ -44,7 +80,15 @@ export const APIProvider = ({ children }) => {
             const data = response.data.data;
             return data;
         } catch (error) {
-            alert("Failed to fetch algorithms. Please try again. : " + error.message);
+            toast.error('Failed to fetch recent algorithms. Please try later.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
             throw error;
         }
     }
@@ -56,9 +100,26 @@ export const APIProvider = ({ children }) => {
         try {
             const response = await axios.post(url, commentData);
             const data = response.data;
+            toast.success("Comment added successfully!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
             return data;
         } catch (error) {
-            alert("Failed to add comment. Please try again. : " + error.message);
+            toast.error("Failed to add comment. Please try again. : " + error.message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
             throw error;
         }
     };

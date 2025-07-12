@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext.jsx";
 
 import bcrypt from "bcryptjs";
+import { toast } from "react-toastify";
 import { APIContext } from "../../contexts/APIContext.jsx";
 
 export default function Connection() {
@@ -74,7 +75,15 @@ export default function Connection() {
             setToken(token);
             navigate("/Home");
         }).catch((error) => {
-            console.error("Error logging in:", error);
+            toast.error("Login failed. Please try again." + error.message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
         });
     }
 

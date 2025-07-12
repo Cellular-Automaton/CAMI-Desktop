@@ -2,31 +2,75 @@ import React, { useState, useEffect, useRef, useContext } from "react";
 import SimulationPlayer from "../../components/SimulationPlayer/SimulationPlayer.jsx";
 import TwoDDisplay from "../../components/2DDisplay/2DDisplay.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
+import { toast } from "react-toastify";
 
 export default function Playground() {
     const [gridSize, setGridSize] = useState(10);
+    const [parameters, setParameters] = useState({});
     const [gap, setGap] = useState(5);
     const [response, setResponse] = useState([]);
 
     const { 
         startSimulation, stopSimulation, 
         isSimulationRunning, clearAll,
-        importSimulation, exportSimulation
+        importSimulation, exportSimulation, getSimulationParameters 
     } = useContext(SimulationContext);
 
     useEffect(() => {
-        return () => {
-            clearAll(); // Clear all when the component unmounts
+        try {
+            getSimulationParameters().then((params) => {
+                const tmp = {};
+                console.log("Simulation Parameters:", params);
+                // delete first parameter because not needed
+                params.shift();
+                params.map((param, index) => {
+                    const [name, type] = param.split(':');
+                    tmp[name] = {
+                        type: type,
+                        value: ""
+                    };
+                });
+                setParameters(tmp);
+                console.log("Parameters set:", tmp);
+            });
+        } catch (error) {
+            console.error("Error fetching simulation parameters:", error);
+            toast.error("Error fetching simulation parameters: " + error.message);
         }
         return () => {
-            if (isSimulationRunning) {
-                stopSimulation();
-            }
+            console.log("Cleaning up Playground component");
+            stopSimulation();
+            clearAll();
         }
     }, []);
 
+    useEffect(() => {
+        if (parameters && Object.keys(parameters).length < 0)
+            return;
+        setParameters(prev => {
+            const updated = { ...prev };
+            Object.keys(updated).forEach(key => {
+                if (key.toLowerCase() === "width" || key.toLowerCase() === "height") {
+                    updated[key] = {
+                        ...updated[key],
+                        value: gridSize
+                    };
+                }
+            });
+            return updated;
+        });
+    }, [gridSize]);
+
     const onStartSimulation = async () => {
-        await startSimulation(gridSize);
+        const params = Object.keys(parameters).map(key => parameters[key].value);
+        Object.keys(params).forEach(key => {
+            console.log(`Parameter ${key}:`, params[key]);
+            if (key.toLowerCase() === "width" || key.toLowerCase() === "height") {
+                params[key] = gridSize;
+            }
+        });
+        console.log("Starting simulation with parameters:", params);
+        await startSimulation(gridSize, params);
     }
 
     const onStopSimulation = () => {
@@ -38,12 +82,34 @@ export default function Playground() {
             <div className="flex flex-col justify-center absolute right-4 w-1/4 h-full bg-transparent z-50 pointer-events-none">
                 <div id="configuration-panel" className="flex flex-col w-full bg-midnight-opacity p-4 rounded-lg font-mono gap-4 pointer-events-auto">
                     <div id="configurations" className="flex flex-col gap-4 ">
-                        {/* 
-                            Ask to the app all the configuartion elements of the simulation such as : Size, Rules, etc...
-                            Currently, the configuration panel is empty so Size as a functionnal placeholder
-                            Should be in JSON format like this : {"name": "format"}
-                            example : {"size": "number", "rules": "string", etc...}
-                        */}
+                        {
+                            Object.keys(parameters).length > 0 ? (
+                                Object.keys(parameters).map((key) => {
+                                    return (
+                                        <div key={key} className="flex flex-col w-full">
+                                            <label className="text-white">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                                            <input
+                                                className="text-white bg-midnight-opacity rounded-md"
+                                                type={parameters[key].type.toLowerCase() === "number" ? "number" : "text"}
+                                                value={parameters[key].value}
+                                                disabled={isSimulationRunning}
+                                                onChange={(e) => {
+                                                    setParameters(prev => ({
+                                                        ...prev,
+                                                        [key]: {
+                                                            ...prev[key],
+                                                            value: e.target.value
+                                                        }
+                                                    }));
+                                                }}
+                                            />
+                                        </div>
+                                    )
+                                })
+                            ) : (
+                                <p className="text-white">Loading parameters...</p>
+                            )
+                        }
                         <div id="size" className="flex flex-col w-full">
                             <label className="text-white">Size</label>
                             <input 

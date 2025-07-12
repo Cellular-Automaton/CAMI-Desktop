@@ -7,16 +7,22 @@ import view from "../../../assets/images/view.svg";
 import download from "../../../assets/images/download.svg";
 import Comment from "../Comment/Comment.jsx";
 import spinner from "../../../assets/images/spinner.svg";
+import { v4 as uuidv4, parse as uuidParse } from "uuid";
 import { UserContext } from "../../contexts/UserContext.jsx";
 import { APIContext } from "../../contexts/APIContext.jsx";
-import { v4 as uuidv4, parse as uuidParse } from "uuid";
+import { SimulationContext } from "../../contexts/SimulationContext.jsx";
+import { useNavigate } from "react-router-dom";
+
 
 const Informations = ({algorithm, onCloseCallback}) => {
     const [isAlgorithmPresent, setIsAlgorithmPresent] = useState(false);
     const [isCommentFetchComplete, setIsCommentFetchComplete] = useState(false);
     const [comments, setComments] = useState([]);
+    const [isAlgorithmInstalled, setIsAlgorithmInstalled] = useState(false);
     const { userData, loggedIn } = useContext(UserContext);
     const { addAlgorithmComment } = useContext(APIContext);
+    const { setSelectedAlgorithm } = useContext(SimulationContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (algorithm !== null && algorithm !== undefined && Object.keys(algorithm).length !== 0) {
@@ -24,6 +30,16 @@ const Informations = ({algorithm, onCloseCallback}) => {
         } else {
             setIsAlgorithmPresent(false);
         }
+        console.log("Algorithm in Informations:", algorithm);
+        window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
+            if (isInstalled) {
+                console.log("Algorithm is installed");
+                setIsAlgorithmInstalled(true);
+            } else {
+                console.log("Algorithm is not installed");
+                setIsAlgorithmInstalled(false);
+            }
+        })
     }, [algorithm]);
 
     const resetScroll = () => {
@@ -67,6 +83,11 @@ const Informations = ({algorithm, onCloseCallback}) => {
                 console.error("Error adding comment:", error);
             });
     }
+
+    const handleLaunchAlgorithm = () => {
+        setSelectedAlgorithm(algorithm);
+        navigate('/Playground');
+    };
 
     return (
         <div id="container" className="flex flex-col max-h-screen min-h-screen w-full relative bg-midnight p-5 z-50">
@@ -197,11 +218,18 @@ const Informations = ({algorithm, onCloseCallback}) => {
                             }
                         </div>
                     </div>
-
-                    <button id="download" className="flex justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
-                        transition ease-in-out duration-300 hover:bg-midnight-purple">
-                        Download
-                    </button>
+                    {
+                        isAlgorithmInstalled ?
+                            <button onClick={handleLaunchAlgorithm} id="install" className="flex justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
+                                transition ease-in-out duration-300 hover:bg-midnight-purple">
+                                Launch
+                            </button>
+                            :
+                            <button id="download" className="flex justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
+                                transition ease-in-out duration-300 hover:bg-midnight-purple">
+                                Download
+                            </button>
+                    }
 
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import gol from "../../../assets/images/gol2.gif";
+import { toast } from "react-toastify";
 
 function Submission() {
     const [form, setForm] = useState({
@@ -24,7 +25,15 @@ function Submission() {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!form.name || !form.description || !form.file) {
-            alert("Please fill in all fields and select a file.");
+            toast.error("Please fill in all fields and select a file.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
             return;
         }
         alert(`Name: ${form.name}\nDescription: ${form.description}\nFile: ${form.file ? form.file.name : "No file selected"}`);

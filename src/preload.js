@@ -18,4 +18,8 @@ contextBridge.exposeInMainWorld('electron', {
   getParametersTypes: (params) => ipcRenderer.invoke('get-parameters-types', params),
   getParametersTypes: (params) => ipcRenderer.invoke('get-plugin-id-by-name', params),
   getParametersTypes: (params) => ipcRenderer.invoke('get-plugin-names', params),
+
+  // Manager related IPC calls
+  isAlgorithmInstalled: (params) => ipcRenderer.invoke('is-algorithm-installed', params),
+  getAlgorithmParameters: (params) => ipcRenderer.invoke('get-simulation-parameters', params),
 });

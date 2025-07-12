@@ -8,10 +8,11 @@ export const SimulationProvider = ({ children }) => {
     const [fetchInterval, setFetchInterval] = useState(null);
     const [isSimulationRunning, setIsSimulationRunning] = useState(false);
     const [importedData, setImportedData] = useState(null);
+    const [selectedAlgorithm, setSelectedAlgorithm] = useState(null);
 
-    const startSimulation = (gridSize) => {
+    const startSimulation = (gridSize, params) => {
         setIsSimulationRunning(true);
-        setFetchInterval(setInterval(() => getSimulationData(gridSize), 150));
+        setFetchInterval(setInterval(() => getSimulationData(gridSize, params), 50));
     };
 
     const stopSimulation = () => {
@@ -22,11 +23,12 @@ export const SimulationProvider = ({ children }) => {
         }
     };
 
-    const getSimulationData = async (gridSize) => {
+    const getSimulationData = async (gridSize, params) => {
         try {
             const table = cellInstances.map(cell => cell.state);
-            const parameters = [1, table, 13, 0.5, 0.15, 0.15, 0.015, new Number(gridSize), new Number(gridSize)];
-            //const parameters = [0, table, new Number(gridSize), new Number(gridSize)];
+            console.log(params);
+            const parameters = [selectedAlgorithm.automaton_id, table, ...params];
+            console.log("Parameters sent to plugin:", parameters);
             const response = await window.electron.callPlugin(parameters);
             setResponse(response);
         } catch (error) {
@@ -63,11 +65,21 @@ export const SimulationProvider = ({ children }) => {
         window.electron.send('save-json', data);
     }
 
+    const getSimulationParameters = async () => {
+        try {
+            const response = await window.electron.getAlgorithmParameters([selectedAlgorithm.automaton_id]);
+            return response;
+        } catch (error) {
+            console.error("Error fetching simulation parameters:", error);
+        }
+    };
+
     return (
         <SimulationContext.Provider value={{
             startSimulation, stopSimulation, response, setResponse,
             cellInstances, setCellInstances, isSimulationRunning,
-            clearAll, importSimulation, exportSimulation, importedData, setImportedData
+            clearAll, importSimulation, exportSimulation, importedData, setImportedData,
+            selectedAlgorithm, setSelectedAlgorithm, getSimulationParameters
         }}>
             {children}
         </SimulationContext.Provider>

@@ -45,7 +45,12 @@ export default function Home() {
             console.log("Fetched algorithms:", algorithms);
             setRecentAlgorithms(algorithms.slice(0, 5));
         }).catch((error) => {
-            console.error("Error fetching recent algorithms:", error);
+            document.getElementById("loading-recent-algorithms").style.display = "none";
+            document.getElementById("loading-new-algorithms").style.display = "none";
+            if (loggedIn)
+                document.getElementById("loading-favorite-algorithms").style.display = "none";
+
+            console.error("Error fetching algorithms:", error);
         });
     }, []);
 
@@ -108,7 +113,7 @@ export default function Home() {
 
                 {
                     recentAlgorithms.length === 0 ?
-                        <div className="flex justify-center items-center h-10 w-full">
+                        <div id="loading-recent-algorithms" className="flex justify-center items-center h-10 w-full">
                             <img src={spinner} alt="Loading..." className="animate-spin h-10 w-10" />
                         </div>
                         :
@@ -121,7 +126,7 @@ export default function Home() {
 
                 {
                     recentAlgorithms.length === 0 ?
-                        <div className="flex justify-center items-center h-10 w-full">
+                        <div id="loading-new-algorithms" className="flex justify-center items-center h-10 w-full">
                             <img src={spinner} alt="Loading..." className="animate-spin h-10 w-10" />
                         </div>
                         :
@@ -136,7 +141,7 @@ export default function Home() {
                     <h2 className="text-midnight-text text-3xl text-left">Favorites</h2>
                     {
                         favoriteAlgorithms.length === 0 ?
-                            <div className="flex justify-center items-center h-10 w-full">
+                            <div id="loading-favorite-algorithms" className="flex justify-center items-center h-10 w-full">
                                 <img src={spinner} alt="Loading..." className="animate-spin h-10 w-10" />
                             </div>
                             :
