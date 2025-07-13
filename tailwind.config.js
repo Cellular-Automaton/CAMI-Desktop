@@ -9,10 +9,13 @@ module.exports = {
       mono: ['JetBrains Mono', 'monospace'],
     },
       colors: {
-        'midnight': '#474746',
+        'midnight': '#242423',
         'midnight-opacity': '#47474650',
         'midnight-text': '#BDBDBD',
-        'midnight-purple': '#7F6EEE'
+        'midnight-purple': '#7F6EEE',
+        'midnight-purple-dark': '#6B5BB8',
+        'midnight-purple-shadow': '#9a8df2',
+        'midnight-red': '#C62828'
       }
     },
   },

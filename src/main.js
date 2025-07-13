@@ -1,28 +1,39 @@
-import { app, BrowserWindow } from "electron";
-import path from "node:path";
-import started from "electron-squirrel-startup";
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import path from 'node:path';
+import fs from 'node:fs';
+//import started from 'electron-squirrel-startup';
+import {load_starting_plugin, load_plugins_params, load_manager} from './plugins_handling.js';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (started) {
+/*if (started) {
   app.quit();
-}
+}*/
+
+await load_starting_plugin()
+await load_manager()
+load_plugins_params()
+//test_simulate_gol_test()
+
+let mainWindow;
 
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     minHeight: 600,
     minWidth: 800,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      nodeIntegration: true,
+      contextIsolation: true
     },
     autoHideMenuBar: true,
     // frame: false Pour être frameless
   });
 
-  // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  console.log(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
@@ -51,6 +62,56 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
-
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+ipcMain.on('save-json', (event, data) => {
+  const filePath = dialog.showSaveDialogSync(mainWindow, {
+    title: 'Save Simulation',
+    defaultPath: path.join(app.getPath('documents'), 'simulation.json'),
+    filters: [{ name: 'JSON Files', extensions: ['json'] }]
+  });
+
+  if (!filePath) {
+    console.log('Save dialog was cancelled', filePath);
+    return;
+  }
+
+  if (filePath) {
+    console.log('Saving file to:', filePath, 'with data:', data);
+
+    fs.writeFile(filePath, data, (err) => {
+      if (err) {
+        console.error('Error saving file:', err);
+        dialog.showErrorBox('Error', 'Failed to save the file.');
+      } else {
+        dialog.showMessageBox(mainWindow, {
+          type: 'info',
+          title: 'Success',
+          message: 'Simulation saved successfully!'
+        });
+      }
+    });
+  }
+});
+
+ipcMain.handle('open-dialog', async (e, fileExtension) => {
+  const {canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile'],
+    filters: [{ name: 'Files', extensions: fileExtension.split(" ") }]
+  });
+
+  if (canceled) {
+    console.log('Open dialog was cancelled');
+    return null;
+  }
+  return filePaths[0];
+});
+
+ipcMain.handle('load-text-file', async (event, filePath) => {
+  return fs.promises.readFile(filePath, 'utf-8');
+});
+
+ipcMain.handle('load-file', async (event, filePath) => {
+  return fs.promises.readFile(filePath);
+});
