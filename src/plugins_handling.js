@@ -1,6 +1,7 @@
 export {load_starting_plugin, load_plugins_params, load_manager};
     import plugin from '@tailwindcss/forms';
 import fs from 'node:fs';
+import { version } from 'node:os';
 import path from 'node:path';
 const { app, ipcMain } = require('electron');
 
@@ -122,16 +123,49 @@ ipcMain.handle('delete-plugin', async (event, param) => {
     await fs.promises.rm(param[0]);
 });
 
+// ipcMain.handle('install-plugin', async (event, param) => {
+//     console.log(param)
+//     if (!app.isPackaged)
+//         throw new Error("App is not packaged. Cant modify plugins");
+//     await fs.promises.access(param[0]);
+//     var split = path.split('-');
+//     var full_path = path.join(process.resourcesPath, 'Plugins/' + split[-1]);
+//     await fs.promises.copyFile(path, full_path,fs.constants.COPYFILE_EXCL);
+//     const tmp = __non_webpack_require__(full_path);
+//     plugins.push(tmp);
+// });
+
 ipcMain.handle('install-plugin', async (event, param) => {
-    console.log(param)
-    if (!app.isPackaged)
-        throw new Error("App is not packaged. Cant modify plugins");
-    await fs.promises.access(param[0]);
-    var split = path.split('-');
-    var full_path = path.join(process.resourcesPath, 'Plugins/' + split[-1]);
-    await fs.promises.copyFile(path, full_path,fs.constants.COPYFILE_EXCL);
-    const tmp = __non_webpack_require__(full_path);
-    plugins.push(tmp);
+    const json = param.data;
+    console.log("Installing plugin:", json);
+    // write my three folders in the plugins folder
+    const pluginsPath = app.isPackaged ? path.join(process.resourcesPath, 'Plugins') : path.join(app.getAppPath(), 'Plugins');
+    json.file.forEach(element => {
+        const buffer = Buffer.from(element.contents, 'base64');
+        fs.writeFileSync(path.join(pluginsPath, json.name + element.name), buffer);
+    });
+
+    // Add the plugin to the manager
+    const managerPath = app.isPackaged ? path.join(process.resourcesPath, 'Plugins/algorithms.json') : path.join(app.getAppPath(), 'Plugins/algorithms.json');
+    const managerData = JSON.parse(fs.readFileSync(managerPath, 'utf-8'));
+    var managerJson = {
+        name: json.name,
+        bdd_id: json.automaton_id,
+        version: "1.0.0",
+        path: "Plugins/" + json.name + '.node',
+        author: "Unknown",
+        license: "MIT",
+    }
+    managerData.plugins.push(managerJson);
+    fs.writeFileSync(managerPath, JSON.stringify(managerData, null, 2));
+
+    const newModule = __non_webpack_require__(path.join(pluginsPath, json.name + '.node'));
+    const parameters = newModule.get_params ? newModule.get_params() : [];
+    pluginManager.plugins.push({
+        ...managerJson,
+        module: newModule,
+        parameters: parameters
+    });
 });
 
 // First parameter is the plugin index, the rest are the parameters

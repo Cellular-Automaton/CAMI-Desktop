@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import view from "../../../assets/images/view.svg";
 import comment from "../../../assets/images/comment.svg";
 import like from "../../../assets/images/like.svg";
 import download from "../../../assets/images/download.svg";
 import Tag from "../Tags/Chip.jsx";
 import star from "../../../assets/images/star.svg";
+import { APIContext } from "../../contexts/APIContext.jsx";
+import { Chip, Tooltip } from "@mui/material";
 
 
 const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
+    const [image, setImage] = useState(null);
     const onMouseEnter = (e) => {
         const target = e.currentTarget;
         const imageContainer = target.querySelector("#image-container");
@@ -22,6 +25,16 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
         imageContainer.classList.add("blur-sm");
     };
 
+    useEffect(() => {
+        console.log("AlgorithmCard useEffect called with algorithm:", algorithm.image[0]);
+        if (algorithm.image[0] !== undefined && algorithm.image[0].contents_binary) {
+            // Si algorithm.image est déjà une chaîne base64
+            // Adapte le type MIME si besoin (png, jpeg, etc.)
+            setImage(`data:image/png;base64,${algorithm.image[0].contents_binary}`);
+        } else {
+            setImage("https://asset.gecdesigns.com/img/background-templates/gradient-triangle-abstract-background-template-10032405-1710079376651-cover.webp");
+        }
+    }, [algorithm.image]);
     return (
         <button
             id={"container"} 
@@ -42,7 +55,7 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
             }
 
             <div id={"image-container"} className="flex flex-col blur-sm justify-center items-center w-full h-3/5 gap-3 transition ease-in-out duration-150 overflow-hidden">
-                <img src={algorithm.image ? algorithm.image : "https://asset.gecdesigns.com/img/background-templates/gradient-triangle-abstract-background-template-10032405-1710079376651-cover.webp"} alt="Algorithm" className="h-full w-full object-cover overflow-hidden"/>
+                <img src={image} alt="Algorithm" className="h-full w-full object-cover overflow-hidden"/>
             </div>
 
             <div id="text-container" className="flex flex-col justify-center items-center w-full h-2/5 gap-2 p-4">
@@ -50,11 +63,18 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
                     {algorithm.name}
                 </div>
 
-                {/* <div id={"tags-container"} className="flex flex-row justify-start items-center w-full h-1/4 gap-1 pb-2">
-                    {algorithm.tags.map((tag) => (
-                        <Tag key={tag} tagName={tag}/>
-                    ))}
-                </div> */}
+                <div id={"tags-container"} className="flex flex-row justify-start items-center w-full h-1/4 gap-1 pb-2">
+                    {  
+                        algorithm.tags.map((tag) => (
+                            <Tooltip key={tag.tag_id} title={tag.tag_description} placement="bottom" arrow>
+                                <Chip 
+                                    label={tag.tag_name} size="small" variant="filled"
+                                    sx={{backgroundColor: "#7F6EEE", color: "white", fontFamily: "'JetBrains Mono', monospace", fontWeight: "bold"}}
+                                />
+                            </Tooltip>
+                        ))
+                    }
+                </div>
 
                 {/* <div id="statistics" className="flex flex-row justify-evenly w-full h-1/4 text-sm font-bold text-midnight-text">
                     <div id="view" className="flex flex-row justify-center items-center gap-1">

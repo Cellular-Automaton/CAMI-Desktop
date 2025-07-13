@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { toast } from "react-toastify";
 
 export const SimulationContext = createContext();
 
@@ -50,10 +51,15 @@ export const SimulationProvider = ({ children }) => {
         const filePath = await window.electron.openDialog("json");
 
         if (filePath) {
-            const data = await window.electron.loadTextFile(filePath);
-            const parsedData = JSON.parse(data);
-            console.log("Imported Data:", parsedData);
-            setImportedData(parsedData);
+            try {
+                const data = await window.electron.loadTextFile(filePath);
+                const parsedData = JSON.parse(data);
+                console.log("Imported Data:", parsedData);
+                setImportedData(parsedData);
+                toast.success("Simulation data imported successfully!");
+            } catch (error) {
+                toast.error("Error importing simulation data");
+            }
         }
     };
 
@@ -62,7 +68,12 @@ export const SimulationProvider = ({ children }) => {
         const data = JSON.stringify(exportedData);
 
         console.log("Exported Data:", data);
-        window.electron.send('save-json', data);
+        try {
+            window.electron.send('save-json', data);
+            toast.success("Simulation data exported successfully!");
+        } catch (error) {
+            toast.error("Error exporting simulation data");
+        }
     }
 
     const getSimulationParameters = async () => {

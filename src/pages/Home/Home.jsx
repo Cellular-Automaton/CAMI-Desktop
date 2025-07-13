@@ -19,7 +19,7 @@ const welcomeSentences = [
 
 export default function Home() {
     const { userData, loggedIn } = useContext(UserContext);
-    const { getAlgorithms } = useContext(APIContext);
+    const { getAlgorithms, getTags } = useContext(APIContext);
     const [isInformationPanelOpen, setIsInformationPanelOpen] = useState(false);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState({});
     const [sentence, setSentence] = useState(welcomeSentences[Math.floor(Math.random() * welcomeSentences.length)]);
@@ -40,6 +40,7 @@ export default function Home() {
     useEffect(() => {
         setSentence(replaceUserInSentence(welcomeSentences[Math.floor(Math.random() * welcomeSentences.length)]));
 
+        getTags();
         // Get algorithms from the API
         getAlgorithms().then((algorithms) => {
             console.log("Fetched algorithms:", algorithms);

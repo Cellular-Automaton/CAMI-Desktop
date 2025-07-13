@@ -7,7 +7,7 @@ const HorizontalScroll = ({algorithms, onClickCallback, favorite}) => {
         <div>
             <div className="flex overflow-x-auto overflow-y-visible w-full gap-4 p-4">
                 {algorithms.map((algorithm, index) => (
-                    <AlgorithmCard key={algorithm.id} algorithm={algorithm} onClickCallback={onClickCallback} favorite={favorite} />
+                    <AlgorithmCard key={algorithm.automaton_id} algorithm={algorithm} onClickCallback={onClickCallback} favorite={favorite} />
                 ))}
             </div>
         </div>

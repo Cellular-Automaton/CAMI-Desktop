@@ -18,7 +18,7 @@ const Comment = ({ comment, reply }) => {
                     : <div className="h-10 w-10 rounded-full bg-midnight-purple"></div>
                 }
                 <p>{comment.posted_by.username}</p>
-                <p className="text-xs">{formatDistance(new Date(comment.inserted_at), new Date(), { addSuffix: true })}</p>
+                <p className="text-xs opacity-80">{formatDistance(new Date(comment.inserted_at), new Date(), { addSuffix: true })}</p>
             </div>
 
             <div id="text" className="flex flex-row justify-start items-start w-full text-sm font-bold text-midnight-text overflow-hidden text-justify">

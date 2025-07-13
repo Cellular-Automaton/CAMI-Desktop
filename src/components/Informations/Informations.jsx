@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import close from "../../../assets/images/close.svg";
 import like from "../../../assets/images/like.svg";
 import dislike from "../../../assets/images/dislike.svg";
-import Chip from "../Tags/Chip.jsx";
 import view from "../../../assets/images/view.svg";
 import download from "../../../assets/images/download.svg";
 import Comment from "../Comment/Comment.jsx";
@@ -12,6 +11,7 @@ import { APIContext } from "../../contexts/APIContext.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Chip, Tooltip } from "@mui/material";
 
 
 const Informations = ({algorithm, onCloseCallback}) => {
@@ -19,8 +19,9 @@ const Informations = ({algorithm, onCloseCallback}) => {
     const [isCommentFetchComplete, setIsCommentFetchComplete] = useState(false);
     const [comments, setComments] = useState([]);
     const [isAlgorithmInstalled, setIsAlgorithmInstalled] = useState(false);
+    const [image, setImage] = useState(null);
     const { userData, loggedIn } = useContext(UserContext);
-    const { addAlgorithmComment, getAlgorithmComments } = useContext(APIContext);
+    const { addAlgorithmComment, getAlgorithmComments, downloadAlgorithm } = useContext(APIContext);
     const { setSelectedAlgorithm } = useContext(SimulationContext);
     const navigate = useNavigate();
 
@@ -28,6 +29,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
         if (algorithm !== null && algorithm !== undefined && Object.keys(algorithm).length !== 0) {
             setIsAlgorithmPresent(true);
             fetchComments();
+            setImage(algorithm.image[0].contents_binary ? `data:image/png;base64,${algorithm.image[0].contents_binary}` : "https://asset.gecdesigns.com/img/background-templates/gradient-triangle-abstract-background-template-10032405-1710079376651-cover.webp");
         } else {
             setIsAlgorithmPresent(false);
         }
@@ -44,7 +46,6 @@ const Informations = ({algorithm, onCloseCallback}) => {
         if (algorithm === null || algorithm === undefined || Object.keys(algorithm).length === 0) {
             console.log("Algorithm is present:", algorithm);
             // Fetch comments for the algorithm
-            
         }
     }, [algorithm]);
 
@@ -98,6 +99,32 @@ const Informations = ({algorithm, onCloseCallback}) => {
         navigate('/Playground');
     };
 
+    const handleDownloadAlgorithm = async () => {
+        try {
+            const response = await downloadAlgorithm(algorithm.automaton_id);
+            console.log("Download response:", response);
+            if (response.success) {
+                toast.success("Algorithm downloaded successfully!");
+                setIsAlgorithmInstalled(true);
+            } else {
+                toast.error("Failed to download algorithm.");
+            }
+            window.electron.installPlugin(response)
+            window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
+            if (isInstalled) {
+                console.log("Algorithm is installed");
+                setIsAlgorithmInstalled(true);
+            } else {
+                console.log("Algorithm is not installed");
+                setIsAlgorithmInstalled(false);
+            }
+        })
+        } catch (error) {
+            console.error("Error downloading algorithm:", error);
+            toast.error("An error occurred while downloading the algorithm.");
+        }
+    }
+
     return (
         <div id="container" className="flex flex-col max-h-screen min-h-screen w-full relative bg-midnight p-5 z-50">
 
@@ -114,9 +141,9 @@ const Informations = ({algorithm, onCloseCallback}) => {
             <div id="information-container" className="flex flex-row justify-center w-full h-full gap-5 p-4 scroll-smooth">
                 <div id="algorithm" className="h-full w-4/5 px-5 gap-5 overflow-y-scroll">
 
-                    <div id="algorithm-infos" className="flex flex-col justify-center items-center w-full h-3/4 gap-2 p-4 rounded-md overflow-hidden bg-midnight-opacity shadow-md shadow-midnight-purple-shadow mb-5">
+                    <div id="algorithm-infos" className="flex flex-col justify-center items-center w-full gap-10 p-4 rounded-md overflow-hidden bg-midnight-opacity shadow-md shadow-midnight-purple-shadow mb-5">
                         <div id={"image-container"} className="flex flex-col justify-center items-center w-full h-3/5 gap-3 transition ease-in-out duration-150 overflow-hidden">
-                            <img src={algorithm.image ? algorithm.image : "https://asset.gecdesigns.com/img/background-templates/gradient-triangle-abstract-background-template-10032405-1710079376651-cover.webp"} alt="Algorithm" className="h-full w-full object-cover z-50"/>
+                            <img src={image} alt="Algorithm" className="h-full w-full object-cover z-50"/>
                         </div>
 
                         <div id="title" className="flex flex-row w-full text-4xl font-bold text-midnight-text">
@@ -148,15 +175,18 @@ const Informations = ({algorithm, onCloseCallback}) => {
                             </div>
                         </div> */}
 
-                        {/* <div id="tags" className="flex flex-row justify-start w-full font-bold text-midnight-text gap-2 pb-2">
+                        <div id="tags" className="flex flex-row justify-start w-full font-bold text-midnight-text gap-2 pb-2">
                             {
-                                isAlgorithmPresent ? 
-                                    algorithm.tags.map((tag) => (
-                                        <Chip key={tag} tagName={tag}/>
-                                    )) :
-                                    null
+                                isAlgorithmPresent && algorithm.tags.map((tag) => (
+                                    <Tooltip key={tag.tag_id} title={tag.tag_description} placement="bottom" arrow>
+                                        <Chip 
+                                            label={tag.tag_name} size="small" variant="filled"
+                                            sx={{backgroundColor: "#7F6EEE", color: "white", fontFamily: "'JetBrains Mono', monospace", fontWeight: "bold"}}
+                                        />
+                                    </Tooltip>
+                                ))
                             }
-                        </div> */}
+                        </div>
                         
                         <div id="description" className="flex flex-row justify-start w-full h-fit text-sm font-bold text-midnight-text text-justify pb-5">
                             {algorithm.description}
@@ -203,6 +233,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
                                     :
                                     <div id="results" className="flex flex-row flex-wrap gap-x-8 gap-y-4 h-full w-full p-5 max-w-full font-mono justify-center overflow-y-auto">
                                         {comments.map((comment) => {
+                                            console.log("Comment:", comment);
                                             return (
                                                 <Comment key={comment.id} comment={comment} />
                                             )
@@ -228,12 +259,18 @@ const Informations = ({algorithm, onCloseCallback}) => {
                     </div>
                     {
                         isAlgorithmInstalled ?
-                            <button onClick={handleLaunchAlgorithm} id="install" className="flex justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
-                                transition ease-in-out duration-300 hover:bg-midnight-purple">
-                                Launch
-                            </button>
+                            <div className="flex flex-row w-full h-fit gap-2 p-4 rounded-md overflow-hidden bg-midnight-opacity shadow-md shadow-midnight-purple-shadow">
+                                <button onClick={handleLaunchAlgorithm} id="install" className="flex w-full justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
+                                    transition ease-in-out duration-300 hover:bg-midnight-purple">
+                                    Launch
+                                </button>
+                                <button onClick={() => {handleUninstallAlgorithm}} id="uninstall" className="flex w-full justify-center items-center text-white bg-midnight-red rounded-md px-5 py-2
+                                    transition ease-in-out duration-300 hover:bg-midnight-red hover:opacity-80">
+                                    Uninstall
+                                </button>
+                            </div>
                             :
-                            <button id="download" className="flex justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
+                            <button onClick={handleDownloadAlgorithm} id="download" className="flex justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
                                 transition ease-in-out duration-300 hover:bg-midnight-purple">
                                 Download
                             </button>

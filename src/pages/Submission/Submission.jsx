@@ -1,13 +1,16 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import gol from "../../../assets/images/gol2.gif";
 import { toast } from "react-toastify";
 import { APIContext } from "../../contexts/APIContext.jsx";
+import { Select, Box, MenuItem, Chip, Tooltip } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 function Submission() {
     const [form, setForm] = useState({
         name: "",
         description: "",
         image: null,
+        tags: [],
         automaton_node: null,
         automaton_lib: null,
         automaton_exp: null,
@@ -19,6 +22,29 @@ function Submission() {
         image: ""
     });
     const { addAlgorithm } = useContext(APIContext);
+    const [tags, setTags] = useState([]);
+    const { getTags } = useContext(APIContext);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // Fetch tags from the API
+        getTags().then((fetchedTags) => {
+            setTags(fetchedTags);
+            console.log("Fetched tags:", fetchedTags);
+        }).catch((error) => {
+            console.error("Error fetching tags:", error)
+            toast.error("Error fetching tags. Please try again later.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            navigate("/Home");
+        });
+    }, []);
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -42,8 +68,10 @@ function Submission() {
             });
             return;
         }
+        console.log("Form submitted:", form);
         // Send to the API
         addAlgorithm(form).then((response) => {
+            navigate("/Home");
         }).catch((error) => {
             console.error("Error adding algorithm:", error);
         });
@@ -66,7 +94,7 @@ function Submission() {
         const file = await window.electron.loadFile(filePath);
         setForm((prev) => ({
             ...prev,
-            [`automaton_${extension}`]: file,
+            [`automaton_${extension}`]: new Blob([file], {type: "application/octet-stream"}), // Convert file to Blob
         }));
     }
 
@@ -84,7 +112,7 @@ function Submission() {
         console.log(image);
         setForm((prev) => ({
             ...prev,
-            image: URL.createObjectURL(image), // Convert Blob to URL
+            image: image, // Convert Blob to URL
         }));
     }
 
@@ -127,6 +155,57 @@ function Submission() {
                                 required
                                 className="w-full p-2 border border-gray-300 rounded bg-midnight text-white"
                             />
+                        </label>
+                    </div>
+
+                    <div>
+                        <label>
+                            Tags:
+                            {/* A list of tag that can be clicked and then be add in form.tags */}
+                            <Select
+                                multiple
+                                value={form.tags}
+                                onChange={(e) => setForm((prev) => ({ ...prev, tags: e.target.value }))}
+                                sx={{ width: "100%", border: "1px solid #FFFFFF", color: "white" }}
+                                renderValue={(selected) => (
+                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, padding: "2px", borderRadius: "4px" }}>
+                                        {
+                                            selected.map((tag) => {
+                                                console.log("Selected tag:", selected);
+                                                console.log("Selected tag:", tag);
+                                                return (
+                                                    <Tooltip title={tag.description} key={tag.id} arrow 
+                                                        sx={{ fontFamily: "'JetBrains Mono', monospace" }}
+                                                    >
+                                                        <Chip
+                                                            key={tag.id}
+                                                            label={tag.name} size="small" variant="filled"
+                                                            sx={{backgroundColor: "#7F6EEE", color: "white", fontFamily: "'JetBrains Mono', monospace", fontWeight: "bold"}}
+                                                        />
+                                                    </Tooltip>
+
+                                                )
+                                            })
+                                        }
+                                    </Box>
+                                )}
+                            >
+                                {
+                                    tags.map((tag) =>
+                                        {
+                                            console.log("Tag:", tag);
+                                            return (
+                                                <MenuItem
+                                                    key={tag.id}
+                                                    value={tag}
+                                                    sx={{ fontFamily: "'JetBrains Mono', monospace" }}
+                                                >
+                                                {tag.name}
+                                            </MenuItem>
+                                        )
+                                    })
+                                }
+                            </Select>
                         </label>
                     </div>
 
@@ -193,10 +272,8 @@ function Submission() {
 
                     <div>
                         <label className="w-full justify-center flex flex-col items-center">
-                            <span className="w-full text-left">Automaton:</span>
+                            <span className="w-full text-left">Automaton .node:</span>
                         </label>
-
-                        <h2 className="text-yellow-200 text-center text-xl mb-5">! Automaton must have .node extension !</h2>
                         {
                             !form.automaton_node ?
                                 <button
@@ -220,10 +297,8 @@ function Submission() {
 
                     <div>
                         <label className="w-full justify-center flex flex-col items-center">
-                            <span className="w-full text-left">Automaton:</span>
+                            <span className="w-full text-left">Automaton .lib:</span>
                         </label>
-
-                        <h2 className="text-yellow-200 text-center text-xl mb-5">! Automaton must have .lib extension !</h2>
                         {
                             !form.automaton_lib ?
                                 <button
@@ -247,10 +322,8 @@ function Submission() {
 
                     <div>
                         <label className="w-full justify-center flex flex-col items-center">
-                            <span className="w-full text-left">Automaton:</span>
+                            <span className="w-full text-left">Automaton .exp:</span>
                         </label>
-
-                        <h2 className="text-yellow-200 text-center text-xl mb-5">! Automaton must have .exp extension !</h2>
                         {
                             !form.automaton_exp ?
                                 <button

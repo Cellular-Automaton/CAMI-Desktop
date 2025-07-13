@@ -9,39 +9,36 @@ import spinner from "../../../assets/images/spinner.svg";
 
 import AlgorithmCard from "../../components/AlgorithmCard/AlgorithmCard.jsx";
 import Informations from "../../components/Informations/Informations.jsx";
-
-var tags = [
-    "2D",
-    "3D",
-    "Endless",
-    "1D",
-    "Deterministic",
-    "Chaotic"
-];
+import { set } from "date-fns";
 
 export default function Community() {
     const [filters, setFilters] = useState([]);
+    const [tags, setTags] = useState([]);
     const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false);
     const [isInformationPanelOpen, setIsInformationPanelOpen] = useState(false);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState({});
     const [algorithms, setAlgorithms] = useState([]);
+    const [notFilteredAlgorithms, setNotFilteredAlgorithms] = useState([]);
     const [isFetchComplete, setIsFetchComplete] = useState(false);
-    const { getAlgorithms } = useContext(APIContext);
+    const { getAlgorithms, getTags } = useContext(APIContext);
     const navigate = useNavigate();
 
     useEffect(() => {
         window.addEventListener("resize", configureFilterPopup);
 
-        tags = tags.sort((a, b) => {
-            a.length > b.length ? 1 : -1;
-        });
-
         // Fetch algorithms from the API
         getAlgorithms().then((algos) => {
             setAlgorithms(algos);
+            setNotFilteredAlgorithms(algos);
             configureFilterPopup();
         }).catch((error) => {
             navigate("/Home");
+        });
+
+        getTags().then((fetchedTags) => {
+            setTags(fetchedTags);
+        }).catch((error) => {
+            console.error("Error fetching tags:", error);
         });
 
         return () => {
@@ -56,6 +53,22 @@ export default function Community() {
         console.log("PASSED")
         setIsFetchComplete(true);
     },  [algorithms]);
+
+    useEffect(() => {
+        console.log("Filters updated:", filters);
+        if (filters.length === 0) {
+            setAlgorithms(notFilteredAlgorithms);
+        } else {
+            const filteredAlgorithms = notFilteredAlgorithms.filter((algorithm) => {
+                return filters.every((filter) => {
+                    if (!algorithm.tags)
+                        return false;
+                    return algorithm.tags.includes(filter);
+                });
+            });
+            setAlgorithms(filteredAlgorithms);
+        }
+    }, [filters]);
 
     const configureFilterPopup = () => {
         // Put just bellow the filter button
@@ -86,20 +99,20 @@ export default function Community() {
         setIsFilterPopupOpen(true);
     };
 
-    const handleFilterChip = (event) => {
+    const handleFilterChip = (event, tag) => {
         // Get the filter
-        const filterId = event.target;
+        const tagHTML = event.target;
 
-        if (filterId.classList.contains("text-midnight-purple")) {
-            filterId.classList.add("bg-midnight-purple");
-            filterId.classList.remove("text-midnight-purple");
-            filterId.classList.add("text-white");
-            setFilters(filters.filter((filter) => filter !== filterId.id));
+        if (tagHTML.classList.contains("text-midnight-purple")) {
+            tagHTML.classList.add("bg-midnight-purple");
+            tagHTML.classList.remove("text-midnight-purple");
+            tagHTML.classList.add("text-white");
+            setFilters([...filters, tag.id]);
         } else {
-            filterId.classList.remove("text-white");
-            filterId.classList.add("text-midnight-purple");
-            filterId.classList.remove("bg-midnight-purple");
-            setFilters([...filters, filterId.id]);
+            tagHTML.classList.remove("text-white");
+            tagHTML.classList.add("text-midnight-purple");
+            tagHTML.classList.remove("bg-midnight-purple");
+            setFilters(filters.filter((filter) => filter !== tag.id));
         }
     };
 
@@ -165,7 +178,7 @@ export default function Community() {
                                     {
                                         tags.map((tag => {
                                             return (
-                                                <button key={tag} id={tag} className="text-midnight-purple rounded-full border-midnight-purple border-2 py-1 px-4" onClick={handleFilterChip}>{tag}</button>
+                                                <button key={tag.id} id={tag.name} obj={tag} className="text-midnight-purple rounded-full border-midnight-purple border-2 py-1 px-4" onClick={(e) => handleFilterChip(e, tag)}>{tag.name}</button>
                                             )
                                         }))
                                     }
