@@ -103,13 +103,10 @@ const Informations = ({algorithm, onCloseCallback}) => {
         try {
             const response = await downloadAlgorithm(algorithm.automaton_id);
             console.log("Download response:", response);
-            if (response.success) {
-                toast.success("Algorithm downloaded successfully!");
-                setIsAlgorithmInstalled(true);
-            } else {
-                toast.error("Failed to download algorithm.");
-            }
-            window.electron.installPlugin(response)
+            toast.success("Algorithm downloaded successfully!");
+            setIsAlgorithmInstalled(true);
+            
+            window.electron.installPlugin(response);
             window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
             if (isInstalled) {
                 console.log("Algorithm is installed");
