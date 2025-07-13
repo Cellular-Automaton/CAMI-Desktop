@@ -6,7 +6,7 @@ import { UserProvider } from './contexts/UserContext.jsx';
 import { APIProvider } from './contexts/APIContext.jsx';
 
 
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById("root");
 const root = ReactDOM.createRoot(rootElement);
 
 root.render(

@@ -56,9 +56,9 @@ export default function Navbar() {
         }
     };
 
-    return (
-        <div
-            className={`fixed top-0 flex h-full flex-col justify-center items-center transition-all duration-300 font-mono z-50
+  return (
+    <div
+      className={`fixed top-0 flex h-full flex-col justify-center items-center transition-all duration-300 font-mono z-50
                 ${isHovered ? "w-1/5" : "w-16"}
                 bg-gradient-to-r from-midnight via-20% via-midnight to-transparent"
                 `}

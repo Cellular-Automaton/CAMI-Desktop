@@ -1,0 +1,29 @@
+name: Desktop - runner
+on:
+  push:
+    branches-ignore:
+      - feature/ignore/**
+  pull_request:
+    branches-ignore:
+      - feature/ignore/**
+
+  workflow_dispatch:
+
+env:
+  CLCACHE_MAX_SIZE: 500M
+
+jobs:
+  linter:
+    name: Check if .ts files have been linted
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install packages needed
+      run: |
+        sudo apt update
+        sudo apt install nodejs
+        npm i
+    - name: run linter
+      run: npm run lint
