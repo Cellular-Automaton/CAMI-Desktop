@@ -105,7 +105,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
             console.log("Download response:", response);
             toast.success("Algorithm downloaded successfully!");
             setIsAlgorithmInstalled(true);
-            
+
             window.electron.installPlugin(response);
             window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
             if (isInstalled) {
@@ -256,7 +256,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
                     </div>
                     {
                         isAlgorithmInstalled ?
-                            <div className="flex flex-row w-full h-fit gap-2 p-4 rounded-md overflow-hidden bg-midnight-opacity shadow-md shadow-midnight-purple-shadow">
+                            <div className="flex flex-row w-full h-fit gap-2 overflow-hidden">
                                 <button onClick={handleLaunchAlgorithm} id="install" className="flex w-full justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
                                     transition ease-in-out duration-300 hover:bg-midnight-purple">
                                     Launch

@@ -69,7 +69,11 @@ export default function Playground() {
                 params[key] = gridSize;
             }
         });
-        console.log("Starting simulation with parameters:", params);
+        // Check if all parameters are set
+        if (Object.values(parameters).some(param => param.value === "")) {
+            toast.error("Please fill all parameters before starting the simulation.");
+            return;
+        }
         await startSimulation(gridSize, params);
     }
 
