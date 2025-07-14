@@ -19,11 +19,11 @@ const icons = [
     {
         name: "Community",
         icon: CommunityImage
-    },
-    {
-        name: "Settings",
-        icon: SettingImage
     }
+    // {
+    //     name: "Settings",
+    //     icon: SettingImage
+    // }
 ];
 
 export default function Navbar() {
