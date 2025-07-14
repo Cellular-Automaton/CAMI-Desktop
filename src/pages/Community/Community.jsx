@@ -55,19 +55,15 @@ export default function Community() {
     },  [algorithms]);
 
     useEffect(() => {
-        console.log("Filters updated:", filters);
         if (filters.length === 0) {
             setAlgorithms(notFilteredAlgorithms);
-        } else {
-            const filteredAlgorithms = notFilteredAlgorithms.filter((algorithm) => {
-                return filters.every((filter) => {
-                    if (!algorithm.tags)
-                        return false;
-                    return algorithm.tags.includes(filter);
-                });
-            });
-            setAlgorithms(filteredAlgorithms);
+            return;
         }
+        
+        const filteredAlgorithms = notFilteredAlgorithms.filter((algorithm) => {
+            return algorithm.tags.some((tag) => filters.includes(tag.tag_id));
+        });
+        setAlgorithms(filteredAlgorithms);
     }, [filters]);
 
     const configureFilterPopup = () => {

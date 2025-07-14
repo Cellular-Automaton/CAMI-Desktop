@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 export const APIContext = createContext();
 
 export const APIProvider = ({ children }) => {
-    // const [apiUrl, setApiUrl] = useState("http://back-dev.cami.ovh/api");
-    const [apiUrl, setApiUrl] = useState("http://localhost:4000/api");
+    const [apiUrl, setApiUrl] = useState("http://back-dev.cami.ovh/api");
+    // const [apiUrl, setApiUrl] = useState("http://localhost:4000/api");
 
     const login = async (formData) => {
         const url = `${apiUrl}/login`;
