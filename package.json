@@ -44,7 +44,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@babylonjs/core": "^8.1.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^7.2.0",
@@ -54,23 +53,17 @@
     "axios": "^1.9.0",
     "bcryptjs": "^3.0.2",
     "chroma-js": "^3.1.2",
-    "crypto-browserify": "^3.12.1",
     "date-fns": "^4.1.0",
     "electron-squirrel-startup": "^1.0.1",
     "motion": "^12.6.3",
     "node-addon-api": "^8.3.1",
     "node-polyfill-webpack-plugin": "^4.1.0",
-    "os-browserify": "^0.3.0",
     "path": "^0.12.7",
-    "piscina": "^5.0.0",
     "pixi-viewport": "^6.0.3",
     "pixi.js": "^8.9.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.0.2",
-    "react-toastify": "^11.0.5",
-    "stream-browserify": "^3.0.0",
-    "uuid": "^11.1.0",
-    "vm-browserify": "^1.1.2"
+    "react-toastify": "^11.0.5"
   }
 }

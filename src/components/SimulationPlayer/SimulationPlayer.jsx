@@ -1,8 +1,10 @@
 import React from "react";
 import Play from "../../../assets/images/play.svg";
 import Pause from "../../../assets/images/pause.svg";
+import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 
 const SimulationPlayer = ({ onStartSimulation, onStopSimulation, isPlaying }) => {
+    const { frames, setCurrentFrame, isSimulationRunning, cFrame, setCFrame } = React.useContext(SimulationContext);
 
     return (
         <div id="player-container" className="flex flex-row absolute justify-center items-center bottom-0 w-full h-1/6 pointer-events-none">
@@ -26,8 +28,21 @@ const SimulationPlayer = ({ onStartSimulation, onStopSimulation, isPlaying }) =>
                         </button>
                     </div>
                 </div>
-                <div id="slider" className="flex flex-row justify-center items-center h-2/5 w-full">
-                    <input type="range" min="1" max="100" value="50" className="w-1/2 h-1/2 bg-midnight text-white rounded-md"/>
+                <div id="slider" className="flex flex-col justify-center items-center h-2/5 w-full">
+                    <div className="flex flex-col justify-left text-left items-center w-1/2 h-full font-mono">
+                        <span className="text-white text-sm">Frame: {cFrame + 1} / {frames.length}</span>
+                    </div>
+                    <input 
+                        disabled={isSimulationRunning || frames.length === 0}
+                        type="range" min="0" max={frames.length - 1} value={cFrame}
+                        className="w-1/2 h-1/2 bg-midnight text-white rounded-md"
+                        onChange={(e) => {
+                            setCFrame(Number(e.target.value));
+                        }}
+                        onMouseUp={() => {
+                            setCurrentFrame(cFrame);
+                        }}
+                        />
                 </div>
             </div>
         </div>

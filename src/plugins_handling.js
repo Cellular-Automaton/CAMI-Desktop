@@ -1,6 +1,7 @@
 export {load_starting_plugin, load_plugins_params, load_manager};
 import fs from 'node:fs';
 import path from 'node:path';
+import { Buffer } from 'node:buffer';
 const { app, ipcMain } = require('electron');
 
 const plugins = []

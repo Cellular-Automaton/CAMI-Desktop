@@ -256,10 +256,10 @@ const Informations = ({algorithm, onCloseCallback}) => {
                                     transition ease-in-out duration-300 hover:bg-midnight-purple">
                                     Launch
                                 </button>
-                                <button onClick={() => {handleUninstallAlgorithm}} id="uninstall" className="flex w-full justify-center items-center text-white bg-midnight-red rounded-md px-5 py-2
+                                {/* <button onClick={() => {handleUninstallAlgorithm}} id="uninstall" className="flex w-full justify-center items-center text-white bg-midnight-red rounded-md px-5 py-2
                                     transition ease-in-out duration-300 hover:bg-midnight-red hover:opacity-80">
                                     Uninstall
-                                </button>
+                                </button> */}
                             </div>
                             :
                             <button onClick={handleDownloadAlgorithm} id="download" className="flex justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2

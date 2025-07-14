@@ -121,6 +121,7 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
 
     const drawCells = () => {
         cellInstances.forEach(cell => {
+            console.log("Drawing cell at position:", cell);
             cell.draw();
         });
         centerCamera();

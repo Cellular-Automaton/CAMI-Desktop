@@ -158,10 +158,10 @@ function Submission() {
                         </label>
                     </div>
 
-                    <div>
+                    {/* <div>
                         <label>
                             Tags:
-                            {/* A list of tag that can be clicked and then be add in form.tags */}
+                            {/* A list of tag that can be clicked and then be add in form.tags 
                             <Select
                                 multiple
                                 value={form.tags}
@@ -207,7 +207,7 @@ function Submission() {
                                 }
                             </Select>
                         </label>
-                    </div>
+                    </div> */}
 
                     <div>
                         <label>

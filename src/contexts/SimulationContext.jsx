@@ -1,3 +1,4 @@
+import { frame } from "motion";
 import React, { createContext, useContext, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -10,6 +11,8 @@ export const SimulationProvider = ({ children }) => {
     const [isSimulationRunning, setIsSimulationRunning] = useState(false);
     const [importedData, setImportedData] = useState(null);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState(null);
+    const [frames, setFrames] = useState([]);
+    const [cFrame, setCFrame] = useState(0);
 
     const startSimulation = (gridSize, params) => {
         setIsSimulationRunning(true);
@@ -32,6 +35,8 @@ export const SimulationProvider = ({ children }) => {
             console.log("Parameters sent to plugin:", parameters);
             const response = await window.electron.callPlugin(parameters);
             setResponse(response);
+            setFrames(prevFrames => [...prevFrames, response]);
+            setCFrame(frames.length - 1);
         } catch (error) {
             console.error("IPC Call error :", error);
         }
@@ -56,6 +61,7 @@ export const SimulationProvider = ({ children }) => {
                 const parsedData = JSON.parse(data);
                 console.log("Imported Data:", parsedData);
                 setImportedData(parsedData);
+                setFrames([]);
                 toast.success("Simulation data imported successfully!");
             } catch (error) {
                 toast.error("Error importing simulation data");
@@ -85,12 +91,26 @@ export const SimulationProvider = ({ children }) => {
         }
     };
 
+    const setCurrentFrame = (index) => {
+        if (index < 0 || index >= frames.length) {
+            console.error("Index out of bounds for frames array");
+            return;
+        }
+        const currentFrame = frames[index];
+        console.log(frames);
+        cellInstances.forEach((cell, i) => {
+            cell.setState(currentFrame[i]);
+        });
+        setCellInstances([...cellInstances]);
+    };
+
     return (
         <SimulationContext.Provider value={{
             startSimulation, stopSimulation, response, setResponse,
             cellInstances, setCellInstances, isSimulationRunning,
             clearAll, importSimulation, exportSimulation, importedData, setImportedData,
-            selectedAlgorithm, setSelectedAlgorithm, getSimulationParameters
+            selectedAlgorithm, setSelectedAlgorithm, getSimulationParameters, frames, setFrames, setCurrentFrame,
+            cFrame, setCFrame
         }}>
             {children}
         </SimulationContext.Provider>
