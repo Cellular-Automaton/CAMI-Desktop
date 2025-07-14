@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 export const APIContext = createContext();
 
 export const APIProvider = ({ children }) => {
-    const [apiUrl, setApiUrl] = useState("http://back-dev.cami.ovh/api");
-    // const [apiUrl, setApiUrl] = useState("http://localhost:4000/api");
+    // const [apiUrl, setApiUrl] = useState("http://back-dev.cami.ovh/api");
+    const [apiUrl, setApiUrl] = useState("http://localhost:4000/api");
 
     const login = async (formData) => {
         const url = `${apiUrl}/login`;
@@ -249,8 +249,22 @@ export const APIProvider = ({ children }) => {
         }
     }
 
+    const setAlgorithmTags = (algorithm_id, tags) => {
+        const URL = `${apiUrl}/automaton_tag`;
+        const formData = new FormData();
+        try {
+            tags.map((tag) => {
+                formData.append("automaton_tag[automaton_id]", algorithm_id);
+                formData.append("automaton_tag[tag_id]", tag.id);
+                axios.post(URL, formData);
+            });
+        } catch (error) {
+            console.error("Error linking algorithm tags:", error);
+        }
+    }
+
     return (
-        <APIContext.Provider value={{ apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms, addAlgorithmComment, getAlgorithmComments, getTags, postAlgorithmTags, downloadAlgorithm }}>
+        <APIContext.Provider value={{ apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms, addAlgorithmComment, getAlgorithmComments, getTags, postAlgorithmTags, downloadAlgorithm, setAlgorithmTags }}>
             {children}
         </APIContext.Provider>
     );

@@ -23,7 +23,7 @@ function Submission() {
     });
     const { addAlgorithm } = useContext(APIContext);
     const [tags, setTags] = useState([]);
-    const { getTags } = useContext(APIContext);
+    const { getTags, setAlgorithmTags } = useContext(APIContext);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -71,6 +71,8 @@ function Submission() {
         console.log("Form submitted:", form);
         // Send to the API
         addAlgorithm(form).then((response) => {
+            console.log("Algorithm added successfully:", response);
+            setAlgorithmTags(response.data.automaton_id, form.tags);
             navigate("/Home");
         }).catch((error) => {
             console.error("Error adding algorithm:", error);
@@ -158,10 +160,10 @@ function Submission() {
                         </label>
                     </div>
 
-                    {/* <div>
+                    <div>
                         <label>
                             Tags:
-                            {/* A list of tag that can be clicked and then be add in form.tags 
+                            {/* A list of tag that can be clicked and then be add in form.tags */}
                             <Select
                                 multiple
                                 value={form.tags}
@@ -207,7 +209,7 @@ function Submission() {
                                 }
                             </Select>
                         </label>
-                    </div> */}
+                    </div>
 
                     <div>
                         <label>
@@ -254,7 +256,7 @@ function Submission() {
                             :
                             <div className="flex flex-row justify-between items-center my-2 p-2 w-full h-24 bg-midnight-opacity rounded">
                                 <div className="h-full flex flex-row items-center justify-center gap-5">
-                                    <img src={form.image} alt="Imported" className="h-full max-h-48 object-fill" />
+                                    <img src={URL.createObjectURL(new Blob([form.image]))} alt="Imported" className="h-full max-h-48 object-fill" />
                                     <p className="text-sm text-center max-w-xs overflow-hidden text-ellipsis">
                                         {filePaths.image.split("\\").pop()}
                                     </p>
