@@ -1,7 +1,5 @@
 export {load_starting_plugin, load_plugins_params, load_manager};
-    import plugin from '@tailwindcss/forms';
 import fs from 'node:fs';
-import { version } from 'node:os';
 import path from 'node:path';
 const { app, ipcMain } = require('electron');
 

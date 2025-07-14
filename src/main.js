@@ -1,18 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
-//import started from 'electron-squirrel-startup';
-import {load_starting_plugin, load_plugins_params, load_manager} from './plugins_handling.js';
-
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-/*if (started) {
-  app.quit();
-}*/
-
-await load_starting_plugin()
-await load_manager()
-load_plugins_params()
-//test_simulate_gol_test()
+import {load_manager} from './plugins_handling.js';
 
 let mainWindow;
 
@@ -29,7 +18,7 @@ const createWindow = () => {
       contextIsolation: true
     },
     autoHideMenuBar: true,
-    // frame: false Pour être frameless
+    //frame: false // Pour être frameless
   });
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
@@ -42,9 +31,9 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   createWindow();
-
+  await load_manager();
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   app.on("activate", () => {

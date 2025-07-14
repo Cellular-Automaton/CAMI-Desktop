@@ -39,19 +39,20 @@ export default function Home() {
 
     useEffect(() => {
         setSentence(replaceUserInSentence(welcomeSentences[Math.floor(Math.random() * welcomeSentences.length)]));
-
-        getTags();
         // Get algorithms from the API
         getAlgorithms().then((algorithms) => {
             console.log("Fetched algorithms:", algorithms);
             setRecentAlgorithms(algorithms.slice(0, 5));
+            getTags().then((tags) => {
+                console.log("Fetched tags:", tags);
+            }).catch((error) => {
+                console.error("Error fetching tags:", error);
+            });
         }).catch((error) => {
             document.getElementById("loading-recent-algorithms").style.display = "none";
             document.getElementById("loading-new-algorithms").style.display = "none";
             if (loggedIn)
                 document.getElementById("loading-favorite-algorithms").style.display = "none";
-
-            console.error("Error fetching algorithms:", error);
         });
     }, []);
 

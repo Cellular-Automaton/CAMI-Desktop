@@ -41,12 +41,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
                 console.log("Algorithm is not installed");
                 setIsAlgorithmInstalled(false);
             }
-        })
-
-        if (algorithm === null || algorithm === undefined || Object.keys(algorithm).length === 0) {
-            console.log("Algorithm is present:", algorithm);
-            // Fetch comments for the algorithm
-        }
+        });
     }, [algorithm]);
 
     const resetScroll = () => {
