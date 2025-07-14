@@ -3,7 +3,6 @@ import { useContext } from "react";
 import { APIContext } from "../../contexts/APIContext.jsx";
 import { useNavigate } from "react-router-dom";
 
-import search from "../../../assets/images/search.svg";
 import filter from "../../../assets/images/filter.svg";
 import spinner from "../../../assets/images/spinner.svg";
 
@@ -21,6 +20,7 @@ export default function Community() {
     const [notFilteredAlgorithms, setNotFilteredAlgorithms] = useState([]);
     const [isFetchComplete, setIsFetchComplete] = useState(false);
     const { getAlgorithms, getTags } = useContext(APIContext);
+    const [search, setSearch] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -45,6 +45,26 @@ export default function Community() {
             window.removeEventListener("resize", configureFilterPopup);
         };
     }, []);
+
+    useEffect(() => {
+        if (search.trim() === "" && filters.length === 0) {
+            setAlgorithms(notFilteredAlgorithms);
+            return;
+        }
+        const filteredAlgorithms = notFilteredAlgorithms.filter((algorithm) => {
+            const nameMatch = algorithm.name.toLowerCase().includes(search.toLowerCase());
+            return nameMatch;
+        });
+
+        // filter algorithms with tags
+        const filteredAlgorithms2 = filteredAlgorithms.filter((algorithm) => {
+            if (filters.length === 0)
+                return true;
+            return algorithm.tags.some((tag) => filters.includes(tag.tag_id));
+        });
+
+        setAlgorithms(filteredAlgorithms2);
+    }, [search]);
 
     useEffect(() => {
         console.log("Algorithms updated:", algorithms);
@@ -154,13 +174,9 @@ export default function Community() {
             <div id="search-bar" className="flex flex-row bg-transparent h-20 w-full p-1 justify-center items-center">
                 <div className="flex flex-row w-full h-full p-2 justify-center items-center gap-6">
                     <div id="search" className="flex flex-row items-center h-full w-fit p-2 gap-2">
-                        <input type="text" className="h-full max-w-96 min-w-80 bg-midnight text-white border-2 border-midnight-purple rounded-full p-2" placeholder="Search for a simulation..." />
+                        <input type="text" className="h-full max-w-96 min-w-80 bg-midnight text-white border-2 border-midnight-purple rounded-full p-2" placeholder="Search for a simulation..." value={search} onChange={(e) => setSearch(e.target.value)} />
                         
                         <div className="w-2 min-w-2"></div>
-
-                        <button className="flex bg-midnight-opacity rounded-full grow-0 shrink-0 shadow-md shadow-midnight-purple-shadow h-10 w-10 items-center p-1">
-                            <img src={search} alt="Search" className="h-10 w-10"/>
-                        </button>
 
                         <div className="w-5 min-w-5"></div>
 
