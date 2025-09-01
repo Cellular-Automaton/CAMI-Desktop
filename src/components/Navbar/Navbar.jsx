@@ -103,6 +103,12 @@ export default function Navbar() {
                         </button>
                     )
                 }
+                    {/* (loggedIn && userData.role === "admin") ? */}
+                    <button className="flex items-center justify-start w-full p-2 pb-5 pt-5 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10"
+                        onClick={() => navigate("/Admin")}>
+                        <img className="h-7 w-7" src={SettingImage} alt="Admin" /> 
+                        <span className="ml-2 text-white">Admin</span>
+                    </button>
             </div>
         </div>
     );

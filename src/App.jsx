@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound/NotFound.jsx";
 import Community from "./pages/Community/Community.jsx";
 import Connection from "./pages/Connection/Connection.jsx";
 import Submission from "./pages/Submission/Submission.jsx";
+import AdminPage from "./pages/Admin/AdminPage.jsx";
 
 export default function App() {
     // When the page is charged for the first time, it redirect to /home
@@ -49,6 +50,7 @@ export default function App() {
                             <Route path="/Community" element={<Community/>} />
                             <Route path="/Connection" element={<Connection/>} />
                             <Route path="/Submission" element={<Submission/>} />
+                            <Route path="/Admin" element={<AdminPage />} />
                             <Route path="/*" element={<NotFound/>}/>
                         </Routes>
                     </SimulationProvider>
