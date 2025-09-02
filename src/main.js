@@ -104,3 +104,8 @@ ipcMain.handle('load-text-file', async (event, filePath) => {
 ipcMain.handle('load-file', async (event, filePath) => {
   return fs.promises.readFile(filePath);
 });
+
+ipcMain.handle('open-external', async (event, url) => {
+  const { shell } = require('electron');
+  await shell.openExternal(url);
+});

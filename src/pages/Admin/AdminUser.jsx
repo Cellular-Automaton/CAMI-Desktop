@@ -47,7 +47,7 @@ export default function AdminUser({ closeCallback }) {
                         <Card key={user.id} className="!bg-midnight-opacity !text-white !h-1/6 !w-1/6">
                             <CardActionArea onClick={() => setSelectedUser(user)}>
                                 <CardContent>
-                                    <div className="m-5 h-full w-full flex flex-col">
+                                    <div className="h-full w-full flex flex-col">
                                         <h3 className="text-lg font-bold mb-2">{user.name}</h3>
                                         <p>Email: {user.email}</p>
                                         <p>Role: {user.role}</p>

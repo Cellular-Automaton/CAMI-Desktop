@@ -22,4 +22,7 @@ contextBridge.exposeInMainWorld('electron', {
   // Manager related IPC calls
   isAlgorithmInstalled: (params) => ipcRenderer.invoke('is-algorithm-installed', params),
   getAlgorithmParameters: (params) => ipcRenderer.invoke('get-simulation-parameters', params),
+
+  // External links
+  openExternal: (url) => ipcRenderer.invoke('open-external', url),
 });

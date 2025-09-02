@@ -47,7 +47,7 @@ export default function AdminComment({ closeCallback }) {
                         <Card key={comment.id} className="!bg-midnight-opacity !text-white !h-1/6 !w-1/3">
                             <CardActionArea onClick={() => setSelectedComment(comment)}>
                                 <CardContent>
-                                    <div className="m-5 h-full w-full flex flex-col">
+                                    <div className="h-full w-full flex flex-col">
                                         <h3 className="text-lg font-bold mb-2">{comment.user}</h3>
                                         <p className="text-ellipsis overflow-hidden">{comment.content}</p>
                                     </div>
