@@ -10,7 +10,7 @@ export default function AdminPage() {
     const [type, setType] = useState("");
     const [content, setContent] = useState([]);
 
-    const displayAdminPopup = (type) => {
+    const openAdminPopup = (type) => {
         const popup = document.getElementById("admin-popup");
 
         console.log("Before");
@@ -41,14 +41,31 @@ export default function AdminPage() {
         }
     }
 
+    const skeletonFactory = () => {
+        const skeletons = [];
+
+        for (let i = 0; i < 5; i++) {
+            skeletons.push(
+                <div key={i} className="flex flex-row gap-2 mt-2 w-full items-center justify-center">
+                    <Skeleton variant="circular" animation="wave" width={90} height={80} />
+                    <div className="flex flex-col gap-1 w-full">
+                        <Skeleton variant="text" animation="wave"/>
+                        <Skeleton variant="text" animation="wave"/>
+                    </div>
+                </div>
+            );
+        }
+        return skeletons;
+    }
+
     return (
-        <div className="bg-midnight h-full w-full font-mono py-10 px-5 justify-center items-center flex flex-col">
+        <div className="bg-midnight h-full w-full overflow-hidden font-mono py-10 px-5 justify-center items-center flex flex-col">
             <h1 className="text-3xl font-bold text-white mb-4">Admin Page</h1>
             <p className="text-white">Welcome to the admin page. Here you can manage the application settings and user accounts.</p>
 
-            <div id="admin-select-controls" className="mt-20 flex flex-row gap-4 w-full h-full py-10">
+            <div id="admin-select-controls" className="mt-10 flex flex-row gap-4 w-full h-full">
                 <button className="flex flex-col p-5 w-full h-full shadow-sm shadow-midnight-purple-shadow text-white rounded-lg"
-                    onClick={() => displayAdminPopup("user")}>
+                    onClick={() => openAdminPopup("user")}>
                     <h2>User Management</h2>
                     <span className="text-sm">Manage user accounts and permissions</span>
                     <Divider sx={{ my: 1, backgroundColor: 'white', height: '1px' }} flexItem />
@@ -56,20 +73,12 @@ export default function AdminPage() {
 
                     <div className="flex flex-col overflow-y-auto h-full w-full px-5 mt-5 gap-5">
                         {
-                            [0, 1, 2, 3, 4, 5].map((_, i) => (
-                                <div key={i} className="flex flex-row gap-2 mt-2 w-full items-center justify-center">
-                                    <Skeleton variant="circular"animation="wave" width={90} height={80} />
-                                    <div className="flex flex-col gap-1 w-full">
-                                        <Skeleton variant="text" animation="wave"/>
-                                        <Skeleton variant="text" animation="wave"/>
-                                    </div>
-                                </div>
-                            ))
+                            skeletonFactory()
                         }
                     </div>
                 </button>
                 <button className="flex flex-col p-5 w-full h-full shadow-sm shadow-midnight-purple-shadow text-white rounded-lg"
-                    onClick={() => displayAdminPopup("algorithm")}>
+                    onClick={() => openAdminPopup("algorithm")}>
                     <h2>Algorithm Management</h2>
                     <span className="text-sm">Add, edit, or remove algorithms</span>
                     <Divider sx={{ my: 1, backgroundColor: 'white', height: '1px' }} flexItem />
@@ -77,21 +86,13 @@ export default function AdminPage() {
 
                     <div className="flex flex-col overflow-y-auto h-full w-full px-5 mt-5 gap-5">
                         {
-                            [0, 1, 2, 3, 4, 5].map((_, i) => (
-                                <div key={i} className="flex flex-row gap-2 mt-2 w-full items-center justify-center">
-                                    <Skeleton variant="circular" animation="wave" width={90} height={80} />
-                                    <div className="flex flex-col gap-1 w-full">
-                                        <Skeleton variant="text" animation="wave"/>
-                                        <Skeleton variant="text"animation="wave" />
-                                    </div>
-                                </div>
-                            ))
+                            skeletonFactory()
                         }
                     </div>
 
                 </button>
                 <button className="flex flex-col p-5 w-full h-full shadow-sm shadow-midnight-purple-shadow text-white rounded-lg"
-                    onClick={() => displayAdminPopup("comment")}>
+                    onClick={() => openAdminPopup("comment")}>
                     <h2>Comment Management</h2>
                     <span className="text-sm">Moderate user comments and feedback</span>
                     <Divider sx={{ my: 1, backgroundColor: 'white', height: '1px' }} flexItem />
@@ -99,15 +100,7 @@ export default function AdminPage() {
 
                     <div className="flex flex-col overflow-y-auto h-full w-full px-5 mt-5 gap-5">
                         {
-                            [0, 1, 2, 3, 4, 5].map((_, i) => (
-                                <div key={i} className="flex flex-row gap-2 mt-2 w-full items-center justify-center">
-                                    <Skeleton variant="circular" animation="wave" width={90} height={80} />
-                                    <div className="flex flex-col gap-1 w-full">
-                                        <Skeleton variant="text" animation="wave"/>
-                                        <Skeleton variant="text" animation="wave"/>
-                                    </div>
-                                </div>
-                            ))
+                            skeletonFactory()
                         }
                     </div>
                 </button>
