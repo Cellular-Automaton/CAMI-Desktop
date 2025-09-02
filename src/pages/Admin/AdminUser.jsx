@@ -85,10 +85,13 @@ export default function AdminUser({ closeCallback }) {
                 </div>
             </Dialog>
 
-            <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32"
-                onClick={closeCallback}>
-                Close
-            </button>
+            
+            <div className="w-full flex justify-center">
+                <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 transition hover:opacity-50 ease-in-out duration-200"
+                    onClick={closeCallback}>
+                    Close
+                </button>
+            </div>
         </div>
     );
 }
