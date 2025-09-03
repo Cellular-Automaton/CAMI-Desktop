@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 
 import SettingImage from "../../../assets/images/settings.svg";
 import HomeImage from "../../../assets/images/home.svg";
@@ -31,8 +31,11 @@ export default function Navbar() {
     const navigate = useNavigate();
     const { userData, loggedIn, logout } = useContext(UserContext);
 
+    useEffect(() => {
+        console.log("User data in Navbar:", userData);
+    });
+
     const handleRedirect = (iconName) => {
-        console.log("Redirecting to:", iconName);
         switch (iconName) {
             case "Home":
                 navigate("/Home");
@@ -103,12 +106,15 @@ export default function Navbar() {
                         </button>
                     )
                 }
-                    {/* (loggedIn && userData.role === "admin") ? */}
+                {
+                    (loggedIn && userData.role === "admin") ?
                     <button className="flex items-center justify-start w-full p-2 pb-5 pt-5 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10"
                         onClick={() => navigate("/Admin")}>
                         <img className="h-7 w-7" src={SettingImage} alt="Admin" /> 
                         <span className="ml-2 text-white">Admin</span>
                     </button>
+                    : null
+                }
             </div>
         </div>
     );

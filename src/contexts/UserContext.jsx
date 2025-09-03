@@ -30,6 +30,7 @@ export const UserProvider = ({ children }) => {
             email: user.email || null,
             img: user.img || null,
             token: user.token || null,
+            role: user.role || null,
         });
         setLoggedIn(true);
     }
