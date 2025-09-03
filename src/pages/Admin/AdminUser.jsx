@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Avatar, Card, CardActionArea, CardContent, Dialog, Divider, TextField } from "@mui/material";
 import { APIContext } from "../../contexts/APIContext.jsx";
+import { formatDistance } from "date-fns";
 
 export default function AdminUser({ closeCallback }) {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredUsers, setFilteredUsers] = useState([]);
-    const { getAllAccounts } = useContext(APIContext);
+    const { getAllAccounts, updateUser, deleteUser } = useContext(APIContext);
 
     useEffect(() => {
         console.log("Users updated:", users);
@@ -22,8 +23,23 @@ export default function AdminUser({ closeCallback }) {
         });
     }
 
-    const updatedUserRole = (newRole) => {
-        // 0 = admin | 1 = dev | 2 = user
+    const updatedUserRole = (role) => {
+        selectedUser.user_role = role;
+        console.log("Updating user to:", selectedUser);
+        updateUser(selectedUser).then(() => {
+            getAllUsers();
+            setSelectedUser(null);
+        }).catch(err => {
+            console.error("Failed to update user:", err);
+        });
+    }
+
+    const handleDeleteUser = () => {
+        deleteUser(selectedUser.user_id).then(() => {
+            getAllUsers();
+        }).catch(err => {
+            console.error("Failed to delete user:", err);
+        });
     }
 
     useEffect(() => {
@@ -36,8 +52,6 @@ export default function AdminUser({ closeCallback }) {
             <p className="text-white">Here you can manage the users of the application.</p>
             <Divider sx={{ my: 2, backgroundColor: 'white', height: '1px' }} flexItem />
 
-            {/* List of all users of the application */}
-
             <div className="w-full flex flex-row justify-center">
                 <TextField label="Search Users" variant="outlined" className="!w-1/5 !rounded-sm"
                     sx={{ input: { color: 'white' }, label: { color: 'white' }, fieldset: { borderColor: 'white' } }}
@@ -46,61 +60,77 @@ export default function AdminUser({ closeCallback }) {
                 />
             </div>
 
-            <div className="flex flex-row flex-wrap mt-5 overflow-y-auto h-full w-full px-5 gap-5 items-center justify-center">
+            <div className="flex flex-row flex-wrap mt-5 overflow-y-auto h-full w-full gap-5 items-center justify-center flex-grow">
 
                 {
+                    filteredUsers.length === 0 ? (
+                        <p className="text-white">No users found.</p>
+                    ) : (
                     filteredUsers.map((user) => (
-                        <Card key={user.user_id} className="!bg-midnight-opacity !text-white !h-1/6 !w-1/6">
-                            <CardActionArea onClick={() => setSelectedUser(user)}>
-                                <CardContent>
+                        <Card key={user.user_id} className="!bg-midnight-opacity !text-white !h-1/5 !w-2/6">
+                            <CardActionArea className="!h-full" onClick={() => setSelectedUser(user)}>
+                                <CardContent className="!h-full">
                                     <div className="h-full w-full flex flex-col">
-                                        <h3 className="text-lg font-bold mb-2">{user.name}</h3>
-                                        <p>Email: {user.email}</p>
-                                        <p>Role: {user.user_role}</p>
+                                        <h3 className="text-lg font-bold mb-2">{user.username}</h3>
+                                        <p className="text-sm opacity-70">ID: {user.user_id}</p>
+                                        <Divider sx={{ my: 1, backgroundColor: 'white', height: '1px' }} flexItem />
+                                        <p>{user.email}</p>
+                                        <p>{user.user_role}</p>
+                                        <p className="text-sm opacity-70">Joined {formatDistance(new Date(user.created_at), new Date(), { addSuffix: true })}</p>
                                     </div>
                                 </CardContent>
                             </CardActionArea>
                         </Card>
-                    ))
+                    )))
                 }
             </div>
 
-            <Dialog open={selectedUser !== null} onClose={() => setSelectedUser(null)} maxWidth="sm" fullWidth>
-                <div className="bg-midnight p-5 flex flex-col">
-                    <div className="bg-midnight p-5 flex flex-row">
-                        <div className="flex flex-col items-center mr-10">
-                            <Avatar className="!w-20 !h-20 !mb-5 !self-center" />
-                            <p className="text-white">ID: {selectedUser === null ? "" : selectedUser.user_id}</p>
+            <Dialog open={selectedUser !== null} onClose={() => setSelectedUser(null)} maxWidth="sm" fullWidth className="font-mono">
+                {
+                    selectedUser === null ?
+                        null
+                        :
+                    <div className="bg-midnight p-5 flex flex-col">
+                        <div className="bg-midnight p-5 flex flex-row">
+                            <div className="flex flex-col items-center mr-10">
+                                <Avatar className="!w-32 !h-32 !mb-5 !self-center" />
+                            </div>
+                            <div className="flex flex-col items-left w-full text-left justify-start">
+                                <h3 className=" text-white text-left text-lg font-bold">{selectedUser.username}</h3>
+                                <p className="text-white mb-4 opacity-70 text-sm">ID: {selectedUser.user_id}</p>
+                                <p className=" text-white text-left">{selectedUser.email}</p>
+                                <p className=" text-white text-left">{selectedUser.user_role}</p>
+                                <p className="text-white text-sm opacity-70">
+                                    Joined {formatDistance(new Date(selectedUser?.created_at), new Date(), { addSuffix: true })}
+                                    <span className="ml-1">({new Date(selectedUser?.created_at).toLocaleDateString()})</span>
+                                </p>
+                            </div>
                         </div>
-                        <div className="flex flex-col items-center w-full">
-                            <p className=" text-white mb-4 text-left">{selectedUser === null ? "" : selectedUser.username}</p>
-                            <p className=" text-white mb-4 text-left">{selectedUser === null ? "" : selectedUser.email}</p>
+                        <div className="flex flex-row-reverse gap-5">
+                            {/* More user details and management options would go here */}
+                            {
+                                selectedUser !== null && selectedUser.user_role === "user" ?
+                                <button className="mt-5 p-2 bg-midnight-blue text-white rounded-lg w-32 self-end"
+                                    onClick={() => updatedUserRole("admin")}>
+                                    Promote
+                                </button>
+                                :
+                                <button className="mt-5 p-2 bg-midnight-blue text-white rounded-lg w-32 self-end"
+                                    onClick={() => updatedUserRole("user")}>
+                                    Demote
+                                </button>
+                            }
+                            <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 self-end"
+                                onClick={() => setSelectedUser(null)}>
+                                Mute
+                            </button>
+                            <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end"
+                                onClick={() => handleDeleteUser()}>
+                                Delete
+                            </button>
                         </div>
                     </div>
-                    <div className="flex flex-row-reverse gap-5">
-                        {/* More user details and management options would go here */}
-                        {
-                            selectedUser !== null && selectedUser.user_role === "user" ?
-                            <button className="mt-5 p-2 bg-midnight-blue text-white rounded-lg w-32 self-end"
-                                onClick={() => setSelectedUser(null)}>
-                                Promote
-                            </button>
-                            :
-                            <button className="mt-5 p-2 bg-midnight-blue text-white rounded-lg w-32 self-end"
-                                onClick={() => setSelectedUser(null)}>
-                                Demote
-                            </button>
-                        }
-                        <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 self-end"
-                            onClick={() => setSelectedUser(null)}>
-                            Mute
-                        </button>
-                        <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end"
-                            onClick={() => setSelectedUser(null)}>
-                            Ban
-                        </button>
-                    </div>
-                </div>
+                }
             </Dialog>
 
             

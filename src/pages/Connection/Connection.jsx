@@ -69,21 +69,12 @@ export default function Connection() {
                 user_id: user.id,
                 username: user.username,
                 img: user.img || null,
-                token: token
+                token: token,
+                role: user.role
             };
             setUser(userInfo);
             setToken(token);
             navigate("/Home");
-        }).catch((error) => {
-            toast.error("Login failed. Please try again." + error.message, {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "dark",
-            });
         });
     }
 

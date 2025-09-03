@@ -53,19 +53,22 @@ export default function AdminAlgorithm({ closeCallback }) {
             <div className="flex flex-row flex-wrap mt-5 overflow-y-auto h-full w-full px-5 gap-5 items-center justify-center">
 
                 {
+                    filteredAlgorithms.length === 0 ? (
+                        <p className="text-white">No algorithms found.</p>
+                    ) : (
                     filteredAlgorithms.map((alg) => (
-                        <Card key={alg.automaton_id} className="!bg-midnight-opacity !text-white !h-1/3 !w-1/3 overflow-y-hidden text-ellipsis">
-                            <CardActionArea onClick={() => setSelectedAlgorithm(alg)}>
+                        <Card key={alg.automaton_id} className="!bg-midnight-opacity !text-white !h-1/4 !w-1/3 overflow-y-hidden text-ellipsis">
+                            <CardActionArea className="!h-full" onClick={() => setSelectedAlgorithm(alg)}>
                                 <CardMedia sx={{ height: 140}} image={alg.image[0].contents_binary ? `data:image/png;base64,${alg.image[0].contents_binary}` : "https://citygem.app/wp-content/uploads/2024/08/placeholder-1-1.png"} title={alg.name} />
-                                <CardContent className="h-full w-full">
+                                <CardContent className="!h-full w-full">
                                     <div className="h-max flex flex-col overflow-hidden text-ellipsis">
                                         <h3 className="text-lg font-bold mb-2">{alg.name}</h3>
-                                        <p className="text-sm text-ellipsis overflow-y-hidden truncate">{alg.description}</p>
+                                        <p className="text-sm text-ellipsis overflow-y-hidden truncate opacity-70">{alg.description}</p>
                                     </div>
                                 </CardContent>
                             </CardActionArea>
                         </Card>
-                    ))
+                    )))
                 }
             </div>
 
@@ -76,7 +79,7 @@ export default function AdminAlgorithm({ closeCallback }) {
                 <div className="bg-midnight p-5 flex flex-col text-white font-mono">
                     <div>
                         <h3 className="text-2xl font-bold mb-2">{selectedAlgorithm?.name}</h3>
-                        <p className="mb-5">{selectedAlgorithm?.description}</p>
+                        <p className="text-sm opacity-70">{selectedAlgorithm?.description}</p>
                         <a href="https://github.com" onClick={
                             (e) => {
                                 e.preventDefault(); 
