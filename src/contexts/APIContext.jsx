@@ -263,8 +263,111 @@ export const APIProvider = ({ children }) => {
         }
     }
 
+    const getAllAccounts = async () => {
+        const url = `${apiUrl}/user`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            toast.error('Failed to fetch all accounts. Please try later.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            throw error;
+        }
+    }
+
+    const getAllComments = async () => {
+        const url = `${apiUrl}/automaton_comment`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            toast.error('Failed to fetch all comments. Please try later.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            throw error;
+        }
+    }
+
+    const getAllAlgorithms = async () => {
+        const url = `${apiUrl}/automaton`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            toast.error('Failed to fetch all algorithms. Please try later.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            throw error;
+        }
+    }
+
+    const getUserById = async (userId) => {
+        const url = `${apiUrl}/user/${userId}`;
+
+        try {
+            const response = await axios.get(url);
+            return response.data;
+        } catch (error) {
+            toast.error("Failed to fetch user data. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        }
+    }
+
+    const getAlgorithmById = async (algorithmId) => {
+        const url = `${apiUrl}/automaton/${algorithmId}`;
+        try {
+            const response = await axios.get(url);
+            return response.data;
+        } catch (error) {
+            toast.error("Failed to fetch algorithm data. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        }
+    }
+
     return (
-        <APIContext.Provider value={{ apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms, addAlgorithmComment, getAlgorithmComments, getTags, postAlgorithmTags, downloadAlgorithm, setAlgorithmTags }}>
+        <APIContext.Provider value={
+            { 
+                apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms, addAlgorithmComment,
+                getAlgorithmComments, getTags, postAlgorithmTags, downloadAlgorithm, setAlgorithmTags,
+                getAllAccounts, getAllComments, getAllAlgorithms, getUserById, getAlgorithmById
+            }
+        }>
             {children}
         </APIContext.Provider>
     );

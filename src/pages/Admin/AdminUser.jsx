@@ -1,23 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Avatar, Card, CardActionArea, CardContent, Dialog, Divider, TextField } from "@mui/material";
+import { APIContext } from "../../contexts/APIContext.jsx";
 
 export default function AdminUser({ closeCallback }) {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredUsers, setFilteredUsers] = useState([]);
+    const { getAllAccounts } = useContext(APIContext);
 
     useEffect(() => {
-        setFilteredUsers(users.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase())));
+        console.log("Users updated:", users);
+        setFilteredUsers(users.filter(user => user.username.toLowerCase().includes(searchTerm.toLowerCase())));
     }, [searchTerm, users]);
 
     const getAllUsers = () => {
-        // Fetch all users from the backend (not implemented)
-        // Temporarily give fake data
+        getAllAccounts().then(fetchedUsers => {
+            setUsers(fetchedUsers);
+        }).catch(err => {
+            console.error("Failed to fetch users:", err);
+        });
+    }
 
-        for (let i = 0; i < 30; i++) {
-            setUsers(prevUsers => [...prevUsers, { id: i, name: `User ${i + 1}`, email: `user${i + 1}@example.com`, role: `Role ${i + 1}` }]);
-        }
+    const updatedUserRole = (newRole) => {
+        // 0 = admin | 1 = dev | 2 = user
     }
 
     useEffect(() => {
@@ -44,13 +50,13 @@ export default function AdminUser({ closeCallback }) {
 
                 {
                     filteredUsers.map((user) => (
-                        <Card key={user.id} className="!bg-midnight-opacity !text-white !h-1/6 !w-1/6">
+                        <Card key={user.user_id} className="!bg-midnight-opacity !text-white !h-1/6 !w-1/6">
                             <CardActionArea onClick={() => setSelectedUser(user)}>
                                 <CardContent>
                                     <div className="h-full w-full flex flex-col">
                                         <h3 className="text-lg font-bold mb-2">{user.name}</h3>
                                         <p>Email: {user.email}</p>
-                                        <p>Role: {user.role}</p>
+                                        <p>Role: {user.user_role}</p>
                                     </div>
                                 </CardContent>
                             </CardActionArea>
@@ -64,15 +70,27 @@ export default function AdminUser({ closeCallback }) {
                     <div className="bg-midnight p-5 flex flex-row">
                         <div className="flex flex-col items-center mr-10">
                             <Avatar className="!w-20 !h-20 !mb-5 !self-center" />
-                            <p className="text-white">ID: {selectedUser === null ? "" : selectedUser.id}</p>
+                            <p className="text-white">ID: {selectedUser === null ? "" : selectedUser.user_id}</p>
                         </div>
                         <div className="flex flex-col items-center w-full">
-                            <p className=" text-white mb-4 text-left">{selectedUser === null ? "" : selectedUser.name}</p>
+                            <p className=" text-white mb-4 text-left">{selectedUser === null ? "" : selectedUser.username}</p>
                             <p className=" text-white mb-4 text-left">{selectedUser === null ? "" : selectedUser.email}</p>
                         </div>
                     </div>
                     <div className="flex flex-row-reverse gap-5">
                         {/* More user details and management options would go here */}
+                        {
+                            selectedUser !== null && selectedUser.user_role === "user" ?
+                            <button className="mt-5 p-2 bg-midnight-blue text-white rounded-lg w-32 self-end"
+                                onClick={() => setSelectedUser(null)}>
+                                Promote
+                            </button>
+                            :
+                            <button className="mt-5 p-2 bg-midnight-blue text-white rounded-lg w-32 self-end"
+                                onClick={() => setSelectedUser(null)}>
+                                Demote
+                            </button>
+                        }
                         <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 self-end"
                             onClick={() => setSelectedUser(null)}>
                             Mute

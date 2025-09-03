@@ -1,18 +1,43 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext} from "react";
 import { Avatar, Card, CardActionArea, CardContent, Dialog, Divider, TextField } from "@mui/material";
+
+import { APIContext } from "../../contexts/APIContext.jsx";
 
 export default function AdminComment({ closeCallback }) {
     const [comments, setComments] = useState([]);
     const [selectedComment, setSelectedComment] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredComments, setFilteredComments] = useState([]);
+    const [userName, setUserName] = useState("");
+    const [algorithmName, setAlgorithmName] = useState("");
+
+    const { getAllComments, getAlgorithmById, getUserById } = useContext(APIContext);
 
     const getComments = () => {
-        // Fetch all comments from the backend (not implemented)
-        // Temporarily give fake data
-        for (let i = 0; i < 29; i++) {
-            setComments(prevComments => [...prevComments, { id: i, user: `User ${i + 1}`, content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur malesuada, urna vitae iaculis finibus, enim dolor posuere eros, at pretium nulla urna sed ante. ${i + 1}` }]);
-        }
+
+        getAllComments().then(fetchedComments => {
+            setComments(fetchedComments);
+            setFilteredComments(fetchedComments);
+            console.log("Fetched comments:", fetchedComments);
+        }).catch(err => {
+            console.error("Failed to fetch comments:", err);
+        });
+    }
+
+    const getUserName = (userId) => {
+        getUserById(userId).then(user => {
+            console.log("Fetched user details:", user);
+            setUserName(user.data.username);
+        });
+    }
+
+    const getAlgorithmName = (algId) => {
+        getAlgorithmById(algId).then(alg => {
+            console.log("Fetched algorithm details:", alg);
+            if (alg !== undefined) {
+                setAlgorithmName(alg.data.name);
+            }
+        });
     }
 
     useEffect(() => {
@@ -20,8 +45,13 @@ export default function AdminComment({ closeCallback }) {
     }, []);
 
     useEffect(() => {
-        setFilteredComments(comments.filter(comment => comment.content.toLowerCase().includes(searchTerm.toLowerCase())));
+        setFilteredComments(comments.filter(comment => comment.contents.toLowerCase().includes(searchTerm.toLowerCase())));
     }, [searchTerm, comments]);
+
+    const getDetails = (userId, algId) => {
+        getUserName(userId);
+        // getAlgorithmName(algId);
+    }
 
     return (
         <div className="bg-midnight w-full h-full p-5 flex flex-col">
@@ -45,11 +75,14 @@ export default function AdminComment({ closeCallback }) {
                 {
                     filteredComments.map((comment) => (
                         <Card key={comment.id} className="!bg-midnight-opacity !text-white !h-1/6 !w-1/3">
-                            <CardActionArea onClick={() => setSelectedComment(comment)}>
+                            <CardActionArea onClick={() => {
+                                setSelectedComment(comment);
+                                getDetails(comment.posted_by, comment.automaton_id);
+                            }}>
                                 <CardContent>
                                     <div className="h-full w-full flex flex-col">
-                                        <h3 className="text-lg font-bold mb-2">{comment.user}</h3>
-                                        <p className="text-ellipsis overflow-hidden">{comment.content}</p>
+                                        <h3 className="text-lg font-bold mb-2">{comment.username}</h3>
+                                        <p className="text-ellipsis overflow-hidden">{comment.contents}</p>
                                     </div>
                                 </CardContent>
                             </CardActionArea>
@@ -60,15 +93,11 @@ export default function AdminComment({ closeCallback }) {
 
             <Dialog open={selectedComment !== null} onClose={() => setSelectedComment(null)} maxWidth="sm" fullWidth>
                 <div className="bg-midnight p-5 flex flex-col">
-                    <div className="bg-midnight p-5 flex flex-row">
-                        <div className="flex flex-col items-center mr-10">
-                            <Avatar className="!w-20 !h-20 !mb-5 !self-center" />
-                            <p className="text-white">ID: {selectedComment === null ? "" : selectedComment.id}</p>
-                        </div>
-                        <div className="flex flex-col items-center w-full">
-                            <p className=" text-white mb-4 text-left">{selectedComment === null ? "" : selectedComment.user}</p>
-                            <p className=" text-white mb-4 text-left">{selectedComment === null ? "" : selectedComment.content}</p>
-                        </div>
+                    <div className="bg-midnight p-5 flex flex-col">
+                        <p className=" text-white text-left opacity-70">User : <span>{selectedComment === null ? "" : userName}</span></p>
+                        {/* <p className=" text-white text-left opacity-70">Automaton : <span>{selectedComment === null ? "" : algorithmName}</span></p> */}
+                        <p className="text-white text-left opacity-70">Comment ID: {selectedComment === null ? "" : selectedComment.id}</p>
+                        <p className=" text-white my-5 text-left text-xl">{selectedComment === null ? "" : selectedComment.contents}</p>
                     </div>
                     <div className="flex flex-row-reverse gap-5">
                         {/* More user details and management options would go here */}

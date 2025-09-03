@@ -1,30 +1,39 @@
-import React, {useState, useEffect} from "react";
-import { CardMedia, Divider, TextField, Card, CardActionArea, CardContent, Dialog, Avatar } from "@mui/material";
+import React, {useState, useEffect, useContext} from "react";
+import { CardMedia, Divider, TextField, Card, CardActionArea, CardContent, Dialog, Avatar, Tooltip } from "@mui/material";
+
+import { APIContext } from "../../contexts/APIContext.jsx";
 
 export default function AdminAlgorithm({ closeCallback }) {
     const [searchTerm, setSearchTerm] = useState("");
-    const [algorithm, setAlgorithm] = useState([]);
+    const [algorithms, setAlgorithms] = useState([]);
     const [filteredAlgorithms, setFilteredAlgorithms] = useState([]);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState(null);
 
-    useEffect(() => {
-        setFilteredAlgorithms(algorithm.filter(alg => alg.name.toLowerCase().includes(searchTerm.toLowerCase())));
-    }, [searchTerm, algorithm]);
+    const { getAllAlgorithms } = useContext(APIContext);
 
-    const getAllAlgorithms = () => {
+    useEffect(() => {
+        setFilteredAlgorithms(algorithms.filter(alg => alg.name.toLowerCase().includes(searchTerm.toLowerCase())));
+    }, [searchTerm, algorithms]);
+
+    const getAlgorithms = () => {
         // Fetch all algorithms from the backend (not implemented)
-        // Temporarily give fake data
-        for (let i = 0; i < 30; i++) {
-            setAlgorithm(prevAlgorithms => [...prevAlgorithms, { id: i, image: "https://citygem.app/wp-content/uploads/2024/08/placeholder-1-1.png", name: `Algorithm ${i + 1}`, description: `Description for Algorithm ${i + 1}`, link: `https://github.com` }]);
-        }
+
+        getAllAlgorithms().then(fetchedAlgorithms => {
+            setAlgorithms(fetchedAlgorithms);
+            setFilteredAlgorithms(fetchedAlgorithms);
+            console.log("Fetched algorithms:", fetchedAlgorithms);
+        }).catch(err => {
+            console.error("Failed to fetch algorithms:", err);
+        });
+        console.log("Fetched algorithms:", algorithms);
     }
 
     const openExternal = (url) => {
-        window.electron.openExternal(url);
+        window.electron.openExternal(url);        // Temporarily give fake data
     }
 
     useEffect(() => {
-        getAllAlgorithms();
+        getAlgorithms();
     }, []);
 
     return (
@@ -45,13 +54,13 @@ export default function AdminAlgorithm({ closeCallback }) {
 
                 {
                     filteredAlgorithms.map((alg) => (
-                        <Card key={alg.id} className="!bg-midnight-opacity !text-white !h-1/3 !w-1/3">
+                        <Card key={alg.automaton_id} className="!bg-midnight-opacity !text-white !h-1/3 !w-1/3 overflow-y-hidden text-ellipsis">
                             <CardActionArea onClick={() => setSelectedAlgorithm(alg)}>
-                                <CardMedia sx={{height: 140}} image={alg.image} title={alg.name} />
-                                <CardContent>
-                                    <div className="h-full w-full flex flex-col">
+                                <CardMedia sx={{ height: 140}} image={alg.image[0].contents_binary ? `data:image/png;base64,${alg.image[0].contents_binary}` : "https://citygem.app/wp-content/uploads/2024/08/placeholder-1-1.png"} title={alg.name} />
+                                <CardContent className="h-full w-full">
+                                    <div className="h-max flex flex-col overflow-hidden text-ellipsis">
                                         <h3 className="text-lg font-bold mb-2">{alg.name}</h3>
-                                        <p>Description: {alg.description}</p>
+                                        <p className="text-sm text-ellipsis overflow-y-hidden truncate">{alg.description}</p>
                                     </div>
                                 </CardContent>
                             </CardActionArea>
@@ -62,7 +71,7 @@ export default function AdminAlgorithm({ closeCallback }) {
 
             <Dialog open={selectedAlgorithm !== null} onClose={() => setSelectedAlgorithm(null)} maxWidth="lg" fullWidth>
                 <div className="w-full h-2/3">
-                    <img src={selectedAlgorithm?.image} alt={selectedAlgorithm?.name} className="w-full h-48 object-cover" />
+                    <img src={selectedAlgorithm?.image[0].contents_binary ? `data:image/png;base64,${selectedAlgorithm?.image[0].contents_binary}` : "https://citygem.app/wp-content/uploads/2024/08/placeholder-1-1.png"} alt={selectedAlgorithm?.name} className="w-full h-48 object-cover" />
                 </div>
                 <div className="bg-midnight p-5 flex flex-col text-white font-mono">
                     <div>
@@ -76,18 +85,24 @@ export default function AdminAlgorithm({ closeCallback }) {
                     </div>
                     <div className="flex flex-row-reverse gap-5">
                         {/* More user details and management options would go here */}
-                        <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
-                            onClick={() => setSelectedAlgorithm(null)}>
-                            Delete
-                        </button>
-                        <button className="mt-5 p-2 bg-green-500 text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
-                            onClick={() => setSelectedAlgorithm(null)}>
-                            Accept
-                        </button>
-                        <button className="mt-5 p-2 bg-blue-500 text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
-                            onClick={() => setSelectedAlgorithm(null)}>
-                            Reject
-                        </button>
+                        <Tooltip title="Deleting an algorithm will remove it from the system." arrow>
+                            <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
+                                onClick={() => setSelectedAlgorithm(null)}>
+                                Delete
+                            </button>
+                        </Tooltip>
+                        <Tooltip title="Accepting an algorithm will add it to the system." arrow>
+                            <button className="mt-5 p-2 bg-midnight-green text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
+                                onClick={() => setSelectedAlgorithm(null)}>
+                                Accept
+                            </button>
+                        </Tooltip>
+                        <Tooltip title="Rejecting an algorithm will keep it in the system but users can't see it." arrow>
+                            <button className="mt-5 p-2 bg-midnight-blue text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
+                                onClick={() => setSelectedAlgorithm(null)}>
+                                Reject
+                            </button>
+                        </Tooltip>
                     </div>
                 </div>
             </Dialog>
