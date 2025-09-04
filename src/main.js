@@ -109,3 +109,7 @@ ipcMain.handle('open-external', async (event, url) => {
   const { shell } = require('electron');
   await shell.openExternal(url);
 });
+
+ipcMain.handle('get-os', async () => {
+  return process.platform;
+});

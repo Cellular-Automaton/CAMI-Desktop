@@ -12,7 +12,7 @@ contextBridge.exposeInMainWorld('electron', {
 
   // Simulation related IPC calls
   callPlugin: (params) => ipcRenderer.invoke('call-plugin', params),
-  installPlugin: (params) => ipcRenderer.invoke('install-plugin', params),
+  installPlugin: (url, params) => ipcRenderer.invoke('install-plugin', url, params),
   deletePlugin: (params) => ipcRenderer.invoke('delete-plugin', params),
   getParametersNames: (params) => ipcRenderer.invoke('get-parameters-names', params),
   getParametersTypes: (params) => ipcRenderer.invoke('get-parameters-types', params),
@@ -25,4 +25,7 @@ contextBridge.exposeInMainWorld('electron', {
 
   // External links
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
+
+  // Get OS
+  getOS: () => ipcRenderer.invoke('get-os'),
 });

@@ -78,16 +78,7 @@ export const APIProvider = ({ children }) => {
         formData.append("automaton[name]", algorithmForm.name);
         formData.append("automaton[description]", algorithmForm.description);
         formData.append("automaton[contents]", algorithmForm.content);
-        
-        // Fichiers binaires
-        formData.append("automaton[file][0][contents]", await blobToBase64(algorithmForm.automaton_node));
-        formData.append("automaton[file][0][name]", ".node");
-
-        formData.append("automaton[file][1][contents]", await blobToBase64(algorithmForm.automaton_lib));
-        formData.append("automaton[file][1][name]", ".lib");
-
-        formData.append("automaton[file][2][contents]", await blobToBase64(algorithmForm.automaton_exp));
-        formData.append("automaton[file][2][name]", ".exp");
+        formData.append("automaton[assets_link]", algorithmForm.link);
 
         // Image (si c'est un blob ou un fichier)
         formData.append("automaton[image][0][contents_binary]", await blobToBase64(algorithmForm.image));
@@ -229,12 +220,25 @@ export const APIProvider = ({ children }) => {
       });
     }
 
-    const downloadAlgorithm = async (algorithm_id) => {
-        const url = `${apiUrl}/automaton/images/${algorithm_id}`;
+    const downloadAlgorithm = async (algorithmLink) => {
+        const url = algorithmLink;
+        const os = await window.electron.getOS();
+        const osMap = {
+            win32: "windows",
+            darwin: "macos",
+            linux: "linux"
+        }
+
+        console.log("Detected OS:", os);
 
         try {
             const response = await axios.get(url);
-            return response.data;
+            const assets = response.data.assets;
+            const asset = assets.find(a => a.name.toLowerCase().includes(osMap[os]));
+            if (!asset)
+                throw new Error(`No compatible asset found for OS: ${osMap[os]}`);
+            console.log("Download response:", asset.browser_download_url);
+            return asset.browser_download_url;
         } catch (error) {
             console.error("Error downloading algorithm:", error);
             toast.error("Failed to download algorithm. Please try again.", {

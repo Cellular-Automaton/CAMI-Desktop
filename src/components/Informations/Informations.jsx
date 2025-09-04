@@ -100,13 +100,14 @@ const Informations = ({algorithm, onCloseCallback}) => {
 
     const handleDownloadAlgorithm = async () => {
         try {
-            const response = await downloadAlgorithm(algorithm.automaton_id);
+            const response = await downloadAlgorithm(algorithm.assets_link);
             console.log("Download response:", response);
             toast.success("Algorithm downloaded successfully!");
             setIsAlgorithmInstalled(true);
 
-            window.electron.installPlugin(response);
+            await window.electron.installPlugin(response, algorithm);
             window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
+                console.log("Checking installation status after download:", isInstalled);
             if (isInstalled) {
                 console.log("Algorithm is installed");
                 setIsAlgorithmInstalled(true);
