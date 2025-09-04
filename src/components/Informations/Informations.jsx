@@ -29,7 +29,11 @@ const Informations = ({algorithm, onCloseCallback}) => {
         if (algorithm !== null && algorithm !== undefined && Object.keys(algorithm).length !== 0) {
             setIsAlgorithmPresent(true);
             fetchComments();
-            setImage(algorithm.image[0].contents_binary ? `data:image/png;base64,${algorithm.image[0].contents_binary}` : "https://asset.gecdesigns.com/img/background-templates/gradient-triangle-abstract-background-template-10032405-1710079376651-cover.webp");
+            if (algorithm.image && algorithm.image.length > 0) {
+                setImage(`data:image/png;base64,${algorithm.image[0].contents_binary}`);
+            } else {
+                setImage("https://asset.gecdesigns.com/img/background-templates/gradient-triangle-abstract-background-template-10032405-1710079376651-cover.webp");
+            }  
         } else {
             setIsAlgorithmPresent(false);
         }
