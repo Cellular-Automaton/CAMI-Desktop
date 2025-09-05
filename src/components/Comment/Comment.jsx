@@ -6,9 +6,6 @@ import { formatDistance } from "date-fns";
 const Comment = ({ comment, reply }) => {
     const [isResponsesLoaded, setIsResponsesLoaded] = useState(false);
 
-    const test = () => {
-        console.log("Commentaire", comment);
-    }
     return (
         <div className="flex flex-col w-full gap-2 p-2">
             <div id="author" className="flex flex-row justify-start items-baseline w-full gap-2 text-sm font-bold text-midnight-text">

@@ -26,7 +26,6 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
     };
 
     useEffect(() => {
-        console.log("AlgorithmCard useEffect called with algorithm:", algorithm.image[0]);
         if (algorithm.image[0] !== undefined && algorithm.image[0].contents_binary) {
             // Si algorithm.image est déjà une chaîne base64
             // Adapte le type MIME si besoin (png, jpeg, etc.)

@@ -4,23 +4,20 @@ import { toast } from "react-toastify";
 import { APIContext } from "../../contexts/APIContext.jsx";
 import { Select, Box, MenuItem, Chip, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Submission() {
     const [form, setForm] = useState({
         name: "",
         description: "",
         image: null,
-        tags: [],
-        automaton_node: null,
-        automaton_lib: null,
-        automaton_exp: null,
+        tags: []
     });
+
     const [filePaths, setFilePaths] = useState({
-        automaton_node: "",
-        automaton_lib: "",
-        automaton_exp: "",
         image: ""
     });
+
     const { addAlgorithm } = useContext(APIContext);
     const [tags, setTags] = useState([]);
     const { getTags, setAlgorithmTags } = useContext(APIContext);
@@ -30,7 +27,7 @@ function Submission() {
         // Fetch tags from the API
         getTags().then((fetchedTags) => {
             setTags(fetchedTags);
-            console.log("Fetched tags:", fetchedTags);
+            
         }).catch((error) => {
             console.error("Error fetching tags:", error)
             toast.error("Error fetching tags. Please try again later.", {
@@ -54,51 +51,44 @@ function Submission() {
         }));
     };
 
+    const openExternalLink = (url) => {
+        window.electron.openExternal(url);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!form.name || !form.description || !form.automaton_exp || !form.automaton_lib || !form.automaton_node) {
-            toast.error("Please fill in all fields and select a file.", {
+        
+
+        // Check link validity
+        try {
+            const url = new URL(form.link);
+            if (!url.hostname.includes("api.github.com")) {
+                throw new Error("Invalid hostname.");
+            }
+            axios.get(url.pathname).then((response) => {
+                if (response.status !== 200 && response.status !== 201 && response.status !== 304) {
+                    throw new Error("GitHub API link is not reachable.");
+                }
+            }).catch((error) => {
+                return error;
+            });
+        } catch (error) {
+            toast.error(error.message + " Please provide a valid GitHub API link.", {
                 position: "top-right",
                 autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "dark",
             });
             return;
         }
-        console.log("Form submitted:", form);
+
         // Send to the API
         addAlgorithm(form).then((response) => {
-            console.log("Algorithm added successfully:", response);
+            
             setAlgorithmTags(response.data.automaton_id, form.tags);
             navigate("/Home");
         }).catch((error) => {
             console.error("Error adding algorithm:", error);
         });
     };
-
-    const handleRemoveFile = () => {
-        setForm((prev) => ({
-            ...prev,
-            file: null,
-        }));
-    }
-
-    const handleImportFile = async (extension) => {
-        const filePath = await window.electron.openDialog(extension);
-        if (!filePath || filePath == null) return;
-        setFilePaths((prev) => ({
-            ...prev,
-            [`automaton_${extension}`]: filePath,
-        }));
-        const file = await window.electron.loadFile(filePath);
-        setForm((prev) => ({
-            ...prev,
-            [`automaton_${extension}`]: new Blob([file], {type: "application/octet-stream"}), // Convert file to Blob
-        }));
-    }
 
     const handleImportImage = async () => {
         const imagePath = await window.electron.openDialog("png jpg jpeg");
@@ -111,7 +101,7 @@ function Submission() {
         }));
         image = await window.electron.loadFile(imagePath);
         image = new Blob([image]);
-        console.log(image);
+        
         setForm((prev) => ({
             ...prev,
             image: image, // Convert Blob to URL
@@ -173,8 +163,8 @@ function Submission() {
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, padding: "2px", borderRadius: "4px" }}>
                                         {
                                             selected.map((tag) => {
-                                                console.log("Selected tag:", selected);
-                                                console.log("Selected tag:", tag);
+                                                
+                                                
                                                 return (
                                                     <Tooltip title={tag.description} key={tag.id} arrow 
                                                         sx={{ fontFamily: "'JetBrains Mono', monospace" }}
@@ -195,7 +185,7 @@ function Submission() {
                                 {
                                     tags.map((tag) =>
                                         {
-                                            console.log("Tag:", tag);
+                                            
                                             return (
                                                 <MenuItem
                                                     key={tag.id}
@@ -227,7 +217,7 @@ function Submission() {
 
                     <div>
                         <label>
-                            Content:
+                            Parameters:
                             <textarea
                                 name="content"
                                 value={form.content}
@@ -239,7 +229,31 @@ function Submission() {
                         </label>
                     </div>
 
-                     <div>
+                    <div className="flex flex-col gap-2">
+                        <label className="justify-center flex flex-col items-center">
+                            <span className="w-full text-left">Github link to release:</span>
+                            <span className="text-xs opacity-70 w-full text-left">(e.g., 
+                                <a 
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        openExternalLink("https://docs.github.com/fr/rest/releases/releases?apiVersion=2022-11-28#get-the-latest-release");
+                                    }}
+                                    className="text-midnight-purple" href="https://docs.github.com/fr/rest/releases/releases?apiVersion=2022-11-28#get-the-latest-release">
+                                    https://api.github.com/repos/[owner]/[repo]/releases/latest
+                                </a>)
+                            </span>
+                            <input
+                                name="link"
+                                type="text"
+                                value={form.link}
+                                onChange={handleChange}
+                                required
+                                className="w-full p-2 border border-gray-300 rounded bg-midnight text-white"
+                            />
+                        </label>
+                    </div>
+
+                    <div>
                         <label className="justify-center flex flex-col items-center">
                             <span className="w-full text-left">Image:</span>
                         </label>
@@ -272,80 +286,6 @@ function Submission() {
                         }
                     </div>
 
-                    <div>
-                        <label className="w-full justify-center flex flex-col items-center">
-                            <span className="w-full text-left">Automaton .node:</span>
-                        </label>
-                        {
-                            !form.automaton_node ?
-                                <button
-                                    type="button"
-                                    onClick={() => handleImportFile("node")}
-                                    className="bg-midnight-purple text-white w-full py-2 px-4 rounded hover:bg-midnight-purple-dark"
-                                >
-                                    Import file
-                                </button>
-                            :
-                            <div className="flex flex-row w-full justify-between items-center my-2 p-2 h-16 bg-midnight-opacity rounded">
-                                <p>
-                                    <span className="text-sm text-center max-w-xs overflow-hidden text-ellipsis">
-                                        {filePaths.automaton_node.split("\\").pop()}
-                                    </span>
-                                </p>
-                                <button onClick={handleRemoveFile} type="button" className="hover:bg-red-500 rounded w-1/12 h-full">X</button>
-                            </div>
-                        }
-                    </div>
-
-                    <div>
-                        <label className="w-full justify-center flex flex-col items-center">
-                            <span className="w-full text-left">Automaton .lib:</span>
-                        </label>
-                        {
-                            !form.automaton_lib ?
-                                <button
-                                    type="button"
-                                    onClick={() => handleImportFile("lib")}
-                                    className="bg-midnight-purple text-white w-full py-2 px-4 rounded hover:bg-midnight-purple-dark"
-                                >
-                                    Import file
-                                </button>
-                            :
-                            <div className="flex flex-row w-full justify-between items-center my-2 p-2 h-16 bg-midnight-opacity rounded">
-                                <p>
-                                    <span className="text-sm text-center max-w-xs overflow-hidden text-ellipsis">
-                                        {filePaths.automaton_lib.split("\\").pop()}
-                                    </span>
-                                </p>
-                                <button onClick={handleRemoveFile} type="button" className="hover:bg-red-500 rounded w-1/12 h-full">X</button>
-                            </div>
-                        }
-                    </div>
-
-                    <div>
-                        <label className="w-full justify-center flex flex-col items-center">
-                            <span className="w-full text-left">Automaton .exp:</span>
-                        </label>
-                        {
-                            !form.automaton_exp ?
-                                <button
-                                    type="button"
-                                    onClick={() => handleImportFile("exp")}
-                                    className="bg-midnight-purple text-white w-full py-2 px-4 rounded hover:bg-midnight-purple-dark"
-                                >
-                                    Import file
-                                </button>
-                            :
-                            <div className="flex flex-row w-full justify-between items-center my-2 p-2 h-16 bg-midnight-opacity rounded">
-                                <p>
-                                    <span className="text-sm text-center max-w-xs overflow-hidden text-ellipsis">
-                                        {filePaths.automaton_exp.split("\\").pop()}
-                                    </span>
-                                </p>
-                                <button onClick={handleRemoveFile} type="button" className="hover:bg-red-500 rounded w-1/12 h-full">X</button>
-                            </div>
-                        }
-                    </div>
                     <div className="flex items-center justify-between mt-4 gap-5">
                         <button type="submit" className="bg-midnight-purple text-white py-2 px-4 rounded hover:bg-midnight-purple-dark w-full">Submit</button>
                         <button onClick={handleReset} type="button" className="bg-red-400 text-white py-2 px-4 rounded hover:bg-red-500 w-full">Reset</button>

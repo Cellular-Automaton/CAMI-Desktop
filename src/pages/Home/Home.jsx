@@ -31,7 +31,7 @@ export default function Home() {
     // Replace $USER with the username
     const replaceUserInSentence = (sentence) => {
         if (loggedIn) {
-            console.log(userData);
+            
             return sentence.replace("$USER",  " " + userData.username);
         }
         return sentence.replace("$USER",  "");
@@ -41,10 +41,10 @@ export default function Home() {
         setSentence(replaceUserInSentence(welcomeSentences[Math.floor(Math.random() * welcomeSentences.length)]));
         // Get algorithms from the API
         getAlgorithms().then((algorithms) => {
-            console.log("Fetched algorithms:", algorithms);
+            
             setRecentAlgorithms(algorithms.slice(0, 5));
             getTags().then((tags) => {
-                console.log("Fetched tags:", tags);
+                
             }).catch((error) => {
                 console.error("Error fetching tags:", error);
             });

@@ -78,22 +78,12 @@ export const APIProvider = ({ children }) => {
         formData.append("automaton[name]", algorithmForm.name);
         formData.append("automaton[description]", algorithmForm.description);
         formData.append("automaton[contents]", algorithmForm.content);
-        
-        // Fichiers binaires
-        formData.append("automaton[file][0][contents]", await blobToBase64(algorithmForm.automaton_node));
-        formData.append("automaton[file][0][name]", ".node");
-
-        formData.append("automaton[file][1][contents]", await blobToBase64(algorithmForm.automaton_lib));
-        formData.append("automaton[file][1][name]", ".lib");
-
-        formData.append("automaton[file][2][contents]", await blobToBase64(algorithmForm.automaton_exp));
-        formData.append("automaton[file][2][name]", ".exp");
+        formData.append("automaton[assets_link]", algorithmForm.link);
 
         // Image (si c'est un blob ou un fichier)
         formData.append("automaton[image][0][contents_binary]", await blobToBase64(algorithmForm.image));
         formData.append("automaton[image][0][contents_type]", algorithmForm.imageType);
 
-        console.log("Form Data:", formData);
         try {
             const response = await axios.post(url, formData, {
                 headers: {
@@ -149,7 +139,6 @@ export const APIProvider = ({ children }) => {
     const addAlgorithmComment = async (commentData) => {
         const url = `${apiUrl}/automaton_comment`;
 
-        console.log("Comment Data:", commentData);
         try {
             const response = await axios.post(url, commentData);
             const data = response.data;
@@ -229,12 +218,23 @@ export const APIProvider = ({ children }) => {
       });
     }
 
-    const downloadAlgorithm = async (algorithm_id) => {
-        const url = `${apiUrl}/automaton/images/${algorithm_id}`;
+    const downloadAlgorithm = async (algorithmLink) => {
+        const url = algorithmLink;
+        const os = await window.electron.getOS();
+        const osMap = {
+            win32: "windows",
+            darwin: "macos",
+            linux: "linux"
+        }
+
 
         try {
             const response = await axios.get(url);
-            return response.data;
+            const assets = response.data.assets;
+            const asset = assets.find(a => a.name.toLowerCase().includes(osMap[os]));
+            if (!asset)
+                throw new Error(`No compatible asset found for OS: ${osMap[os]}`);
+            return asset.browser_download_url;
         } catch (error) {
             console.error("Error downloading algorithm:", error);
             toast.error("Failed to download algorithm. Please try again.", {
@@ -263,8 +263,255 @@ export const APIProvider = ({ children }) => {
         }
     }
 
+    const getAllAccounts = async () => {
+        const url = `${apiUrl}/user`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            toast.error('Failed to fetch all accounts. Please try later.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            throw error;
+        }
+    }
+
+    const getAllComments = async () => {
+        const url = `${apiUrl}/automaton_comment`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            toast.error('Failed to fetch all comments. Please try later.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            throw error;
+        }
+    }
+
+    const getAllAlgorithms = async () => {
+        const url = `${apiUrl}/automaton`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            toast.error('Failed to fetch all algorithms. Please try later.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            throw error;
+        }
+    }
+
+    const getUserById = async (userId) => {
+        const url = `${apiUrl}/user/${userId}`;
+
+        try {
+            const response = await axios.get(url);
+            return response.data;
+        } catch (error) {
+            toast.error("Failed to fetch user data. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        }
+    }
+
+    const getAlgorithmById = async (algorithmId) => {
+        const url = `${apiUrl}/automaton/${algorithmId}`;
+        try {
+            const response = await axios.get(url);
+            return response.data;
+        } catch (error) {
+            toast.error("Failed to fetch algorithm data. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        }
+    }
+
+    const deleteComment = async (commentId) => {
+        const url = `${apiUrl}/automaton_comment/${commentId}`;
+        try {
+            const response = await axios.delete(url);
+            toast.success("Comment deleted successfully!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            return response.data;
+        } catch (error) {
+            toast.error("Failed to delete comment. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        }
+    }
+
+    const deleteUser = async (userId) => {
+        const url = `${apiUrl}/user/${userId}`;
+        try {
+            const response = await axios.delete(url);
+            toast.success("User deleted successfully!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            return response.data;
+        } catch (error) {
+            toast.error("Failed to delete user. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        }
+    }
+
+    const deleteAlgorithm = async (algorithmId) => {
+        const url = `${apiUrl}/automaton/${algorithmId}`;
+        try {
+            const response = await axios.delete(url);
+            toast.success("Algorithm deleted successfully!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            return response.data;
+        } catch (error) {
+            toast.error("Failed to delete algorithm. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        }
+    }
+
+    const updateUser = async (updatedData) => {
+        const url = `${apiUrl}/user/${updatedData.user_id}`;
+        const data = {
+            user: updatedData,
+        }
+
+        try {
+            const response = await axios.put(url, data);
+            toast.success("User updated successfully!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            return response.data;
+        } catch (error) {
+            toast.error("Failed to update user. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        }
+    }
+
+    const getLastestUsers = async () => {
+        try {
+            const users = await getAllAccounts();
+            users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            return users.slice(0, 5);
+        } catch (error) {
+            console.error("Failed to fetch last 5 users:", error);
+        }
+    }
+
+    const getLastestAlgorithms = async () => {
+        try {
+            const algorithms = await getAllAlgorithms();
+            algorithms.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            return algorithms.slice(0, 5);
+        } catch (error) {
+            console.error("Failed to fetch last 5 algorithms:", error);
+        }
+    }
+
+    const getLastestComments = async () => {
+        try {
+            const comments = await getAllComments();
+            comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            return comments.slice(0, 5);
+        } catch (error) {
+            console.error("Failed to fetch last 5 comments:", error);
+        }
+    }
+
     return (
-        <APIContext.Provider value={{ apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms, addAlgorithmComment, getAlgorithmComments, getTags, postAlgorithmTags, downloadAlgorithm, setAlgorithmTags }}>
+        <APIContext.Provider value={
+            { 
+                apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms, addAlgorithmComment,
+                getAlgorithmComments, getTags, postAlgorithmTags, downloadAlgorithm, setAlgorithmTags,
+                getAllAccounts, getAllComments, getAllAlgorithms, getUserById, getAlgorithmById,
+                deleteComment, deleteUser, deleteAlgorithm, updateUser,
+                getLastestUsers, getLastestAlgorithms, getLastestComments
+            }
+        }>
             {children}
         </APIContext.Provider>
     );

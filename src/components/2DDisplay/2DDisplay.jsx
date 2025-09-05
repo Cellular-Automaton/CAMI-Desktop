@@ -18,7 +18,6 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
 
     useEffect(() => {
         init().then(() => {
-            console.log("PixiJS Application initialized");
         }).catch((error) => {
             console.error("Error initializing PixiJS Application:", error);
         });
@@ -121,7 +120,6 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
 
     const drawCells = () => {
         cellInstances.forEach(cell => {
-            console.log("Drawing cell at position:", cell);
             cell.draw();
         });
         centerCamera();

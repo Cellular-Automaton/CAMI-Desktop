@@ -34,20 +34,14 @@ import './index.jsx';
 /* var worker = new Worker(new URL('./worker.js', import.meta.url));
 worker.onmessage = function(event) {
    //print result on console and h1 tag
-   console.log("worker : ", event.data);
+   
    document.querySelector('h1').innerHTML = "native addon add function(3, 4): " + event.data;   //terminate webworker
    worker.terminate();
    //set it to undefined
    worker = undefined;
 }
 worker.onerror = function (event) {
-  console.log(event.message, event);
+  
 };
 worker.postMessage('start');
 */
-
-
-
-console.log(
-  '👋 This message is being logged by "renderer.js", included via webpack',
-);

@@ -67,10 +67,10 @@ export default function Community() {
     }, [search]);
 
     useEffect(() => {
-        console.log("Algorithms updated:", algorithms);
+        
 
         if (algorithms === undefined || algorithms.length === 0) return;
-        console.log("PASSED")
+        
         setIsFetchComplete(true);
     },  [algorithms]);
 
@@ -211,7 +211,7 @@ export default function Community() {
                     <div id="results" className="flex flex-row flex-wrap gap-x-8 gap-y-4 h-full w-full p-5 max-w-full font-mono justify-center overflow-y-auto">
                         {
                             algorithms.map((algorithm) => {
-                                console.log("Algorithm:", algorithm);
+                                
                                 return (
                                     <AlgorithmCard key={algorithm.automaton_id} algorithm={algorithm} onClickCallback={openInformationPanel} />
                                 )

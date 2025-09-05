@@ -5,7 +5,6 @@ export default function Taskbar() {
   const [isFullscreen, setIsFullscreen] = React.useState(false);
 
   const handleMinimize = () => {
-    console.log("Minimize");
     window.electron.ipcRenderer.send("minimize-app");
   };
 

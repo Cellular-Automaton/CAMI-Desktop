@@ -23,13 +23,13 @@ export const UserProvider = ({ children }) => {
     }
 
     const setUser = async (user) => {
-        console.log("HERE", user)
         setUserData({
             user_id: user.user_id || null,
             username: user.username || null,
             email: user.email || null,
             img: user.img || null,
             token: user.token || null,
+            role: user.role || null,
         });
         setLoggedIn(true);
     }

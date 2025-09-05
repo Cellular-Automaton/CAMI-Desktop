@@ -22,10 +22,10 @@ const createWindow = () => {
   });
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  console.log(MAIN_WINDOW_WEBPACK_ENTRY);
+  
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -62,16 +62,13 @@ ipcMain.on('save-json', (event, data) => {
   });
 
   if (!filePath) {
-    console.log('Save dialog was cancelled', filePath);
     return;
   }
 
   if (filePath) {
-    console.log('Saving file to:', filePath, 'with data:', data);
 
     fs.writeFile(filePath, data, (err) => {
       if (err) {
-        console.error('Error saving file:', err);
         dialog.showErrorBox('Error', 'Failed to save the file.');
       } else {
         dialog.showMessageBox(mainWindow, {
@@ -91,7 +88,6 @@ ipcMain.handle('open-dialog', async (e, fileExtension) => {
   });
 
   if (canceled) {
-    console.log('Open dialog was cancelled');
     return null;
   }
   return filePaths[0];
@@ -103,4 +99,13 @@ ipcMain.handle('load-text-file', async (event, filePath) => {
 
 ipcMain.handle('load-file', async (event, filePath) => {
   return fs.promises.readFile(filePath);
+});
+
+ipcMain.handle('open-external', async (event, url) => {
+  const { shell } = require('electron');
+  await shell.openExternal(url);
+});
+
+ipcMain.handle('get-os', async () => {
+  return process.platform;
 });

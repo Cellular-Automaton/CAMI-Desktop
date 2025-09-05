@@ -2,13 +2,18 @@ export {load_starting_plugin, load_plugins_params, load_manager};
 import fs from 'node:fs';
 import path from 'node:path';
 import { Buffer } from 'node:buffer';
-const { app, ipcMain } = require('electron');
+import axios from 'axios';
+import plugin from '@tailwindcss/forms';
+
+const extract = require('extract-zip');
+const { app, ipcMain, BrowserWindow } = require('electron');
 
 const plugins = []
 const plugins_parameters = []
 const pluginManager = {
     "plugins": [],
 }
+
 
 async function load_starting_plugin() {
     var pluginsPath = "";
@@ -17,22 +22,17 @@ async function load_starting_plugin() {
     } else {
         pluginsPath = path.join(app.getAppPath(), 'Plugins');
     }
-    console.log(pluginsPath)
     await fs.promises.access(pluginsPath)
     const files = await fs.promises.readdir(pluginsPath)
     for (const file of files) {
         if (!file.endsWith(".node"))
             continue;
-        console.log(file);
         await fs.promises.access(path.join(pluginsPath, file))
         const full_path = path.join(pluginsPath, file);
-        console.log(full_path);
         const tmp_name = file.slice(0, -5);
-        console.log(tmp_name);
         const tmp = __non_webpack_require__(full_path)
         plugins.push([tmp_name, tmp]);
     }
-    console.log("Plugins loaded:", plugins);
 } ;
 
 async function load_manager() {
@@ -42,7 +42,6 @@ async function load_manager() {
     } else {
         pluginsPath = path.join(app.getAppPath(), 'Plugins/algorithms.json');
     }
-    console.log(pluginsPath)
     // If file does not exist, create an empty algorithms.json
     if (!fs.existsSync(pluginsPath)) {
         await fs.promises.writeFile(pluginsPath, JSON.stringify({ plugins: [] }), { flag: 'w+'});
@@ -113,7 +112,6 @@ ipcMain.handle('get-plugin-names', async(event, params) => {
 
 
 ipcMain.handle('delete-plugin', async (event, param) => {
-    console.log(param)
     if (!app.isPackaged)
         throw new Error("App is not packaged. Cant modify plugins");
     if (!path.include(process.resourcesPath, 'Plugins/'))
@@ -123,7 +121,7 @@ ipcMain.handle('delete-plugin', async (event, param) => {
 });
 
 // ipcMain.handle('install-plugin', async (event, param) => {
-//     console.log(param)
+//     
 //     if (!app.isPackaged)
 //         throw new Error("App is not packaged. Cant modify plugins");
 //     await fs.promises.access(param[0]);
@@ -134,37 +132,88 @@ ipcMain.handle('delete-plugin', async (event, param) => {
 //     plugins.push(tmp);
 // });
 
-ipcMain.handle('install-plugin', async (event, param) => {
-    const json = param.data;
-    console.log("Installing plugin:", json);
-    // write my three folders in the plugins folder
-    const pluginsPath = app.isPackaged ? path.join(process.resourcesPath, 'Plugins') : path.join(app.getAppPath(), 'Plugins');
-    json.file.forEach(element => {
-        const buffer = Buffer.from(element.contents, 'base64');
-        fs.writeFileSync(path.join(pluginsPath, json.name + element.name), buffer);
-    });
+// ipcMain.handle('install-plugin', async (event, param) => {
+//     const json = param.data;
+//     
+//     // write my three folders in the plugins folder
+//     const pluginsPath = app.isPackaged ? path.join(process.resourcesPath, 'Plugins') : path.join(app.getAppPath(), 'Plugins');
+//     json.file.forEach(element => {
+//         const buffer = Buffer.from(element.contents, 'base64');
+//         fs.writeFileSync(path.join(pluginsPath, json.name + element.name), buffer);
+//     });
 
+//     // Add the plugin to the manager
+//     const managerPath = app.isPackaged ? path.join(process.resourcesPath, 'Plugins/algorithms.json') : path.join(app.getAppPath(), 'Plugins/algorithms.json');
+//     const managerData = JSON.parse(fs.readFileSync(managerPath, 'utf-8'));
+//     var managerJson = {
+//         name: json.name,
+//         bdd_id: json.automaton_id,
+//         version: "1.0.0",
+//         path: "Plugins/" + json.name + '.node',
+//         author: "Unknown",
+//         license: "MIT",
+//     }
+//     managerData.plugins.push(managerJson);
+//     fs.writeFileSync(managerPath, JSON.stringify(managerData, null, 2));
+
+//     const newModule = __non_webpack_require__(path.join(pluginsPath, json.name + '.node'));
+//     const parameters = newModule.get_params ? newModule.get_params() : [];
+//     pluginManager.plugins.push({
+//         ...managerJson,
+//         module: newModule,
+//         parameters: parameters
+//     });
+// });
+
+ipcMain.handle('install-plugin', async (event, url, param) => {
+    // Download ZIP from URL
+    // Unzip it in the plugins folder
     // Add the plugin to the manager
+    // Load the plugin in memory
+    const filePath = app.isPackaged ? path.join(process.resourcesPath, 'Plugins') : path.join(app.getAppPath(), 'Plugins');
     const managerPath = app.isPackaged ? path.join(process.resourcesPath, 'Plugins/algorithms.json') : path.join(app.getAppPath(), 'Plugins/algorithms.json');
     const managerData = JSON.parse(fs.readFileSync(managerPath, 'utf-8'));
-    var managerJson = {
-        name: json.name,
-        bdd_id: json.automaton_id,
-        version: "1.0.0",
-        path: "Plugins/" + json.name + '.node',
-        author: "Unknown",
-        license: "MIT",
-    }
-    managerData.plugins.push(managerJson);
-    fs.writeFileSync(managerPath, JSON.stringify(managerData, null, 2));
 
-    const newModule = __non_webpack_require__(path.join(pluginsPath, json.name + '.node'));
-    const parameters = newModule.get_params ? newModule.get_params() : [];
-    pluginManager.plugins.push({
-        ...managerJson,
-        module: newModule,
-        parameters: parameters
-    });
+    try {
+        // Start download
+        const response = await axios.get(url, { responseType: 'arraybuffer' });
+        const directory = path.join(filePath, param.automaton_id);
+        fs.writeFileSync(path.join(filePath, param.automaton_id + '.zip'), response.data);
+        fs.mkdirSync(directory, { recursive: true });
+        await extract(path.join(filePath, param.automaton_id + '.zip'), { dir: directory });
+
+        // Delete the zip file
+        fs.unlinkSync(path.join(filePath, param.automaton_id + '.zip'));
+
+        // get name of .node file
+        const nodeFiles = fs.readdirSync(directory).filter(file => file.endsWith('.node'));
+        if (nodeFiles.length === 0) {
+            throw new Error("No .node file found in the extracted plugin");
+        }
+        const pluginPath = path.join(directory, nodeFiles[0]);
+        const managerJson = {
+            name: param.name,
+            bdd_id: param.automaton_id,
+            version: "1.0.0",
+            path: pluginPath.replace(app.isPackaged ? process.resourcesPath : app.getAppPath(), '').replace(/\\/g, '/').replace(/^\/+/g, ''),
+            author: "Unknown",
+            license: "MIT",
+        }
+        managerData.plugins.push(managerJson);
+        fs.writeFileSync(managerPath, JSON.stringify(managerData, null, 2));
+
+        const pluginModule = __non_webpack_require__(pluginPath);
+        const pluginParameters = pluginModule.get_params ? pluginModule.get_params() : [];
+        pluginManager.plugins.push({
+            ...managerJson,
+            module: pluginModule,
+            parameters: pluginParameters
+        });
+        return;
+    } catch (error) {
+        console.error("Error downloading plugin:", error);
+        return;
+    };
 });
 
 // First parameter is the plugin index, the rest are the parameters
@@ -178,7 +227,6 @@ ipcMain.handle('call-plugin', async (event, params) =>{
         console.error("Plugin not found:", params[0]);
         throw new Error("Plugin not found");
     }
-    console.log("Plugin found:", p);
     for (const obj of p.parameters)
         types.push(obj.split(':')[1]);
 
