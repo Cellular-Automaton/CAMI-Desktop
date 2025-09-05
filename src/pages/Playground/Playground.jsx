@@ -20,7 +20,7 @@ export default function Playground() {
         try {
             getSimulationParameters().then((params) => {
                 const tmp = {};
-                console.log("Simulation Parameters:", params);
+                
                 // delete first parameter because not needed
                 params.shift();
                 params.map((param, index) => {
@@ -31,14 +31,14 @@ export default function Playground() {
                     };
                 });
                 setParameters(tmp);
-                console.log("Parameters set:", tmp);
+                
             });
         } catch (error) {
             console.error("Error fetching simulation parameters:", error);
             toast.error("Error fetching simulation parameters: " + error.message);
         }
         return () => {
-            console.log("Cleaning up Playground component");
+            
             stopSimulation();
             clearAll();
         }
@@ -64,7 +64,7 @@ export default function Playground() {
     const onStartSimulation = async () => {
         const params = Object.keys(parameters).map(key => parameters[key].value);
         Object.keys(params).forEach(key => {
-            console.log(`Parameter ${key}:`, params[key]);
+            
             if (key.toLowerCase() === "width" || key.toLowerCase() === "height") {
                 params[key] = gridSize;
             }

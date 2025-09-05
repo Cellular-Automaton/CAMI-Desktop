@@ -4,16 +4,14 @@ import { toast } from "react-toastify";
 import { APIContext } from "../../contexts/APIContext.jsx";
 import { Select, Box, MenuItem, Chip, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Submission() {
     const [form, setForm] = useState({
         name: "",
         description: "",
         image: null,
-        tags: [],
-        automaton_node: null,
-        automaton_lib: null,
-        automaton_exp: null,
+        tags: []
     });
 
     const [filePaths, setFilePaths] = useState({
@@ -29,7 +27,7 @@ function Submission() {
         // Fetch tags from the API
         getTags().then((fetchedTags) => {
             setTags(fetchedTags);
-            console.log("Fetched tags:", fetchedTags);
+            
         }).catch((error) => {
             console.error("Error fetching tags:", error)
             toast.error("Error fetching tags. Please try again later.", {
@@ -59,11 +57,32 @@ function Submission() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Form data before submission:", form);
+        
+
+        // Check link validity
+        try {
+            const url = new URL(form.link);
+            if (!url.hostname.includes("api.github.com")) {
+                throw new Error("Invalid hostname.");
+            }
+            axios.get(url.pathname).then((response) => {
+                if (response.status !== 200 && response.status !== 201 && response.status !== 304) {
+                    throw new Error("GitHub API link is not reachable.");
+                }
+            }).catch((error) => {
+                return error;
+            });
+        } catch (error) {
+            toast.error(error.message + " Please provide a valid GitHub API link.", {
+                position: "top-right",
+                autoClose: 5000,
+            });
+            return;
+        }
 
         // Send to the API
         addAlgorithm(form).then((response) => {
-            console.log("Algorithm added successfully:", response);
+            
             setAlgorithmTags(response.data.automaton_id, form.tags);
             navigate("/Home");
         }).catch((error) => {
@@ -82,7 +101,7 @@ function Submission() {
         }));
         image = await window.electron.loadFile(imagePath);
         image = new Blob([image]);
-        console.log(image);
+        
         setForm((prev) => ({
             ...prev,
             image: image, // Convert Blob to URL
@@ -144,8 +163,8 @@ function Submission() {
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, padding: "2px", borderRadius: "4px" }}>
                                         {
                                             selected.map((tag) => {
-                                                console.log("Selected tag:", selected);
-                                                console.log("Selected tag:", tag);
+                                                
+                                                
                                                 return (
                                                     <Tooltip title={tag.description} key={tag.id} arrow 
                                                         sx={{ fontFamily: "'JetBrains Mono', monospace" }}
@@ -166,7 +185,7 @@ function Submission() {
                                 {
                                     tags.map((tag) =>
                                         {
-                                            console.log("Tag:", tag);
+                                            
                                             return (
                                                 <MenuItem
                                                     key={tag.id}

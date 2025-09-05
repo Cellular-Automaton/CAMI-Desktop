@@ -39,10 +39,8 @@ const Informations = ({algorithm, onCloseCallback}) => {
         }
         window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
             if (isInstalled) {
-                console.log("Algorithm is installed");
                 setIsAlgorithmInstalled(true);
             } else {
-                console.log("Algorithm is not installed");
                 setIsAlgorithmInstalled(false);
             }
         });
@@ -81,7 +79,6 @@ const Informations = ({algorithm, onCloseCallback}) => {
         // Call the API to add the comment
         addAlgorithmComment(commentData)
             .then((response) => {
-                console.log("Comment added successfully:", response);
                 // Reset the form
                 document.getElementById("own-comment").reset();
                 fetchComments();
@@ -101,18 +98,14 @@ const Informations = ({algorithm, onCloseCallback}) => {
     const handleDownloadAlgorithm = async () => {
         try {
             const response = await downloadAlgorithm(algorithm.assets_link);
-            console.log("Download response:", response);
             toast.success("Algorithm downloaded successfully!");
             setIsAlgorithmInstalled(true);
 
             await window.electron.installPlugin(response, algorithm);
             window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
-                console.log("Checking installation status after download:", isInstalled);
             if (isInstalled) {
-                console.log("Algorithm is installed");
                 setIsAlgorithmInstalled(true);
             } else {
-                console.log("Algorithm is not installed");
                 setIsAlgorithmInstalled(false);
             }
         })
@@ -230,7 +223,6 @@ const Informations = ({algorithm, onCloseCallback}) => {
                                     :
                                     <div id="results" className="flex flex-row flex-wrap gap-x-8 gap-y-4 h-full w-full p-5 max-w-full font-mono justify-center overflow-y-auto">
                                         {comments.map((comment) => {
-                                            console.log("Comment:", comment);
                                             return (
                                                 <Comment key={comment.id} comment={comment} />
                                             )

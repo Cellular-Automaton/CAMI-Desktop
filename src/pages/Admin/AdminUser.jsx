@@ -9,9 +9,10 @@ export default function AdminUser({ closeCallback }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredUsers, setFilteredUsers] = useState([]);
     const { getAllAccounts, updateUser, deleteUser } = useContext(APIContext);
+    const [isValidationOpen, setIsValidationOpen] = useState(false);
 
     useEffect(() => {
-        console.log("Users updated:", users);
+        
         setFilteredUsers(users.filter(user => user.username.toLowerCase().includes(searchTerm.toLowerCase())));
     }, [searchTerm, users]);
 
@@ -25,7 +26,7 @@ export default function AdminUser({ closeCallback }) {
 
     const updatedUserRole = (role) => {
         selectedUser.user_role = role;
-        console.log("Updating user to:", selectedUser);
+        
         updateUser(selectedUser).then(() => {
             getAllUsers();
             setSelectedUser(null);
@@ -37,6 +38,8 @@ export default function AdminUser({ closeCallback }) {
     const handleDeleteUser = () => {
         deleteUser(selectedUser.user_id).then(() => {
             getAllUsers();
+            setSelectedUser(null);
+            setIsValidationOpen(false);
         }).catch(err => {
             console.error("Failed to delete user:", err);
         });
@@ -125,15 +128,30 @@ export default function AdminUser({ closeCallback }) {
                                 Mute
                             </button>
                             <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end"
-                                onClick={() => handleDeleteUser()}>
+                                onClick={() => setIsValidationOpen(true)}>
                                 Delete
                             </button>
                         </div>
                     </div>
                 }
             </Dialog>
-
             
+            <Dialog open={isValidationOpen} onClose={() => setIsValidationOpen(false)} className="flex flex-col p-5">
+                <div className="bg-midnight p-5 flex flex-col text-white font-mono">
+                    <h2 className="text-lg font-bold pb-5">Are you sure to delete this comment?</h2>
+                    <div className="flex flex-row-reverse gap-5 mt-5">
+                        <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
+                            onClick={() => handleDeleteUser(selectedUser?.id)}>
+                            Yes
+                        </button>
+                        <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
+                            onClick={() => setIsValidationOpen(false)}>
+                            No
+                        </button>
+                    </div>
+                </div>
+            </Dialog>
+
             <div className="w-full flex justify-center">
                 <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 transition hover:opacity-50 ease-in-out duration-200"
                     onClick={closeCallback}>

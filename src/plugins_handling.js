@@ -22,22 +22,17 @@ async function load_starting_plugin() {
     } else {
         pluginsPath = path.join(app.getAppPath(), 'Plugins');
     }
-    console.log(pluginsPath)
     await fs.promises.access(pluginsPath)
     const files = await fs.promises.readdir(pluginsPath)
     for (const file of files) {
         if (!file.endsWith(".node"))
             continue;
-        console.log(file);
         await fs.promises.access(path.join(pluginsPath, file))
         const full_path = path.join(pluginsPath, file);
-        console.log(full_path);
         const tmp_name = file.slice(0, -5);
-        console.log(tmp_name);
         const tmp = __non_webpack_require__(full_path)
         plugins.push([tmp_name, tmp]);
     }
-    console.log("Plugins loaded:", plugins);
 } ;
 
 async function load_manager() {
@@ -47,7 +42,6 @@ async function load_manager() {
     } else {
         pluginsPath = path.join(app.getAppPath(), 'Plugins/algorithms.json');
     }
-    console.log(pluginsPath)
     // If file does not exist, create an empty algorithms.json
     if (!fs.existsSync(pluginsPath)) {
         await fs.promises.writeFile(pluginsPath, JSON.stringify({ plugins: [] }), { flag: 'w+'});
@@ -81,8 +75,6 @@ function load_plugins_params() {
 ipcMain.handle('is-algorithm-installed', async (event, params) => {
     const algorithmName = params[0];
     const installedAlgorithms = pluginManager.plugins.map(plugin => plugin.bdd_id);
-    console.log("Checking if algorithm is installed:", algorithmName);
-    console.log(pluginManager.plugins);
     return installedAlgorithms.includes(algorithmName);
 });
 
@@ -120,7 +112,6 @@ ipcMain.handle('get-plugin-names', async(event, params) => {
 
 
 ipcMain.handle('delete-plugin', async (event, param) => {
-    console.log(param)
     if (!app.isPackaged)
         throw new Error("App is not packaged. Cant modify plugins");
     if (!path.include(process.resourcesPath, 'Plugins/'))
@@ -130,7 +121,7 @@ ipcMain.handle('delete-plugin', async (event, param) => {
 });
 
 // ipcMain.handle('install-plugin', async (event, param) => {
-//     console.log(param)
+//     
 //     if (!app.isPackaged)
 //         throw new Error("App is not packaged. Cant modify plugins");
 //     await fs.promises.access(param[0]);
@@ -143,7 +134,7 @@ ipcMain.handle('delete-plugin', async (event, param) => {
 
 // ipcMain.handle('install-plugin', async (event, param) => {
 //     const json = param.data;
-//     console.log("Installing plugin:", json);
+//     
 //     // write my three folders in the plugins folder
 //     const pluginsPath = app.isPackaged ? path.join(process.resourcesPath, 'Plugins') : path.join(app.getAppPath(), 'Plugins');
 //     json.file.forEach(element => {
@@ -236,7 +227,6 @@ ipcMain.handle('call-plugin', async (event, params) =>{
         console.error("Plugin not found:", params[0]);
         throw new Error("Plugin not found");
     }
-    console.log("Plugin found:", p);
     for (const obj of p.parameters)
         types.push(obj.split(':')[1]);
 

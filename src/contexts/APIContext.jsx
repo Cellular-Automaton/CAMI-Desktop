@@ -84,7 +84,6 @@ export const APIProvider = ({ children }) => {
         formData.append("automaton[image][0][contents_binary]", await blobToBase64(algorithmForm.image));
         formData.append("automaton[image][0][contents_type]", algorithmForm.imageType);
 
-        console.log("Form Data:", formData);
         try {
             const response = await axios.post(url, formData, {
                 headers: {
@@ -140,7 +139,6 @@ export const APIProvider = ({ children }) => {
     const addAlgorithmComment = async (commentData) => {
         const url = `${apiUrl}/automaton_comment`;
 
-        console.log("Comment Data:", commentData);
         try {
             const response = await axios.post(url, commentData);
             const data = response.data;
@@ -229,7 +227,6 @@ export const APIProvider = ({ children }) => {
             linux: "linux"
         }
 
-        console.log("Detected OS:", os);
 
         try {
             const response = await axios.get(url);
@@ -237,7 +234,6 @@ export const APIProvider = ({ children }) => {
             const asset = assets.find(a => a.name.toLowerCase().includes(osMap[os]));
             if (!asset)
                 throw new Error(`No compatible asset found for OS: ${osMap[os]}`);
-            console.log("Download response:", asset.browser_download_url);
             return asset.browser_download_url;
         } catch (error) {
             console.error("Error downloading algorithm:", error);

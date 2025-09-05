@@ -21,22 +21,22 @@ export default function AdminPage() {
 
     const getLatest = () => {
         getLastestUsers().then(fetchedUsers => {
-            console.log("Fetched last 5 users from API:", fetchedUsers);
+            
             setFiveLastUsers(fetchedUsers);
         }).catch(err => {
             console.error("Failed to fetch last 5 users:", err);
         });
 
         getLastestAlgorithms().then(fetchedAlgorithms => {
-            console.log("Fetched last 5 algorithms from API:", fetchedAlgorithms);
+            
             setFiveLastAlgorithms(fetchedAlgorithms);
-            console.log("Set last 5 algorithms state to:", fetchedAlgorithms);
+            
         }).catch(err => {
             console.error("Failed to fetch last 5 algorithms:", err);
         });
 
         getLastestComments().then(fetchedComments => {
-            console.log("Fetched last 5 comments from API:", fetchedComments);
+            
             setFiveLastComments(fetchedComments);
         }).catch(err => {
             console.error("Failed to fetch last 5 comments:", err);
@@ -46,11 +46,11 @@ export default function AdminPage() {
     const openAdminPopup = (type) => {
         const popup = document.getElementById("admin-popup");
 
-        console.log("Before");
+        
         setType(type);
         popup.classList.add("bottom-0");
         popup.classList.remove("bottom-full");
-        console.log("After");
+        
     }
 
     const closeAdminPopup = () => {

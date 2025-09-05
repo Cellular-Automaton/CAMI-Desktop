@@ -30,9 +30,7 @@ export const SimulationProvider = ({ children }) => {
     const getSimulationData = async (gridSize, params) => {
         try {
             const table = cellInstances.map(cell => cell.state);
-            console.log(params);
             const parameters = [selectedAlgorithm.automaton_id, table, ...params];
-            console.log("Parameters sent to plugin:", parameters);
             const response = await window.electron.callPlugin(parameters);
             setResponse(response);
             setFrames(prevFrames => [...prevFrames, response]);
@@ -59,7 +57,6 @@ export const SimulationProvider = ({ children }) => {
             try {
                 const data = await window.electron.loadTextFile(filePath);
                 const parsedData = JSON.parse(data);
-                console.log("Imported Data:", parsedData);
                 setImportedData(parsedData);
                 setFrames([]);
                 toast.success("Simulation data imported successfully!");
@@ -73,7 +70,6 @@ export const SimulationProvider = ({ children }) => {
         const exportedData = cellInstances.map(cell => (cell.state));
         const data = JSON.stringify(exportedData);
 
-        console.log("Exported Data:", data);
         try {
             window.electron.send('save-json', data);
             toast.success("Simulation data exported successfully!");
@@ -97,7 +93,6 @@ export const SimulationProvider = ({ children }) => {
             return;
         }
         const currentFrame = frames[index];
-        console.log(frames);
         cellInstances.forEach((cell, i) => {
             cell.setState(currentFrame[i]);
         });

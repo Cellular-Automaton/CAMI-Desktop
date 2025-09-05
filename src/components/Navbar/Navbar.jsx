@@ -31,10 +31,6 @@ export default function Navbar() {
     const navigate = useNavigate();
     const { userData, loggedIn, logout } = useContext(UserContext);
 
-    useEffect(() => {
-        console.log("User data in Navbar:", userData);
-    });
-
     const handleRedirect = (iconName) => {
         switch (iconName) {
             case "Home":

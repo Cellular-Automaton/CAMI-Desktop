@@ -2,14 +2,16 @@ import React, {useState, useEffect, useContext} from "react";
 import { CardMedia, Divider, TextField, Card, CardActionArea, CardContent, Dialog, Avatar, Tooltip } from "@mui/material";
 
 import { APIContext } from "../../contexts/APIContext.jsx";
+import { set } from "date-fns";
 
 export default function AdminAlgorithm({ closeCallback }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [algorithms, setAlgorithms] = useState([]);
     const [filteredAlgorithms, setFilteredAlgorithms] = useState([]);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState(null);
+    const [isValidationOpen, setIsValidationOpen] = useState(false);
 
-    const { getAllAlgorithms } = useContext(APIContext);
+    const { getAllAlgorithms, deleteAlgorithm } = useContext(APIContext);
 
     useEffect(() => {
         setFilteredAlgorithms(algorithms.filter(alg => alg.name.toLowerCase().includes(searchTerm.toLowerCase())));
@@ -21,15 +23,24 @@ export default function AdminAlgorithm({ closeCallback }) {
         getAllAlgorithms().then(fetchedAlgorithms => {
             setAlgorithms(fetchedAlgorithms);
             setFilteredAlgorithms(fetchedAlgorithms);
-            console.log("Fetched algorithms:", fetchedAlgorithms);
         }).catch(err => {
             console.error("Failed to fetch algorithms:", err);
         });
-        console.log("Fetched algorithms:", algorithms);
     }
 
     const openExternal = (url) => {
         window.electron.openExternal(url);        // Temporarily give fake data
+    }
+
+    const handleDeleteAlgorithm = (algId) => {
+        deleteAlgorithm(algId).then(() => {
+            setAlgorithms(algorithms.filter(alg => alg.automaton_id !== algId));
+            setFilteredAlgorithms(filteredAlgorithms.filter(alg => alg.automaton_id !== algId));
+            setSelectedAlgorithm(null);
+            setIsValidationOpen(false);
+        }).catch(err => {
+            console.error("Failed to delete algorithm:", err);
+        });
     }
 
     useEffect(() => {
@@ -59,7 +70,7 @@ export default function AdminAlgorithm({ closeCallback }) {
                     filteredAlgorithms.map((alg) => (
                         <Card key={alg.automaton_id} className="!bg-midnight-opacity !text-white !h-1/4 !w-1/3 overflow-y-hidden text-ellipsis">
                             <CardActionArea className="!h-full" onClick={() => setSelectedAlgorithm(alg)}>
-                                <CardMedia sx={{ height: 140}} image={alg.image[0].contents_binary ? `data:image/png;base64,${alg.image[0].contents_binary}` : "https://citygem.app/wp-content/uploads/2024/08/placeholder-1-1.png"} title={alg.name} />
+                                <CardMedia sx={{ height: 140}} image={alg?.image[0]?.contents_binary ? `data:image/png;base64,${alg.image[0].contents_binary}` : "https://citygem.app/wp-content/uploads/2024/08/placeholder-1-1.png"} title={alg.name} />
                                 <CardContent className="!h-full w-full">
                                     <div className="h-max flex flex-col overflow-hidden text-ellipsis">
                                         <h3 className="text-lg font-bold mb-2">{alg.name}</h3>
@@ -74,7 +85,7 @@ export default function AdminAlgorithm({ closeCallback }) {
 
             <Dialog open={selectedAlgorithm !== null} onClose={() => setSelectedAlgorithm(null)} maxWidth="lg" fullWidth>
                 <div className="w-full h-2/3">
-                    <img src={selectedAlgorithm?.image[0].contents_binary ? `data:image/png;base64,${selectedAlgorithm?.image[0].contents_binary}` : "https://citygem.app/wp-content/uploads/2024/08/placeholder-1-1.png"} alt={selectedAlgorithm?.name} className="w-full h-48 object-cover" />
+                    <img src={selectedAlgorithm?.image[0]?.contents_binary ? `data:image/png;base64,${selectedAlgorithm?.image[0].contents_binary}` : "https://citygem.app/wp-content/uploads/2024/08/placeholder-1-1.png"} alt={selectedAlgorithm?.name} className="w-full h-48 object-cover" />
                 </div>
                 <div className="bg-midnight p-5 flex flex-col text-white font-mono">
                     <div>
@@ -90,7 +101,7 @@ export default function AdminAlgorithm({ closeCallback }) {
                         {/* More user details and management options would go here */}
                         <Tooltip title="Deleting an algorithm will remove it from the system." arrow>
                             <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
-                                onClick={() => setSelectedAlgorithm(null)}>
+                                onClick={() => setIsValidationOpen(true)}>
                                 Delete
                             </button>
                         </Tooltip>
@@ -106,6 +117,22 @@ export default function AdminAlgorithm({ closeCallback }) {
                                 Reject
                             </button>
                         </Tooltip>
+                    </div>
+                </div>
+            </Dialog>
+
+            <Dialog open={isValidationOpen} onClose={() => setIsValidationOpen(false)} className="flex flex-col p-5">
+                <div className="bg-midnight p-5 flex flex-col text-white font-mono">
+                    <h2 className="text-lg font-bold pb-5">Are you sure to delete this algorithm?</h2>
+                    <div className="flex flex-row-reverse gap-5 mt-5">
+                        <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
+                            onClick={() => handleDeleteAlgorithm(selectedAlgorithm?.automaton_id)}>
+                            Yes
+                        </button>
+                        <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
+                            onClick={() => setIsValidationOpen(false)}>
+                            No
+                        </button>
                     </div>
                 </div>
             </Dialog>

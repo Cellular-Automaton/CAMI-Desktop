@@ -11,6 +11,7 @@ export default function AdminComment({ closeCallback }) {
     const [filteredComments, setFilteredComments] = useState([]);
     const [userName, setUserName] = useState("");
     const [algorithmName, setAlgorithmName] = useState("");
+    const [isValidationOpen, setIsValidationOpen] = useState(false);
 
     const { getAllComments, getAlgorithmById, getUserById, deleteComment } = useContext(APIContext);
 
@@ -19,7 +20,7 @@ export default function AdminComment({ closeCallback }) {
         getAllComments().then(fetchedComments => {
             setComments(fetchedComments);
             setFilteredComments(fetchedComments);
-            console.log("Fetched comments:", fetchedComments);
+            
         }).catch(err => {
             console.error("Failed to fetch comments:", err);
         });
@@ -27,14 +28,14 @@ export default function AdminComment({ closeCallback }) {
 
     const getUserName = (userId) => {
         getUserById(userId).then(user => {
-            console.log("Fetched user details:", user);
+            
             setUserName(user.data.username);
         });
     }
 
     const getAlgorithmName = (algId) => {
         getAlgorithmById(algId).then(alg => {
-            console.log("Fetched algorithm details:", alg);
+            
             if (alg !== undefined) {
                 setAlgorithmName(alg.data.name);
             }
@@ -59,6 +60,7 @@ export default function AdminComment({ closeCallback }) {
             setComments(comments.filter(comment => comment.id !== commentId));
             setFilteredComments(filteredComments.filter(comment => comment.id !== commentId));
             setSelectedComment(null);
+            setIsValidationOpen(false);
         }).catch(err => {
             console.error("Failed to delete comment:", err);
         });
@@ -89,7 +91,7 @@ export default function AdminComment({ closeCallback }) {
                     ) : (
                         filteredComments.map((comment) => (
                             <Card key={comment.id} className="!bg-midnight-opacity !text-white !h-1/6 !w-1/3">
-                                <CardActionArea onClick={() => {
+                                <CardActionArea className="!h-full" onClick={() => {
                                     setSelectedComment(comment);
                                     getDetails(comment.posted_by, comment.automaton_id);
                                 }}>
@@ -117,8 +119,24 @@ export default function AdminComment({ closeCallback }) {
                     <div className="flex flex-row-reverse gap-5">
                         {/* More user details and management options would go here */}
                         <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end"
-                            onClick={() => handleDeleteComment(selectedComment.id)}>
+                            onClick={() => setIsValidationOpen(true)}>
                             Delete
+                        </button>
+                    </div>
+                </div>
+            </Dialog>
+
+            <Dialog open={isValidationOpen} onClose={() => setIsValidationOpen(false)} className="flex flex-col p-5">
+                <div className="bg-midnight p-5 flex flex-col text-white font-mono">
+                    <h2 className="text-lg font-bold pb-5">Are you sure to delete this comment?</h2>
+                    <div className="flex flex-row-reverse gap-5 mt-5">
+                        <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
+                            onClick={() => handleDeleteComment(selectedComment?.id)}>
+                            Yes
+                        </button>
+                        <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
+                            onClick={() => setIsValidationOpen(false)}>
+                            No
                         </button>
                     </div>
                 </div>
