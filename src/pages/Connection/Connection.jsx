@@ -57,7 +57,14 @@ export default function Connection() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!emailRegex.test(data.email)) {
-            console.error("Invalid email format");
+            toast.error("Email is not valid, please enter a valid email.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true
+            });
             return;
         }
 
@@ -75,6 +82,8 @@ export default function Connection() {
             setUser(userInfo);
             setToken(token);
             navigate("/Home");
+        }).catch((error) => {
+            console.error("Error signing in:", error)
         });
     }
 
