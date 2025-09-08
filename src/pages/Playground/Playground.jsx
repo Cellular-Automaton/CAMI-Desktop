@@ -13,7 +13,8 @@ export default function Playground() {
     const { 
         startSimulation, stopSimulation, 
         isSimulationRunning, clearAll,
-        importSimulation, exportSimulation, getSimulationParameters 
+        importSimulation, exportSimulation, getSimulationParameters,
+        clearFrames
     } = useContext(SimulationContext);
 
     useEffect(() => {
@@ -74,6 +75,11 @@ export default function Playground() {
             toast.error("Please fill all parameters before starting the simulation.");
             return;
         }
+
+        // Clear old frames
+        clearFrames();
+
+        // Start simulation
         await startSimulation(gridSize, params);
     }
 
@@ -123,12 +129,6 @@ export default function Playground() {
                         </div>
                     </div>
                     <div className="flex flex-col gap-2 justify-center items-center">
-                        <div id="start" className="flex justify-center items-center w-3/4">
-                            <button className="flex flex-col justify-center items-center w-full h-10 bg-midnight-purple text-white rounded-lg"
-                                onClick={onStartSimulation} >
-                                Start
-                            </button>
-                        </div>
                         <div id="import-export" className="flex flex-row justify-center w-3/4 gap-2 items-center">
                             <button className="flex flex-col justify-center items-center w-1/2 h-10 bg-midnight-purple text-white rounded-lg"
                                 onClick={importSimulation} >
@@ -137,6 +137,15 @@ export default function Playground() {
                             <button className="flex flex-col justify-center items-center w-1/2 h-10 bg-midnight-purple text-white rounded-lg"
                                 onClick={exportSimulation} >
                                 Export
+                            </button>
+                        </div>
+                        <div>
+                            <button className="flex flex-col justify-center items-center w-3/4 h-10 bg-midnight-purple text-white rounded-lg"
+                                onClick={() => {
+                                    stopSimulation();
+                                    clearAll();
+                                }} >
+                                Clear
                             </button>
                         </div>
                     </div>

@@ -1,10 +1,10 @@
-import React from "react";
+import React, {useContext} from "react";
 import Play from "../../../assets/images/play.svg";
 import Pause from "../../../assets/images/pause.svg";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 
 const SimulationPlayer = ({ onStartSimulation, onStopSimulation, isPlaying }) => {
-    const { frames, setCurrentFrame, isSimulationRunning, cFrame, setCFrame } = React.useContext(SimulationContext);
+    const { frames, setCurrentFrame, isSimulationRunning, cFrame, setCFrame } = useContext(SimulationContext);
 
     return (
         <div id="player-container" className="flex flex-row absolute justify-center items-center bottom-0 w-full h-1/6 pointer-events-none">
