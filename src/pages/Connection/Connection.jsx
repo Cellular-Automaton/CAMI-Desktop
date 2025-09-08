@@ -22,18 +22,18 @@ export default function Connection() {
             password: formData.get("password")
         }
 
-        var hashedPassword = "";
-        await bcrypt.hash(data.password, 10).then(hash => {
-            hashedPassword = hash;
-        }).catch(err => {
-            console.error("Error hashing password:", err);
-            return;
-        });
+        // TODO : Find solution about password checking
+        // var hashedPassword = "";
+        // await bcrypt.hash(data.password, 10).then(hash => {
+        //     hashedPassword = hash;
+        // }).catch(err => {
+        //     console.error("Error hashing password:", err);
+        //     return;
+        // });
 
         const body = {
             user: {
                 ...data,
-                password: hashedPassword,
                 verified: false,
                 user_role: "user"
             }
