@@ -11,6 +11,8 @@ function Submission() {
         name: "",
         description: "",
         image: null,
+        link: "",
+        content: "",
         tags: []
     });
 
@@ -113,10 +115,11 @@ function Submission() {
             name: "",
             description: "",
             image: null,
-            file: null,
+            tags: [],
+            content: "",
+            link: ""
         });
         setFilePaths({
-            automaton: "",
             image: ""
         });
     };
