@@ -111,7 +111,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
         })
         } catch (error) {
             console.error("Error downloading algorithm:", error);
-            toast.error("An error occurred while downloading the algorithm.");
+            toast.error("An error occurred while downloading the algorithm. Try to download it later.");
         }
     }
 
