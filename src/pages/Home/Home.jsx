@@ -9,6 +9,8 @@ import spinner from "../../../assets/images/spinner.svg";
 import { UserContext } from "../../contexts/UserContext.jsx";
 import { APIContext } from "../../contexts/APIContext.jsx";
 
+import { Skeleton } from "@mui/material";
+
 const welcomeSentences = [
         `Hello$USER! Hope you're having a fantastic day! 🌞`,
         `Hi$USER! Hope you're having a great day so far. 😊`,
@@ -28,6 +30,10 @@ export default function Home() {
     const [newAlgorithms, setNewAlgorithms] = useState([]);
     const [favoriteAlgorithms, setFavoriteAlgorithms] = useState([]);
 
+    const [isRecentAlgorithmsFetched, setIsRecentAlgorithmsFetched] = useState(false);
+    const [isNewAlgorithmsFetched, setIsNewAlgorithmsFetched] = useState(false);
+    const [isFavoriteAlgorithmsFetched, setIsFavoriteAlgorithmsFetched] = useState(false);
+
     // Replace $USER with the username
     const replaceUserInSentence = (sentence) => {
         if (loggedIn) {
@@ -43,6 +49,14 @@ export default function Home() {
         getAlgorithms().then((algorithms) => {
             
             setRecentAlgorithms(algorithms.slice(0, 5));
+            setIsRecentAlgorithmsFetched(true);
+            setNewAlgorithms(algorithms.slice(-5).reverse());
+            setIsNewAlgorithmsFetched(true);
+
+            // TODO : Fetch favorite algorithms from the API
+            // For now, is just true by default
+            setIsFavoriteAlgorithmsFetched(true);
+
             getTags().then((tags) => {
                 
             }).catch((error) => {
@@ -114,12 +128,16 @@ export default function Home() {
                 <h2 className="text-midnight-text text-3xl text-left">Last Simulations</h2>
 
                 {
-                    recentAlgorithms.length === 0 ?
+                    !isRecentAlgorithmsFetched ?
                         <div id="loading-recent-algorithms" className="flex justify-center items-center h-10 w-full">
-                            <img src={spinner} alt="Loading..." className="animate-spin h-10 w-10" />
+                            <Skeleton variant="rectangular" animation="wave" width="100%" height="100%" />
                         </div>
-                        :
-                        <HorizontalScroll algorithms={recentAlgorithms} onClickCallback={openInformationPanel} />
+                        : recentAlgorithms.length === 0 ?
+                            <div className="flex justify-center items-center h-40 w-full text-white">
+                                No recent simulations available.
+                            </div>
+                            :
+                            <HorizontalScroll algorithms={recentAlgorithms} onClickCallback={openInformationPanel} />
                 }
 
             </section>
@@ -127,12 +145,16 @@ export default function Home() {
                 <h2 className="text-midnight-text text-3xl text-left">New Algorithms</h2>
 
                 {
-                    recentAlgorithms.length === 0 ?
+                    !isNewAlgorithmsFetched ?
                         <div id="loading-new-algorithms" className="flex justify-center items-center h-10 w-full">
-                            <img src={spinner} alt="Loading..." className="animate-spin h-10 w-10" />
+                            <Skeleton variant="rectangular" animation="wave" width="100%" height="100%" />
                         </div>
-                        :
-                        <HorizontalScroll algorithms={newAlgorithms} onClickCallback={openInformationPanel} />
+                        : newAlgorithms.length === 0 ?
+                            <div className="flex justify-center items-center h-40 w-full text-white">
+                                No new simulations available.
+                            </div>
+                            :
+                            <HorizontalScroll algorithms={newAlgorithms} onClickCallback={openInformationPanel} />
                 }
             </section>
 
@@ -142,13 +164,17 @@ export default function Home() {
                 <section id="favorites" className="flex flex-col gap-2 my-3">
                     <h2 className="text-midnight-text text-3xl text-left">Favorites</h2>
                     {
-                        favoriteAlgorithms.length === 0 ?
-                            <div id="loading-favorite-algorithms" className="flex justify-center items-center h-10 w-full">
-                                <img src={spinner} alt="Loading..." className="animate-spin h-10 w-10" />
+                    !isFavoriteAlgorithmsFetched ?
+                        <div id="loading-favorite-algorithms" className="flex justify-center items-center h-10 w-full">
+                            <Skeleton variant="rectangular" animation="wave" width="100%" height="100%" />
+                        </div>
+                        : favoriteAlgorithms.length === 0 ?
+                            <div className="flex justify-center items-center h-40 w-full text-white">
+                                No favorite simulations available.
                             </div>
                             :
-                            <HorizontalScroll algorithms={favoriteAlgorithms} onClickCallback={openInformationPanel} favorite={true}/>
-                    }
+                            <HorizontalScroll algorithms={favoriteAlgorithms} onClickCallback={openInformationPanel} />
+                }
                 </section>
                 :
                 null

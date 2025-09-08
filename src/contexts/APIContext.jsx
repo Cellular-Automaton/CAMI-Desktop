@@ -26,7 +26,7 @@ export const APIProvider = ({ children }) => {
             });
             return data;
         } catch (error) {
-            toast.error("Login failed. Please try again." + error.message, {
+            toast.error("Login failed. Please try again or check your credentials. (" + error.message + ")", {
                 position: "top-right",
                 autoClose: 5000,
                 hideProgressBar: false,

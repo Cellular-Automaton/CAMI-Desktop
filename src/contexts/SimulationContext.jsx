@@ -99,13 +99,18 @@ export const SimulationProvider = ({ children }) => {
         setCellInstances([...cellInstances]);
     };
 
+    const clearFrames = () => {
+        setFrames([]);
+        setCFrame(0);
+    };
+
     return (
         <SimulationContext.Provider value={{
             startSimulation, stopSimulation, response, setResponse,
             cellInstances, setCellInstances, isSimulationRunning,
             clearAll, importSimulation, exportSimulation, importedData, setImportedData,
             selectedAlgorithm, setSelectedAlgorithm, getSimulationParameters, frames, setFrames, setCurrentFrame,
-            cFrame, setCFrame
+            cFrame, setCFrame, clearFrames
         }}>
             {children}
         </SimulationContext.Provider>

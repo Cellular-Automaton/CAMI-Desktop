@@ -48,5 +48,20 @@ export default class RangeCell {
     }
 
     setInterations() {
+        this.shape.on("pointerdown", (event) => {
+            this.color = this.state == 0 ? this.colorScale(1).hex() : this.colorScale(0).hex();
+            this.draw();
+            this.state = this.state == 0 ? 1 : 0; // Toggle state between dead (0) and alive (1)
+        });
+
+        this.shape.on("pointerover", (event) => {
+            this.shape.alpha = 0.5;
+            this.draw();
+        });
+
+        this.shape.on("pointerout", (event) => {
+            this.shape.alpha = 1;
+            this.draw();
+        });
     }
 }

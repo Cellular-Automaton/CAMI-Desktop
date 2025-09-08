@@ -14,7 +14,7 @@ const createWindow = () => {
     minWidth: 800,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-      nodeIntegration: true,
+      nodeIntegration: false,
       contextIsolation: true
     },
     autoHideMenuBar: true,
@@ -25,7 +25,7 @@ const createWindow = () => {
   
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

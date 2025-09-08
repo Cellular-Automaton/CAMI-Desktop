@@ -22,18 +22,18 @@ export default function Connection() {
             password: formData.get("password")
         }
 
-        var hashedPassword = "";
-        await bcrypt.hash(data.password, 10).then(hash => {
-            hashedPassword = hash;
-        }).catch(err => {
-            console.error("Error hashing password:", err);
-            return;
-        });
+        // TODO : Find solution about password checking
+        // var hashedPassword = "";
+        // await bcrypt.hash(data.password, 10).then(hash => {
+        //     hashedPassword = hash;
+        // }).catch(err => {
+        //     console.error("Error hashing password:", err);
+        //     return;
+        // });
 
         const body = {
             user: {
                 ...data,
-                password: hashedPassword,
                 verified: false,
                 user_role: "user"
             }
@@ -57,7 +57,14 @@ export default function Connection() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!emailRegex.test(data.email)) {
-            console.error("Invalid email format");
+            toast.error("Email is not valid, please enter a valid email.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true
+            });
             return;
         }
 
@@ -75,11 +82,13 @@ export default function Connection() {
             setUser(userInfo);
             setToken(token);
             navigate("/Home");
+        }).catch((error) => {
+            console.error("Error signing in:", error)
         });
     }
 
     return (
-        <div id="container" className="flex flex-col items-center justify-center h-screen bg-midnight">
+        <div id="container" className="flex flex-col items-center justify-center h-screen bg-midnight font-mono">
 
             <div id="login-container" className=" relative flex flex-row rounded-md h-4/5 w-5/6 
                 items-center justify-center bg-midnight-opacity p-8 shadow-lg m-5
