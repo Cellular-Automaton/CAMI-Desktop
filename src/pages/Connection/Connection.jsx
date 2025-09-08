@@ -79,7 +79,7 @@ export default function Connection() {
     }
 
     return (
-        <div id="container" className="flex flex-col items-center justify-center h-screen bg-midnight">
+        <div id="container" className="flex flex-col items-center justify-center h-screen bg-midnight font-mono">
 
             <div id="login-container" className=" relative flex flex-row rounded-md h-4/5 w-5/6 
                 items-center justify-center bg-midnight-opacity p-8 shadow-lg m-5
