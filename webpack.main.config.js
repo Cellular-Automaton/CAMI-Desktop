@@ -10,7 +10,8 @@ module.exports = {
   entry: './src/main.js',
 
   // Put your normal webpack config below here
-  externals: [ nodeExternals() ],
+  externals: [
+  ],
 
   plugins: [new NodePolyfillPlugin()],
 
