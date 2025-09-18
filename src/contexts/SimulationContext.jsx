@@ -1,5 +1,5 @@
 import { frame } from "motion";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 
 export const SimulationContext = createContext();
@@ -7,48 +7,72 @@ export const SimulationContext = createContext();
 export const SimulationProvider = ({ children }) => {
     const [cellInstances, setCellInstances] = useState([]);
     const [response, setResponse] = useState([]);
-    const [fetchInterval, setFetchInterval] = useState(null);
     const [isSimulationRunning, setIsSimulationRunning] = useState(false);
     const [importedData, setImportedData] = useState(null);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState(null);
     const [frames, setFrames] = useState([]);
-    const [cFrame, setCFrame] = useState(0);
+    
+    const intervalRef = useRef(null);
+    const currentFrameRef = useRef(0);
 
     const startSimulation = (gridSize, params) => {
         setIsSimulationRunning(true);
-        setFetchInterval(setInterval(() => getSimulationData(gridSize, params), 50));
+
+        // Set first frame to the frames
+        setFrames([cellInstances.map(cell => cell.state)]);
+
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+        intervalRef.current = setInterval(() => getSimulationData(gridSize, params), 50);
     };
 
     const stopSimulation = () => {
         setIsSimulationRunning(false);
-        if (fetchInterval) {
-            clearInterval(fetchInterval);
-            setFetchInterval(null);
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
         }
     };
 
     const getSimulationData = async (gridSize, params) => {
         try {
+            if (!selectedAlgorithm) return;
             const table = cellInstances.map(cell => cell.state);
             const parameters = [selectedAlgorithm.automaton_id, table, ...params];
-            const response = await window.electron.callPlugin(parameters);
-            setResponse(response);
-            setFrames(prevFrames => [...prevFrames, response]);
-            setCFrame(frames.length - 1);
+            const res = await window.electron.callPlugin(parameters);
+            setResponse(res);
+            setFrames(prev => {
+                const next = [...prev, res];
+                currentFrameRef.current = next.length - 1;
+                return next;
+            });
         } catch (error) {
             console.error("IPC Call error :", error);
         }
     };
 
     const clearAll = () => {
-        setCellInstances([]);
+        clearCells();
         setResponse([]);
-        if (fetchInterval) {
-            clearInterval(fetchInterval);
-            setFetchInterval(null);
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
         }
         setIsSimulationRunning(false);
+        setFrames([]);
+        currentFrameRef.current = 0;
     };
+
+    useEffect(() => {
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        };
+    }, []);
 
     const importSimulation = async () => {
         const filePath = await window.electron.openDialog("json");
@@ -80,16 +104,18 @@ export const SimulationProvider = ({ children }) => {
 
     const getSimulationParameters = async () => {
         try {
+            if (!selectedAlgorithm) return [];
             const response = await window.electron.getAlgorithmParameters([selectedAlgorithm.automaton_id]);
             return response;
         } catch (error) {
             console.error("Error fetching simulation parameters:", error);
+            return [];
         }
     };
 
     const setCurrentFrame = (index) => {
         if (index < 0 || index >= frames.length) {
-            console.error("Index out of bounds for frames array");
+            console.warn("Index out of bounds for frames array");
             return;
         }
         const currentFrame = frames[index];
@@ -97,11 +123,18 @@ export const SimulationProvider = ({ children }) => {
             cell.setState(currentFrame[i]);
         });
         setCellInstances([...cellInstances]);
+        currentFrameRef.current = index;
     };
+
+    const clearCells = () => {
+        cellInstances.forEach(cell => cell.setState(0));
+        setCellInstances([...cellInstances]);
+        setResponse([]);
+    }
 
     const clearFrames = () => {
         setFrames([]);
-        setCFrame(0);
+        currentFrameRef.current = 0;
     };
 
     return (
@@ -109,8 +142,8 @@ export const SimulationProvider = ({ children }) => {
             startSimulation, stopSimulation, response, setResponse,
             cellInstances, setCellInstances, isSimulationRunning,
             clearAll, importSimulation, exportSimulation, importedData, setImportedData,
-            selectedAlgorithm, setSelectedAlgorithm, getSimulationParameters, frames, setFrames, setCurrentFrame,
-            cFrame, setCFrame, clearFrames
+            selectedAlgorithm, setSelectedAlgorithm, getSimulationParameters, frames, setFrames,
+            currentFrameRef, clearFrames, setCurrentFrame
         }}>
             {children}
         </SimulationContext.Provider>
