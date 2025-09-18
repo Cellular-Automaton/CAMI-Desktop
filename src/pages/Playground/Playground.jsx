@@ -39,7 +39,7 @@ export default function Playground() {
             toast.error("Error fetching simulation parameters: " + error.message);
         }
         return () => {
-            
+            console.log("Cleaning up...");
             stopSimulation();
             clearAll();
         }
@@ -89,7 +89,7 @@ export default function Playground() {
 
     return (
         <div id="playground" className='flex flex-col h-full w-full relative'>
-            <div className="flex flex-col justify-center absolute right-4 w-1/4 h-full bg-transparent z-50 pointer-events-none">
+            <div className="flex flex-col justify-center absolute right-4 w-1/5 min-w-52 h-full bg-transparent z-50 pointer-events-none">
                 <div id="configuration-panel" className="flex flex-col w-full bg-midnight-opacity p-4 rounded-lg font-mono gap-4 pointer-events-auto">
                     <div id="configurations" className="flex flex-col gap-4 ">
                         {
@@ -129,18 +129,25 @@ export default function Playground() {
                         </div>
                     </div>
                     <div className="flex flex-col gap-2 justify-center items-center">
-                        <div id="import-export" className="flex flex-row justify-center w-3/4 gap-2 items-center">
-                            <button className="flex flex-col justify-center items-center w-1/2 h-10 bg-midnight-purple text-white rounded-lg"
+                        <div id="import-export" className="flex flex-row justify-center w-full gap-2 items-center">
+                            <button className="
+                                flex flex-col justify-center items-center w-1/2 h-10 bg-midnight-purple text-white rounded-lg
+                                hover:opacity-75 transition ease-in-out duration-300"
                                 onClick={importSimulation} >
                                 Import
                             </button>
-                            <button className="flex flex-col justify-center items-center w-1/2 h-10 bg-midnight-purple text-white rounded-lg"
+                            <button className="
+                                flex flex-col justify-center items-center w-1/2 h-10 bg-midnight-purple text-white rounded-lg
+                                hover:opacity-75 transition ease-in-out duration-300"
                                 onClick={exportSimulation} >
                                 Export
                             </button>
                         </div>
-                        <div>
-                            <button className="flex flex-col justify-center items-center w-3/4 h-10 bg-midnight-purple text-white rounded-lg"
+                        <div className="flex flex-row justify-center w-full gap-2 items-center">
+                            <button className="
+                                flex flex-col justify-center items-center w-full h-10 bg-midnight-red text-white rounded-lg
+                                hover:opacity-75 transition ease-in-out duration-300
+                                "
                                 onClick={() => {
                                     stopSimulation();
                                     clearAll();

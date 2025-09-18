@@ -1,13 +1,13 @@
-import React, {useContext} from "react";
+import React, {useContext, useRef, useEffect} from "react";
 import Play from "../../../assets/images/play.svg";
 import Pause from "../../../assets/images/pause.svg";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 
 const SimulationPlayer = ({ onStartSimulation, onStopSimulation, isPlaying }) => {
-    const { frames, setCurrentFrame, isSimulationRunning, cFrame, setCFrame } = useContext(SimulationContext);
+    const { frames, isSimulationRunning, currentFrameRef, setCurrentFrame } = useContext(SimulationContext);
 
     return (
-        <div id="player-container" className="flex flex-row absolute justify-center items-center bottom-0 w-full h-1/6 pointer-events-none">
+        <div id="player-container" className="flex flex-row absolute justify-center items-center bottom-0 w-full min-w-80 h-1/6 pointer-events-none">
             <div 
                 id="player" 
                 className="flex flex-col justify-center items-center w-4/5 h-2/3 py-4 gap-4
@@ -30,19 +30,17 @@ const SimulationPlayer = ({ onStartSimulation, onStopSimulation, isPlaying }) =>
                 </div>
                 <div id="slider" className="flex flex-col justify-center items-center h-2/5 w-full">
                     <div className="flex flex-col justify-left text-left items-center w-1/2 h-full font-mono">
-                        <span className="text-white text-sm">Frame: {cFrame + 1} / {frames.length}</span>
+                        <span className="text-white text-sm">Frame: {currentFrameRef.current} / {frames.length === 0 ? frames.length : frames.length - 1}</span>
                     </div>
                     <input 
                         disabled={isSimulationRunning || frames.length === 0}
-                        type="range" min="0" max={frames.length - 1} value={cFrame}
+                        type="range" min="0" max={frames.length - 1} value={currentFrameRef.current}
                         className="w-1/2 h-1/2 bg-midnight text-white rounded-md"
                         onChange={(e) => {
-                            setCFrame(Number(e.target.value));
+                            const index = parseInt(e.target.value, 10);
+                            setCurrentFrame(index);
                         }}
-                        onMouseUp={() => {
-                            setCurrentFrame(cFrame);
-                        }}
-                        />
+                    />
                 </div>
             </div>
         </div>
