@@ -30,4 +30,12 @@ contextBridge.exposeInMainWorld('electron', {
 
   // Get OS
   getOS: () => ipcRenderer.invoke('get-os'),
+
+  // Store handling
+  storeData: (data_name, data) => ipcRenderer.invoke('store-data', data_name, data),
+  getData: (data_name) => ipcRenderer.invoke('get-data', data_name),
+  deleteData: (data_name) => ipcRenderer.invoke('delete-data', data_name),
+
+  // User session event
+  onUserSession: (func) => { ipcRenderer.on('user-session', (event, ...args) => func(...args)); }
 });

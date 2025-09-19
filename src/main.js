@@ -1,9 +1,12 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
+import Store from "electron-store"
 import {load_manager} from './plugins_handling.js';
 
 let mainWindow;
+
+const store = new Store();
 
 const createWindow = () => {
   // Create the browser window.
@@ -25,7 +28,7 @@ const createWindow = () => {
   
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -33,7 +36,19 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   createWindow();
+
+  // Load plugins
   await load_manager();
+
+  // Handle user session
+
+  const user = store.get('user');
+  if (user) {
+    mainWindow.webContents.once('did-finish-load', () => {
+      mainWindow.webContents.send('user-session', user);
+    });
+  }
+
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   app.on("activate", () => {
@@ -54,7 +69,7 @@ app.on("window-all-closed", () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
-ipcMain.on('save-json', (event, data) => {
+ipcMain.handle('save-json', (event, data) => {
   const filePath = dialog.showSaveDialogSync(mainWindow, {
     title: 'Save Simulation',
     defaultPath: path.join(app.getPath('documents'), 'simulation.json'),
@@ -65,20 +80,18 @@ ipcMain.on('save-json', (event, data) => {
     return;
   }
 
-  if (filePath) {
-
-    fs.writeFile(filePath, data, (err) => {
-      if (err) {
-        dialog.showErrorBox('Error', 'Failed to save the file.');
-      } else {
-        dialog.showMessageBox(mainWindow, {
-          type: 'info',
-          title: 'Success',
-          message: 'Simulation saved successfully!'
-        });
-      }
-    });
-  }
+  const dataToText = JSON.stringify(data, null, 2);
+  fs.writeFile(filePath, dataToText, (err) => {
+    if (err) {
+      dialog.showErrorBox('Error', 'Failed to save the file.');
+    } else {
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: 'Success',
+        message: 'Simulation saved successfully!'
+      });
+    }
+  });
 });
 
 ipcMain.handle('open-dialog', async (e, fileExtension) => {
@@ -108,4 +121,31 @@ ipcMain.handle('open-external', async (event, url) => {
 
 ipcMain.handle('get-os', async () => {
   return process.platform;
+});
+
+ipcMain.handle('store-data', (event, data_name, data) => {
+    try {
+        store.set(data_name, data);
+        return;
+    } catch (error) {
+        throw new Error("Error storing data: " + error.message);
+    }
+});
+
+ipcMain.handle('get-data', (event, data_name) => {
+    try {
+        const data = store.get(data_name);
+        return data;
+    } catch (error) {
+        throw new Error("Error retrieving data: " + error.message);
+    }
+});
+
+ipcMain.handle('delete-data', (event, data_name) => {
+  try {
+      store.delete(data_name);
+      return;
+  } catch (error) {
+      throw new Error("Error deleting data: " + error.message);
+  }
 });

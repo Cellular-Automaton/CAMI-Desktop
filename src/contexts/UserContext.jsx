@@ -1,17 +1,39 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import axios from "axios";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const [userData, setUserData] = useState({
-        user_id: null,
-        username: null, 
-        img: null,
-        email: null,
-        token: null,
-    });
+    const [userData, setUserData] = useState({});
     const [loggedIn, setLoggedIn] = useState(false);
+
+    useEffect(() => {
+        window.electron.onUserSession((user) => {
+            console.log("User session received in UserProvider:", user);
+            if (user && user.token) {
+                setUser(user);
+                setToken(user.token);
+            }
+        });
+
+        window.addEventListener("beforeunload", () => {
+            sessionStorage.setItem("isReload", "true");
+        });
+
+        if (sessionStorage.getItem("isReload") === "true") {
+            console.log("Page reloaded, retrieving user data from storage...");
+            window.electron.getData("user").then((data) => {
+                console.log("Stored user data:", data);
+                if (data && data.token) {
+                    setUser(data);
+                    setToken(data.token);
+                }
+            }).catch((error) => {
+                console.error("Error retrieving stored user data:", error);
+            });
+            sessionStorage.setItem("isReload", "false");
+        }
+    }, []);
 
     const setToken = (token) => {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -35,14 +57,10 @@ export const UserProvider = ({ children }) => {
     }
 
     const logout = () => {
-        setUser({
-            id: null,
-            username: null,
-            //img: null,
-            email: null,
-            //token: null,
-        });
+        setUser({});
+        setToken(null);
 
+        window.electron.deleteData("user");
         localStorage.removeItem("token");
         delete axios.defaults.headers.common["Authorization"];
         setLoggedIn(false);
