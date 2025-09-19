@@ -1,4 +1,3 @@
-import { frame } from "motion";
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 
@@ -11,6 +10,7 @@ export const SimulationProvider = ({ children }) => {
     const [importedData, setImportedData] = useState(null);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState(null);
     const [frames, setFrames] = useState([]);
+    const [parameters, setParameters] = useState({});
     
     const intervalRef = useRef(null);
     const currentFrameRef = useRef(0);
@@ -37,11 +37,13 @@ export const SimulationProvider = ({ children }) => {
     };
 
     const getSimulationData = async (gridSize, params) => {
+        console.log(parameters)
         try {
             if (!selectedAlgorithm) return;
+            console.log("Parameters before sending to plugin:", params);
             const table = cellInstances.map(cell => cell.state);
-            const parameters = [selectedAlgorithm.automaton_id, table, ...params];
-            const res = await window.electron.callPlugin(parameters);
+            const param = [selectedAlgorithm.automaton_id, table, ...params];
+            const res = await window.electron.callPlugin(param);
             setResponse(res);
             setFrames(prev => {
                 const next = [...prev, res];
@@ -74,15 +76,20 @@ export const SimulationProvider = ({ children }) => {
         };
     }, []);
 
-    const importSimulation = async () => {
+    const importSimulation = async (algorithm_id) => {
         const filePath = await window.electron.openDialog("json");
 
         if (filePath) {
             try {
                 const data = await window.electron.loadTextFile(filePath);
                 const parsedData = JSON.parse(data);
+
+                if (algorithm_id && parsedData.algorithm_id !== algorithm_id) {
+                    throw new Error("Imported save does not match the selected algorithm");
+                }
+
                 setImportedData(parsedData);
-                setFrames([]);
+                clearCells();
                 toast.success("Simulation data imported successfully!");
             } catch (error) {
                 toast.error("Error importing simulation data");
@@ -90,15 +97,20 @@ export const SimulationProvider = ({ children }) => {
         }
     };
 
-    const exportSimulation = () => {
+    const exportSimulation = async () => {
         const exportedData = cellInstances.map(cell => (cell.state));
-        const data = JSON.stringify(exportedData);
+        const data = {
+            "algorithm_id" : selectedAlgorithm ? selectedAlgorithm.automaton_id : null,
+            "parameters": parameters,
+            "frames": exportedData,
+        }
 
+        // TODO : Faire en sorte que le toast ne s'enclenche qu'une fois l'export terminé
         try {
-            window.electron.send('save-json', data);
+            await window.electron.saveJson(data);
             toast.success("Simulation data exported successfully!");
         } catch (error) {
-            toast.error("Error exporting simulation data");
+            toast.error("Error exporting simulation data: " + error.message);
         }
     }
 
@@ -143,7 +155,7 @@ export const SimulationProvider = ({ children }) => {
             cellInstances, setCellInstances, isSimulationRunning,
             clearAll, importSimulation, exportSimulation, importedData, setImportedData,
             selectedAlgorithm, setSelectedAlgorithm, getSimulationParameters, frames, setFrames,
-            currentFrameRef, clearFrames, setCurrentFrame
+            currentFrameRef, clearFrames, setCurrentFrame, parameters, setParameters
         }}>
             {children}
         </SimulationContext.Provider>

@@ -1,9 +1,7 @@
 export {load_starting_plugin, load_plugins_params, load_manager};
 import fs from 'node:fs';
 import path from 'node:path';
-import { Buffer } from 'node:buffer';
 import axios from 'axios';
-import plugin from '@tailwindcss/forms';
 
 const extract = require('extract-zip');
 const { app, ipcMain, BrowserWindow } = require('electron');

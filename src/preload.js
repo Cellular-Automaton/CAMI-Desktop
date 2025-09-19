@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld('electron', {
   openDialog: (fileExtension) => ipcRenderer.invoke('open-dialog', fileExtension),
   loadFile: (filePath) => ipcRenderer.invoke('load-file', filePath),
   loadTextFile: (filePath) => ipcRenderer.invoke('load-text-file', filePath),
+  saveJson: (data) => ipcRenderer.invoke('save-json', data),
+
 
   // Simulation related IPC calls
   callPlugin: (params) => ipcRenderer.invoke('call-plugin', params),

@@ -24,7 +24,7 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
     }, []);
 
     useEffect(() => {
-        if (importedData && importedData.length > 0) {
+        if (importedData && importedData.frames.length > 0) {
             constructImportedData();
             setImportedData(null);
         }
@@ -145,18 +145,20 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
     };
 
     const constructImportedData = () => {
-        const gSize = Math.sqrt(importedData.length);
+        const gSize = Math.sqrt(importedData.frames.length);
+        console.log("Imported data grid size:", importedData);
         setCellInstances([]);
         containerRef.current.removeChildren();
 
+        // Construct the grid based on imported data size
         setShouldUpdate(false);
         setGridSize(gSize);
-        for (let i = 0; i < importedData.length; i += 1) {
+        for (let i = 0; i < importedData.frames.length; i += 1) {
             const cell = new RangedCell(
                 (i % gSize), Math.floor(i / gSize),
                 i, "default", appRef, null, colorScale
             );
-            cell.setState(importedData[i]);
+            cell.setState(importedData.frames[i]);
             containerRef.current.addChild(cell.shape);
             setCellInstances(prev => [...prev, cell]);
         }

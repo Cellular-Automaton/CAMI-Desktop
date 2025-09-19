@@ -3,18 +3,18 @@ import SimulationPlayer from "../../components/SimulationPlayer/SimulationPlayer
 import TwoDDisplay from "../../components/2DDisplay/2DDisplay.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 export default function Playground() {
     const [gridSize, setGridSize] = useState(10);
-    const [parameters, setParameters] = useState({});
-    const [gap, setGap] = useState(5);
-    const [response, setResponse] = useState([]);
+    const { state } = useLocation();
+    const algorithmFromState = state ? state.algorithm : null;
 
     const { 
         startSimulation, stopSimulation, 
         isSimulationRunning, clearAll,
         importSimulation, exportSimulation, getSimulationParameters,
-        clearFrames
+        clearFrames, parameters, setParameters, importedData
     } = useContext(SimulationContext);
 
     useEffect(() => {
@@ -32,7 +32,7 @@ export default function Playground() {
                     };
                 });
                 setParameters(tmp);
-                
+                console.log(algorithmFromState);
             });
         } catch (error) {
             console.error("Error fetching simulation parameters:", error);
@@ -61,6 +61,31 @@ export default function Playground() {
             return updated;
         });
     }, [gridSize]);
+
+    useEffect(() => {
+        if (importedData === undefined || importedData === null)
+            return;
+
+        const params = importedData.parameters;
+        if (!params || Object.keys(params).length === 0) {
+            toast.error("Imported data does not contain parameters.");
+            return;
+        }
+        // Replace current parameters with imported ones
+        setParameters(prev => {
+            const updated = { ...prev };
+            Object.keys(params).forEach(key => {
+                if (updated[key]) {
+                    updated[key] = {
+                        ...updated[key],
+                        value: params[key].value
+                    };
+                }
+            });
+            console.log("Parameters after import:", updated);
+            return updated;
+        });
+    }, [importedData]);
 
     const onStartSimulation = async () => {
         const params = Object.keys(parameters).map(key => parameters[key].value);
@@ -133,7 +158,7 @@ export default function Playground() {
                             <button className="
                                 flex flex-col justify-center items-center w-1/2 h-10 bg-midnight-purple text-white rounded-lg
                                 hover:opacity-75 transition ease-in-out duration-300"
-                                onClick={importSimulation} >
+                                onClick={() => {importSimulation(algorithmFromState.automaton_id);}}>
                                 Import
                             </button>
                             <button className="

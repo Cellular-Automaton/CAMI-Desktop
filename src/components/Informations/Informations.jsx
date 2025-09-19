@@ -92,7 +92,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
 
     const handleLaunchAlgorithm = () => {
         setSelectedAlgorithm(algorithm);
-        navigate('/Playground');
+        navigate('/Playground', { state: { algorithm } });
     };
 
     const handleDownloadAlgorithm = async () => {
