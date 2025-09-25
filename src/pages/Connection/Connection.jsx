@@ -42,6 +42,8 @@ export default function Connection() {
         signUp(body).then((response) => {
             const data = response.data;
             setUser(data);
+            setToken(data.token);
+            window.electron.storeData("user", data);
             navigate("/Home");
         }).catch((error) => {
             console.error("Error signing up:", error);
@@ -79,6 +81,7 @@ export default function Connection() {
                 token: token,
                 role: user.role
             };
+            window.electron.storeData("user", userInfo);
             setUser(userInfo);
             setToken(token);
             navigate("/Home");
