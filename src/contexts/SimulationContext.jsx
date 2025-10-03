@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 export const SimulationContext = createContext();
 
 export const SimulationProvider = ({ children }) => {
-    const [cellInstances, setCellInstances] = useState([]);
+    const [simulationTable, setSimulationTable] = useState([]);
     const [response, setResponse] = useState([]);
     const [isSimulationRunning, setIsSimulationRunning] = useState(false);
     const [importedData, setImportedData] = useState(null);
@@ -12,21 +12,27 @@ export const SimulationProvider = ({ children }) => {
     const [frames, setFrames] = useState([]);
     const [parameters, setParameters] = useState({});
     
+    const currentTableRef = useRef([]);
+    const currentParametersRef = useRef({});
+
     const intervalRef = useRef(null);
     const currentFrameRef = useRef(0);
 
-    const startSimulation = (gridSize, params) => {
+    const startSimulation = (table, params) => {
         setIsSimulationRunning(true);
+        currentTableRef.current = table;
+        currentParametersRef.current = params;
 
         // Set first frame to the frames
-        setFrames([cellInstances.map(cell => cell.state)]);
+        setFrames(table);
 
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
         }
-        intervalRef.current = setInterval(() => getSimulationData(gridSize, params), 50);
+        intervalRef.current = setInterval(() => getSimulationData(), 50);
     };
+
 
     const stopSimulation = () => {
         setIsSimulationRunning(false);
@@ -36,15 +42,19 @@ export const SimulationProvider = ({ children }) => {
         }
     };
 
-    const getSimulationData = async (gridSize, params) => {
-        console.log(parameters)
+    const getSimulationData = async () => {
+        console.log(currentFrameRef.current);
         try {
             if (!selectedAlgorithm) return;
-            console.log("Parameters before sending to plugin:", params);
-            const table = cellInstances.map(cell => cell.state);
-            const param = [selectedAlgorithm.automaton_id, table, ...params];
+
+            console.log("Parameters before sending to plugin:", currentParametersRef.current);
+            const table = currentTableRef.current;
+            const param = [selectedAlgorithm.automaton_id, table, ...Object.values(currentParametersRef.current)];
+            console.log(param);
             const res = await window.electron.callPlugin(param);
+            console.log("Response from plugin:", res);
             setResponse(res);
+            currentTableRef.current = res;
             setFrames(prev => {
                 const next = [...prev, res];
                 currentFrameRef.current = next.length - 1;
@@ -98,7 +108,7 @@ export const SimulationProvider = ({ children }) => {
     };
 
     const exportSimulation = async () => {
-        const exportedData = cellInstances.map(cell => (cell.state));
+        const exportedData = simulationTable.map(cell => (cell.state));
         const data = {
             "algorithm_id" : selectedAlgorithm ? selectedAlgorithm.automaton_id : null,
             "parameters": parameters,
@@ -131,16 +141,16 @@ export const SimulationProvider = ({ children }) => {
             return;
         }
         const currentFrame = frames[index];
-        cellInstances.forEach((cell, i) => {
+        simulationTables.forEach((cell, i) => {
             cell.setState(currentFrame[i]);
         });
-        setCellInstances([...cellInstances]);
+        setSimulationTable([...simulationTable]);
         currentFrameRef.current = index;
     };
 
     const clearCells = () => {
-        cellInstances.forEach(cell => cell.setState(0));
-        setCellInstances([...cellInstances]);
+        simulationTable.forEach(cell => cell.setState(0));
+        setSimulationTable([...simulationTable]);
         setResponse([]);
     }
 
@@ -152,7 +162,7 @@ export const SimulationProvider = ({ children }) => {
     return (
         <SimulationContext.Provider value={{
             startSimulation, stopSimulation, response, setResponse,
-            cellInstances, setCellInstances, isSimulationRunning,
+            simulationTable, setSimulationTable, isSimulationRunning,
             clearAll, importSimulation, exportSimulation, importedData, setImportedData,
             selectedAlgorithm, setSelectedAlgorithm, getSimulationParameters, frames, setFrames,
             currentFrameRef, clearFrames, setCurrentFrame, parameters, setParameters

@@ -1,9 +1,12 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, protocol, WebContentsView } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
 import {load_manager} from './plugins_handling.js';
+import express from 'express';
 
 let mainWindow;
+let visualServer;
+let serverPort;
 
 const createWindow = () => {
   // Create the browser window.
@@ -15,7 +18,8 @@ const createWindow = () => {
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      webviewTag: true
     },
     autoHideMenuBar: true,
     //frame: false // Pour être frameless
@@ -25,7 +29,7 @@ const createWindow = () => {
   
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -33,6 +37,7 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   createWindow();
+  createMiniServer();
   await load_manager();
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
@@ -42,6 +47,24 @@ app.whenReady().then(async () => {
     }
   });
 });
+
+const createMiniServer = () => {
+  visualServer = express();
+  const serverPath = app.isPackaged ? path.join(process.resourcesPath, "Visuals") : path.join(app.getAppPath(), "Visuals")
+  console.log(serverPath);
+  visualServer.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // autorise toutes les origines
+    res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    next();
+  });
+  visualServer.use(express.static(serverPath));
+
+  const server = visualServer.listen(0, () => {
+    serverPort = server.address().port;
+    console.log(`Visual server running at http://localhost:${serverPort}`);
+  });
+}
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -108,4 +131,15 @@ ipcMain.handle('open-external', async (event, url) => {
 
 ipcMain.handle('get-os', async () => {
   return process.platform;
+});
+
+ipcMain.handle('get-server-url', async () => {
+  if (visualServer) {
+    return `http://localhost:${serverPort}/`;
+  }
+});
+
+ipcMain.handle('get-visual-folder', async () => {
+  const visualFolderPath = app.isPackaged ? path.join(process.resourcesPath, "Visuals") : path.join(app.getAppPath(), "Visuals")
+  return visualFolderPath;
 });

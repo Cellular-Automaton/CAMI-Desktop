@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import SimulationPlayer from "../../components/SimulationPlayer/SimulationPlayer.jsx";
-import TwoDDisplay from "../../components/2DDisplay/2DDisplay.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
+import VisualLoader from "../VisualLoader.jsx";
+import TwoDDisplay from "../../components/2DDisplay/2DDisplay.jsx";
 
 export default function Playground() {
     const [gridSize, setGridSize] = useState(10);
+    const [visualComponent, setVisualComponent] = useState(null);
     const { state } = useLocation();
     const algorithmFromState = state ? state.algorithm : null;
 
@@ -18,6 +20,7 @@ export default function Playground() {
     } = useContext(SimulationContext);
 
     useEffect(() => {
+
         try {
             getSimulationParameters().then((params) => {
                 const tmp = {};
@@ -33,6 +36,9 @@ export default function Playground() {
                 });
                 setParameters(tmp);
                 console.log(algorithmFromState);
+
+                // Load visual with preload and src paths
+                loadVisual();
             });
         } catch (error) {
             console.error("Error fetching simulation parameters:", error);
@@ -112,86 +118,26 @@ export default function Playground() {
         stopSimulation();
     }
 
+    const renderVisual = async () => {
+        const visualFolder = await window.electron.getVisualFolder();
+        const currentUrl = await window.electron.getServerURL();
+        const preloadPath = "file://" + visualFolder.replace(/\\/g, "/") + "/webview_preload.js";
+        const srcPath = currentUrl + "base.html";
+        return (
+            <VisualLoader preloadPath={preloadPath} srcPath={srcPath} />
+        )
+    };
+
+    const loadVisual = async () => {
+        const visual = await renderVisual();
+        setVisualComponent(visual);
+    };
+
     return (
         <div id="playground" className='flex flex-col h-full w-full relative'>
-            <div className="flex flex-col justify-center absolute right-4 w-1/5 min-w-52 h-full bg-transparent z-50 pointer-events-none">
-                <div id="configuration-panel" className="flex flex-col w-full bg-midnight-opacity p-4 rounded-lg font-mono gap-4 pointer-events-auto">
-                    <div id="configurations" className="flex flex-col gap-4 ">
-                        {
-                            Object.keys(parameters).length > 0 ? (
-                                Object.keys(parameters).map((key) => {
-                                    return (
-                                        <div key={key} className="flex flex-col w-full">
-                                            <label className="text-white">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
-                                            <input
-                                                className="text-white bg-midnight-opacity rounded-md"
-                                                type={parameters[key].type.toLowerCase() === "number" ? "number" : "text"}
-                                                value={parameters[key].value}
-                                                disabled={isSimulationRunning}
-                                                onChange={(e) => {
-                                                    setParameters(prev => ({
-                                                        ...prev,
-                                                        [key]: {
-                                                            ...prev[key],
-                                                            value: e.target.value
-                                                        }
-                                                    }));
-                                                }}
-                                            />
-                                        </div>
-                                    )
-                                })
-                            ) : (
-                                <p className="text-white">Loading parameters...</p>
-                            )
-                        }
-                        <div id="size" className="flex flex-col w-full">
-                            <label className="text-white">Size</label>
-                            <input 
-                                className="text-white bg-midnight-opacity rounded-md" type="number" 
-                                max={50} min={5} value={gridSize} disabled={isSimulationRunning}
-                                onChange={(e) => {setGridSize(e.target.value)}}/>
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-2 justify-center items-center">
-                        <div id="import-export" className="flex flex-row justify-center w-full gap-2 items-center">
-                            <button className="
-                                flex flex-col justify-center items-center w-1/2 h-10 bg-midnight-purple text-white rounded-lg
-                                hover:opacity-75 transition ease-in-out duration-300"
-                                onClick={() => {importSimulation(algorithmFromState.automaton_id);}}>
-                                Import
-                            </button>
-                            <button className="
-                                flex flex-col justify-center items-center w-1/2 h-10 bg-midnight-purple text-white rounded-lg
-                                hover:opacity-75 transition ease-in-out duration-300"
-                                onClick={exportSimulation} >
-                                Export
-                            </button>
-                        </div>
-                        <div className="flex flex-row justify-center w-full gap-2 items-center">
-                            <button className="
-                                flex flex-col justify-center items-center w-full h-10 bg-midnight-red text-white rounded-lg
-                                hover:opacity-75 transition ease-in-out duration-300
-                                "
-                                onClick={() => {
-                                    stopSimulation();
-                                    clearAll();
-                                }} >
-                                Clear
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <SimulationPlayer 
-                onStartSimulation={onStartSimulation} 
-                onStopSimulation={onStopSimulation}
-                isPlaying={isSimulationRunning}
-            />
-            <TwoDDisplay
-                gridSize={gridSize}
-                setGridSize={setGridSize}
-            />
+            {
+                visualComponent
+            }
         </div>
     );
 }

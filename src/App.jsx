@@ -1,7 +1,6 @@
-import React from "react";
 import Home from "./pages/Home/Home.jsx";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { SimulationProvider, useSimulation } from "./contexts/SimulationContext.jsx";
 import { ToastContainer } from "react-toastify";
 

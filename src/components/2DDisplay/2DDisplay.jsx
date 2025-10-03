@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState, useContext } from "react";
 import {Application, Container} from "pixi.js";
 import { Viewport } from "pixi-viewport";
-import Cell from "../../classes/Cell.jsx";
 import RangedCell from "../../classes/RangeCell.jsx";
 import {SimulationContext} from "../../contexts/SimulationContext.jsx";
 import chroma from "chroma-js";
@@ -10,7 +9,7 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
     const appRef = useRef(null);
     const containerRef = useRef(null);
     const viewportRef = useRef(null);
-    const { response, cellInstances, setCellInstances,
+    const { response, simulationTable, setSimulationTable,
         importedData, setImportedData
     } = useContext(SimulationContext);
     const [shouldUpdate, setShouldUpdate] = useState(true);
@@ -92,7 +91,7 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
         if (appRef.current && containerRef.current) {
             softUpdate();
         }
-    }, [cellInstances]);
+    }, [simulationTable]);
 
     // Function that only updates the grid without recreate the cells
     const softUpdate = () => {
@@ -107,19 +106,19 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
 
     const createGrid = (gSize) => {
         containerRef.current.removeChildren();
-        setCellInstances([]);
+        setSimulationTable([]);
         for (let i = 0; i < gSize * gSize; i += 1) {
             const cell = new RangedCell(
                 (i % gSize), Math.floor(i / gSize),
                 i, "default", appRef, null, colorScale
             );
             containerRef.current.addChild(cell.shape);
-            setCellInstances(prev => [...prev, cell]);
+            setSimulationTable(prev => [...prev, cell]);
         }
     };
 
     const drawCells = () => {
-        cellInstances.forEach(cell => {
+        simulationTable.forEach(cell => {
             cell.draw();
         });
         centerCamera();
@@ -138,8 +137,8 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
             return;
 
         data.forEach((state, index) => {
-            if (cellInstances[index]) {
-                cellInstances[index].setState(state);
+            if (simulationTable[index]) {
+                simulationTable[index].setState(state);
             }
         });
     };
@@ -147,7 +146,7 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
     const constructImportedData = () => {
         const gSize = Math.sqrt(importedData.frames.length);
         console.log("Imported data grid size:", importedData);
-        setCellInstances([]);
+        setSimulationTable([]);
         containerRef.current.removeChildren();
 
         // Construct the grid based on imported data size
@@ -160,7 +159,7 @@ export default function TwoDDisplay({gridSize, setGridSize}) {
             );
             cell.setState(importedData.frames[i]);
             containerRef.current.addChild(cell.shape);
-            setCellInstances(prev => [...prev, cell]);
+            setSimulationTable(prev => [...prev, cell]);
         }
     };
 

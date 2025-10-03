@@ -6,9 +6,11 @@ module.exports = {
     asar: true,
     Files: [
         '!./Plugins/',
-        '!./Plugins/**'
+        '!./Plugins/**',
+        '!./Visuals/',
+        '!./Visuals/**'
         ],
-    extraResource: "./Plugins"
+    extraResource: ["./Plugins", "./Visuals"],
   },
   rebuildConfig: {},
   makers: [

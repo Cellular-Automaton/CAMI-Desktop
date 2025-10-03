@@ -1,7 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld('electron', {
-
   send: (channel, data) => { ipcRenderer.send(channel, data); },
   receive: (channel, func) => { ipcRenderer.on(channel, (event, ...args) => func(...args)); },
 
@@ -30,4 +29,9 @@ contextBridge.exposeInMainWorld('electron', {
 
   // Get OS
   getOS: () => ipcRenderer.invoke('get-os'),
+
+  // Mini server related
+  getServerURL: () => ipcRenderer.invoke('get-server-url'),
+
+  getVisualFolder: () => ipcRenderer.invoke('get-visual-folder'),
 });
