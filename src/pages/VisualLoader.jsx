@@ -11,7 +11,7 @@ export default function VisualLoader({preloadPath, srcPath}) {
         simulationTable, setSimulationTable,
         parameters, setParameters,
         startSimulation, stopSimulation,
-        response
+        response, importSimulation, exportSimulation,
     } = useContext(SimulationContext);
 
     useEffect(() => {
@@ -29,6 +29,7 @@ export default function VisualLoader({preloadPath, srcPath}) {
 
                 webview.contentWindow.postMessage({ action: 'LOAD_VISUAL', payload: { url: trueUrl } }, '*');
                 setIsLoading(false);
+                webview.contentWindow.postMessage({ action: 'PARAMETERS', data: { parameters: parameters } }, '*');
             } catch (err) {
                 console.error("Failed to get server URL:", err);
                 setIsLoading(false);
@@ -62,11 +63,21 @@ export default function VisualLoader({preloadPath, srcPath}) {
                 stopSimulation();
                 console.log("Pause simulation requested");
             }
+
+            if (msg.action === 'EXPORT') {
+                const table = data.table;
+                const parameters = data.parameters;
+
+                exportSimulation(table, parameters);
+            }
+
+            if (msg.action === 'IMPORT') {}
         });
 
         return () => {
             if (webview) {
                 webview.removeEventListener('dom-ready', handleDomReady);
+                webview.removeEventListener('ipc-message', () => {});
             }
         };
     }, []);

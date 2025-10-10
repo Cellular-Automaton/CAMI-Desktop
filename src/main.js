@@ -77,31 +77,27 @@ app.on("window-all-closed", () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
-ipcMain.on('save-json', (event, data) => {
+ipcMain.handle('save-json', async (evt, data) => {
   const filePath = dialog.showSaveDialogSync(mainWindow, {
     title: 'Save Simulation',
     defaultPath: path.join(app.getPath('documents'), 'simulation.json'),
     filters: [{ name: 'JSON Files', extensions: ['json'] }]
   });
 
-  if (!filePath) {
+  if (!filePath)
     return;
-  }
 
-  if (filePath) {
-
-    fs.writeFile(filePath, data, (err) => {
-      if (err) {
-        dialog.showErrorBox('Error', 'Failed to save the file.');
-      } else {
-        dialog.showMessageBox(mainWindow, {
-          type: 'info',
-          title: 'Success',
-          message: 'Simulation saved successfully!'
-        });
-      }
-    });
-  }
+  fs.writeFile(filePath, JSON.stringify(data), (err) => {
+    if (err) {
+      dialog.showErrorBox('Error', 'Failed to save the file.');
+    } else {
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: 'Success',
+        message: 'Simulation saved successfully!'
+      });
+    }
+  });
 });
 
 ipcMain.handle('open-dialog', async (e, fileExtension) => {

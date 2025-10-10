@@ -107,12 +107,12 @@ export const SimulationProvider = ({ children }) => {
         }
     };
 
-    const exportSimulation = async () => {
-        const exportedData = simulationTable.map(cell => (cell.state));
+    const exportSimulation = async (table, params) => {
+        const exportedData = simulationTable;
         const data = {
             "algorithm_id" : selectedAlgorithm ? selectedAlgorithm.automaton_id : null,
-            "parameters": parameters,
-            "frames": exportedData,
+            "parameters": params,
+            "frames": table,
         }
 
         // TODO : Faire en sorte que le toast ne s'enclenche qu'une fois l'export terminé
