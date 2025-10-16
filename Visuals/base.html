@@ -5,7 +5,6 @@
     <script type="module">
         window.addEventListener("message", (event) => {
             const msg = event.data;
-            console.log("Message event received:", msg);
 
             if (msg && msg.action === "LOAD_VISUAL") {
                 const url = msg.payload.url;

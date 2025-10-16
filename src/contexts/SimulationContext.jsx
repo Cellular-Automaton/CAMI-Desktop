@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 export const SimulationContext = createContext();
 
@@ -7,7 +7,6 @@ export const SimulationProvider = ({ children }) => {
     const [simulationTable, setSimulationTable] = useState([]);
     const [response, setResponse] = useState([]);
     const [isSimulationRunning, setIsSimulationRunning] = useState(false);
-    const [importedData, setImportedData] = useState(null);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState(null);
     const [frames, setFrames] = useState([]);
     const [parameters, setParameters] = useState({});
@@ -95,12 +94,12 @@ export const SimulationProvider = ({ children }) => {
                 const parsedData = JSON.parse(data);
 
                 if (algorithm_id && parsedData.algorithm_id !== algorithm_id) {
+                    toast.error("Imported save does not match the selected algorithm");
                     throw new Error("Imported save does not match the selected algorithm");
                 }
 
-                setImportedData(parsedData);
-                clearCells();
                 toast.success("Simulation data imported successfully!");
+                return parsedData;
             } catch (error) {
                 toast.error("Error importing simulation data");
             }
@@ -127,8 +126,8 @@ export const SimulationProvider = ({ children }) => {
     const getSimulationParameters = async () => {
         try {
             if (!selectedAlgorithm) return [];
-            const response = await window.electron.getAlgorithmParameters([selectedAlgorithm.automaton_id]);
-            return response;
+            const res = await window.electron.getAlgorithmParameters([selectedAlgorithm.automaton_id]);
+            return res;
         } catch (error) {
             console.error("Error fetching simulation parameters:", error);
             return [];
@@ -163,8 +162,8 @@ export const SimulationProvider = ({ children }) => {
         <SimulationContext.Provider value={{
             startSimulation, stopSimulation, response, setResponse,
             simulationTable, setSimulationTable, isSimulationRunning,
-            clearAll, importSimulation, exportSimulation, importedData, setImportedData,
-            selectedAlgorithm, setSelectedAlgorithm, getSimulationParameters, frames, setFrames,
+            clearAll, importSimulation, exportSimulation, selectedAlgorithm,
+            setSelectedAlgorithm, getSimulationParameters, frames, setFrames,
             currentFrameRef, clearFrames, setCurrentFrame, parameters, setParameters
         }}>
             {children}

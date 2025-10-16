@@ -5,10 +5,11 @@ import { SimulationContext } from "../contexts/SimulationContext.jsx";
 export default function VisualLoader({preloadPath, srcPath}) {
     const webviewRef = useRef(null);
     const [isLoading, setIsLoading] = useState(true);
+    const isImportedRef = useRef(false);
     const urlRef = useRef("");
 
     const { 
-        simulationTable, setSimulationTable,
+        simulationTable, setSimulationTable, selectedAlgorithm,
         parameters, setParameters,
         startSimulation, stopSimulation,
         response, importSimulation, exportSimulation,
@@ -71,7 +72,23 @@ export default function VisualLoader({preloadPath, srcPath}) {
                 exportSimulation(table, parameters);
             }
 
-            if (msg.action === 'IMPORT') {}
+            if (msg.action === 'IMPORT') {
+                const id = selectedAlgorithm.automaton_id;
+                importSimulation(id).then((imported) => {
+                    if (imported) {
+                        const frames = imported.frames;
+                        const params = imported.parameters;
+                        const paramWithValues = {};
+                        Object.entries(params).forEach(([key, val]) => {
+                            paramWithValues[key] = val.value;
+                        });
+                        setSimulationTable(frames);
+                        const data = { parameters: paramWithValues, table: frames };
+                        console.log("Sending imported data to webview:", data);
+                        webview.contentWindow.postMessage({ action: 'IMPORTED_DATA', data: data }, '*');
+                    }
+                });
+            }
         });
 
         return () => {
