@@ -1,12 +1,15 @@
 import { app, BrowserWindow, dialog, ipcMain, protocol, WebContentsView } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
+import Store from "electron-store"
 import {load_manager} from './plugins_handling.js';
 import express from 'express';
 
 let mainWindow;
 let visualServer;
 let serverPort;
+
+const store = new Store();
 
 const createWindow = () => {
   // Create the browser window.
@@ -38,7 +41,19 @@ const createWindow = () => {
 app.whenReady().then(async () => {
   createWindow();
   createMiniServer();
+
+  // Load plugins
   await load_manager();
+
+  // Handle user session
+
+  const user = store.get('user');
+  if (user) {
+    mainWindow.webContents.once('did-finish-load', () => {
+      mainWindow.webContents.send('user-session', user);
+    });
+  }
+
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   app.on("activate", () => {
@@ -138,4 +153,31 @@ ipcMain.handle('get-server-url', async () => {
 ipcMain.handle('get-visual-folder', async () => {
   const visualFolderPath = app.isPackaged ? path.join(process.resourcesPath, "Visuals") : path.join(app.getAppPath(), "Visuals")
   return visualFolderPath;
+});
+
+ipcMain.handle('store-data', (event, data_name, data) => {
+    try {
+        store.set(data_name, data);
+        return;
+    } catch (error) {
+        throw new Error("Error storing data: " + error.message);
+    }
+});
+
+ipcMain.handle('get-data', (event, data_name) => {
+    try {
+        const data = store.get(data_name);
+        return data;
+    } catch (error) {
+        throw new Error("Error retrieving data: " + error.message);
+    }
+});
+
+ipcMain.handle('delete-data', (event, data_name) => {
+  try {
+      store.delete(data_name);
+      return;
+  } catch (error) {
+      throw new Error("Error deleting data: " + error.message);
+  }
 });
