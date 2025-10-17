@@ -11,6 +11,7 @@ export default function Playground() {
     const [visualComponent, setVisualComponent] = useState(null);
     const { state } = useLocation();
     const algorithmFromState = state ? state.algorithm : null;
+    const visualFromState = state ? state.visual : null;
 
     const { 
         startSimulation, stopSimulation, 
@@ -21,6 +22,7 @@ export default function Playground() {
 
     useEffect(() => {
 
+        console.log('here', algorithmFromState, visualFromState);
         try {
             getSimulationParameters().then((params) => {
                 const tmp = {};
@@ -119,12 +121,18 @@ export default function Playground() {
     }
 
     const renderVisual = async () => {
+        const visualById = await window.electron.getVisualById(visualFromState.id);
+        if (!visualById) {
+            toast.error("Visual not found: " + visualFromState.name);
+            return null;
+        }
         const visualFolder = await window.electron.getVisualFolder();
         const currentUrl = await window.electron.getServerURL();
         const preloadPath = "file://" + visualFolder.replace(/\\/g, "/") + "/webview_preload.js";
         const srcPath = currentUrl + "base.html";
+        const visualUrl = currentUrl + visualById.path.replace("Visuals/", "");
         return (
-            <VisualLoader preloadPath={preloadPath} srcPath={srcPath} />
+            <VisualLoader preloadPath={preloadPath} srcPath={srcPath} visualUrl={visualUrl} />
         )
     };
 

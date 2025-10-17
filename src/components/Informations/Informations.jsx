@@ -6,12 +6,15 @@ import view from "../../../assets/images/view.svg";
 import download from "../../../assets/images/download.svg";
 import Comment from "../Comment/Comment.jsx";
 import spinner from "../../../assets/images/spinner.svg";
+import VisualSelector from "../VisualSelector/VisualSelector.jsx";
+
 import { UserContext } from "../../contexts/UserContext.jsx";
 import { APIContext } from "../../contexts/APIContext.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Chip, Tooltip } from "@mui/material";
+import { Chip, Tooltip, Dialog } from "@mui/material";
+import axios from "axios";
 
 
 const Informations = ({algorithm, onCloseCallback}) => {
@@ -20,9 +23,12 @@ const Informations = ({algorithm, onCloseCallback}) => {
     const [comments, setComments] = useState([]);
     const [isAlgorithmInstalled, setIsAlgorithmInstalled] = useState(false);
     const [image, setImage] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
     const { userData, loggedIn } = useContext(UserContext);
-    const { addAlgorithmComment, getAlgorithmComments, downloadAlgorithm } = useContext(APIContext);
+    const { addAlgorithmComment, getAlgorithmComments, downloadAlgorithm, downloadVisual } = useContext(APIContext);
     const { setSelectedAlgorithm } = useContext(SimulationContext);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -90,21 +96,46 @@ const Informations = ({algorithm, onCloseCallback}) => {
 
     }
 
-    const handleLaunchAlgorithm = () => {
+    const handleDownloadVisual = async (visual) => {
+        toast.info(`Downloading visual "${visual.name}". This may take a while...`);
+        try {
+            const visualLink = await downloadVisual(visual.visualUrl);
+            console.log("Visual download link:", visualLink);
+            await window.electron.installVisual(visualLink, visual);
+        } catch (error) {
+            console.error("Error downloading visual:", error);
+        }
+    };
+
+    const handleLaunchAlgorithm = async (visual) => {
         setSelectedAlgorithm(algorithm);
-        navigate('/Playground', { state: { algorithm } });
+        const isInstalled = await window.electron.isVisualInstalled(visual.id);
+        console.log("Launching algorithm with visual:", visual);
+        if (!isInstalled) {
+            console.log("Visual not installed, downloading...");
+            await handleDownloadVisual(visual);
+        }
+        navigate('/Playground', { state: { 
+            algorithm: algorithm,
+            visual : visual
+            }
+        });
+    };
+
+    const handleVisualization = () => {
+        setIsDialogOpen(true);
     };
 
     const handleDownloadAlgorithm = async () => {
         try {
             const response = await downloadAlgorithm(algorithm.assets_link);
-            toast.success("Algorithm downloaded successfully!");
             setIsAlgorithmInstalled(true);
 
             await window.electron.installPlugin(response, algorithm);
             window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
             if (isInstalled) {
                 setIsAlgorithmInstalled(true);
+                toast.success("Algorithm installed successfully!");
             } else {
                 setIsAlgorithmInstalled(false);
             }
@@ -249,9 +280,9 @@ const Informations = ({algorithm, onCloseCallback}) => {
                     {
                         isAlgorithmInstalled ?
                             <div className="flex flex-row w-full h-fit gap-2 overflow-hidden">
-                                <button onClick={handleLaunchAlgorithm} id="install" className="flex w-full justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
+                                <button onClick={handleVisualization} id="install" className="flex w-full justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
                                     transition ease-in-out duration-300 hover:bg-midnight-purple">
-                                    Launch
+                                    Choose visualization
                                 </button>
                                 {/* <button onClick={() => {handleUninstallAlgorithm}} id="uninstall" className="flex w-full justify-center items-center text-white bg-midnight-red rounded-md px-5 py-2
                                     transition ease-in-out duration-300 hover:bg-midnight-red hover:opacity-80">
@@ -267,6 +298,12 @@ const Informations = ({algorithm, onCloseCallback}) => {
 
                 </div>
             </div>
+        
+            <Dialog 
+                open={isDialogOpen} onClose={() => setIsDialogOpen(false)}
+                maxWidth="md" fullWidth>
+                    <VisualSelector onSelect={handleLaunchAlgorithm} />
+            </Dialog>
 
         </div>
     );

@@ -26,6 +26,8 @@ contextBridge.exposeInMainWorld('electron', {
 
   // Visual manager related IPC calls
   isVisualInstalled: (params) => ipcRenderer.invoke('is-visual-installed', params),
+  getVisualById: (params) => ipcRenderer.invoke('get-visual-by-id', params),
+  installVisual: (url, params) => ipcRenderer.invoke('install-visual', url, params),
 
   // External links
   openExternal: (url) => ipcRenderer.invoke('open-external', url),

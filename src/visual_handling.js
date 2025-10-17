@@ -51,3 +51,38 @@ ipcMain.handle('is-visual-installed', async (event, visual_id) => {
         return false;
     }
 });
+
+ipcMain.handle('get-visual-by-id', async (event, visual_id) => {
+    try {
+        const visual = visualManager.visuals.find(v => v.bdd_id === visual_id);
+        return visual !== undefined ? visual : null;
+    } catch (error) {
+        console.error("Error fetching visual:", error);
+        return null;
+    }
+});
+
+ipcMain.handle('install-visual', async (event, url, visual) => {
+    try {
+        console.log("Visual download response:", url);
+        const response = await axios.get(url, { headers: { Authorization: undefined }, responseType: 'arraybuffer'});
+        const visualData = response.data;
+        console.log("Visual data length:", visualData);
+        const dirPath = get_path() + `/${visual.id}`;
+        await fs.promises.mkdir(dirPath, { recursive: true });
+        const visualPath = get_path() + `/${visual.id}/${visual.name}.js`;
+        await fs.promises.writeFile(visualPath, visualData);
+        visualManager.visuals.push({
+            bdd_id: visual.id,
+            name: visual.name,
+            version: "1.0.0",
+            path: `Visuals/${visual.id}/${visual.name}.js`,
+            author: visual.author || "Unknown",
+        });
+        await save_visual_manager();
+        console.log(response);
+    } catch (error) {
+        console.error("Error installing visual:", error);
+        throw error;
+    }
+});

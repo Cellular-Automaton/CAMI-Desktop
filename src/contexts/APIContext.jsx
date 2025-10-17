@@ -228,7 +228,7 @@ export const APIProvider = ({ children }) => {
 
 
         try {
-            const response = await axios.get(url);
+            const response = await axios.get(url, {headers: {Authorization: undefined}});
             const assets = response.data.assets;
             const asset = assets.find(a => a.name.toLowerCase().includes(osMap[os]));
             if (!asset)
@@ -237,6 +237,29 @@ export const APIProvider = ({ children }) => {
         } catch (error) {
             console.error("Error downloading algorithm:", error);
             toast.error("Failed to download algorithm. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        }
+    }
+
+    const downloadVisual = async (visualLink) => {
+        const url = visualLink;
+
+        try {
+            const response = await axios.get(url, {headers: {Authorization: undefined}});
+            const asset = response.data.assets[0];
+            if (!asset)
+                throw new Error(`No asset found for visual.`);
+            return asset.browser_download_url;
+        } catch (error) {
+            console.error("Error downloading visual:", error);
+            toast.error("Failed to download visual. Please try again.", {
                 position: "top-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -508,7 +531,7 @@ export const APIProvider = ({ children }) => {
                 getAlgorithmComments, getTags, postAlgorithmTags, downloadAlgorithm, setAlgorithmTags,
                 getAllAccounts, getAllComments, getAllAlgorithms, getUserById, getAlgorithmById,
                 deleteComment, deleteUser, deleteAlgorithm, updateUser,
-                getLastestUsers, getLastestAlgorithms, getLastestComments
+                getLastestUsers, getLastestAlgorithms, getLastestComments, downloadVisual
             }
         }>
             {children}

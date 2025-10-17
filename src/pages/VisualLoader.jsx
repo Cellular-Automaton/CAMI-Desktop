@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import { CircularProgress } from "@mui/material";
 import { SimulationContext } from "../contexts/SimulationContext.jsx";
 
-export default function VisualLoader({preloadPath, srcPath}) {
+export default function VisualLoader({preloadPath, srcPath, visualUrl}) {
     const webviewRef = useRef(null);
     const [isLoading, setIsLoading] = useState(true);
     const isImportedRef = useRef(false);
@@ -22,13 +22,7 @@ export default function VisualLoader({preloadPath, srcPath}) {
         const handleDomReady = async () => {
             console.log("Webview DOM is ready:", webview);
             try {
-                const url = await window.electron.getServerURL();
-                urlRef.current = url;
-
-                const trueUrl = url + "plugin.js"; 
-                webview.openDevTools();
-
-                webview.contentWindow.postMessage({ action: 'LOAD_VISUAL', payload: { url: trueUrl } }, '*');
+                webview.contentWindow.postMessage({ action: 'LOAD_VISUAL', payload: { url: visualUrl } }, '*');
                 setIsLoading(false);
                 webview.contentWindow.postMessage({ action: 'PARAMETERS', data: { parameters: parameters } }, '*');
             } catch (err) {
