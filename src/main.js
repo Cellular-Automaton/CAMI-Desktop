@@ -3,6 +3,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import Store from "electron-store"
 import {load_manager} from './plugins_handling.js';
+import { load_visual_manager } from './visual_handling.js';
 import express from 'express';
 
 let mainWindow;
@@ -44,6 +45,7 @@ app.whenReady().then(async () => {
 
   // Load plugins
   await load_manager();
+  await load_visual_manager();
 
   // Handle user session
 
