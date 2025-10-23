@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import gol from "../../../assets/images/gol2.gif";
 import { APIContext } from "../../contexts/APIContext.jsx";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Chip } from "@mui/material";
 
 export default function VisualSubmission() {
     const { getAlgorithms } = useContext(APIContext);
@@ -11,15 +12,40 @@ export default function VisualSubmission() {
         image: null
     });
     const [imagePath, setImagePath] = useState("");
+    const [isAlgorithmDialogOpen, setIsAlgorithmDialogOpen] = useState(false);
     const [algorithms, setAlgorithms] = useState([]);
+    const [searchedAlgorithm, setSearchedAlgorithm] = useState([]);
+    const [selectedAlgorithm, setSelectedAlgorithm] = useState([]);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         const getAllAlgorithms = async () => {
-            const algorithms = await getAlgorithms();
-            console.log(algorithms);
+            let algorithms = await getAlgorithms();
+            // algorithms = algorithms.concat(algorithms).concat(algorithms);
+            // algorithms = algorithms.concat(algorithms).concat(algorithms);
+            // algorithms = algorithms.concat(algorithms).concat(algorithms);
+            algorithms = algorithms.map((prev) => {
+                return {...prev, selected: false}
+            })
+
+            setAlgorithms(algorithms);
+            setSearchedAlgorithm(algorithms);
         }
         getAllAlgorithms();
     }, []);
+
+    useEffect(() => {
+        if (search === "") {
+            setSearchedAlgorithm(algorithms);
+            return;
+        }
+
+        setSearchedAlgorithm(
+            algorithms.filter((algorithm) =>
+                algorithm.name.toLowerCase().includes(search.toLowerCase())
+            )
+        );
+    }, [search]);
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -46,8 +72,12 @@ export default function VisualSubmission() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Handle form submission logic here
+        let toSendForm = { ...form };
+
+        toSendForm.related_algorithms = selectedAlgorithm.map((alg) => alg.automaton_id);
+        console.log(toSendForm);
     }
+
     return (
         <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-midnight font-mono text-white relative">
             <div className="absolute top-0 left-0 w-full h-full bg-midnight-opacity">
@@ -87,6 +117,38 @@ export default function VisualSubmission() {
                                 className="w-full p-2 border border-gray-300 rounded bg-midnight text-white"
                             />
                         </label>
+                    </div>
+
+                    <div >
+                        <label className="w-full">
+                            Related algorithms:
+                        </label>
+                        <div className="flex flex-row justify-between items-center gap-4 min-h-10">
+                            <div className="
+                                w-full h-full min-h-10 flex flex-row flex-wrap gap-2 border items-center 
+                                border-gray-300 rounded bg-midnight text-white
+                                px-3
+                            ">
+                                {
+                                    selectedAlgorithm.map((algorithm) => (
+                                        <Chip
+                                            size="small"
+                                            key={algorithm.automaton_id}
+                                            label={algorithm.name}
+                                            className="m-1 !bg-midnight-purple !text-white"
+                                            onDelete={() => {
+                                                setSelectedAlgorithm((prev) => prev.filter((a) => a.automaton_id !== algorithm.automaton_id));
+                                            }}
+                                        />
+                                    ))
+                                }
+                            </div>
+                            <button type="button" className="w-1/4 h-full min-h-10 bg-midnight-purple rounded hover:bg-midnight-purple-dark"
+                                onClick={(e) => setIsAlgorithmDialogOpen(true)}
+                            >
+                                Add
+                            </button>
+                        </div>
                     </div>
 
                     <div>
@@ -145,7 +207,80 @@ export default function VisualSubmission() {
                             </div>
                         }
                     </div>
+                    
+                    <div className="flex w-full items-center justify-between mt-4 gap-5">
+                        <button type="submit" className="bg-midnight-purple text-white py-2 px-4 rounded hover:bg-midnight-purple-dark w-full">Submit</button>
+                        <button type="button" className="bg-red-400 text-white py-2 px-4 rounded hover:bg-red-500 w-full">Reset</button>
+                    </div>
                 </form>
+
+                {/* MODAL FOR ALGORITHM SELECTION */}
+                <Dialog 
+                    open={isAlgorithmDialogOpen} 
+                    onClose={() => setIsAlgorithmDialogOpen(false)}
+                    maxWidth="lg"
+                    slotProps={{ 
+                        paper: { 
+                            className: "!rounded-lg !text-white !bg-midnight"
+                        }
+                    }}
+                >
+                    <DialogTitle>Select an Algorithm</DialogTitle>
+                    <DialogContent className="flex flex-col">
+                        <div className="flex flex-col flex-1 w-full my-4 sticky top-0 z-20 bg-midnight">
+                            <input
+                                type="text"
+                                placeholder="Search algorithms..."
+                                className="p-2 w-full border border-gray-300 rounded bg-midnight text-white"
+                                value={search}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                }}
+                            >
+                            </input>
+                            <div className="w-full h-4 bg-midnight"></div>
+                        </div>
+
+                        <div className="flex flex-row mt-2 flex-wrap gap-4 justify-center items-center">
+                            {
+                                searchedAlgorithm.map((algorithm) =>
+                                    {
+                                        return (
+                                            <button className={`
+                                                relative size-52 bg-white rounded-lg overflow-hidden
+                                                ${algorithm.selected ? "ring-4 ring-midnight-purple" : ""}
+                                                `} key={algorithm.automaton_id}
+                                                onClick={() => {
+                                                    if (selectedAlgorithm.find((a) => a.automaton_id === algorithm.automaton_id)) {
+                                                        algorithm.selected = false;
+                                                        setSelectedAlgorithm((prev) => prev.filter((a) => a.automaton_id !== algorithm.automaton_id));
+                                                        return;
+                                                    }
+                                                    algorithm.selected = true;
+                                                    setSelectedAlgorithm((prev) => [...prev, algorithm]);
+                                                }}
+                                                type="button"
+                                            >
+                                                <img 
+                                                    src={`data:image/png;base64,${algorithm.image[0].contents_binary}`} 
+                                                    alt={algorithm.name} className="absolute top-0 w-full h-full object-cover"
+                                                />
+                                                <div className="absolute flex w-full bottom-2 justify-center">
+                                                    <div className="flex justify-center mx-3 p-2 rounded-lg w-full backdrop-blur-md bg-midnight/30">
+                                                        {algorithm.name}
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        );
+                                    }
+                                )
+                            }
+                        </div>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setIsAlgorithmDialogOpen(false)}>Close</Button>
+                    </DialogActions>
+                </Dialog>
             </div>
         </div>
     );
