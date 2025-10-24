@@ -28,6 +28,8 @@ contextBridge.exposeInMainWorld('electron', {
   isVisualInstalled: (params) => ipcRenderer.invoke('is-visual-installed', params),
   getVisualById: (params) => ipcRenderer.invoke('get-visual-by-id', params),
   installVisual: (url, params) => ipcRenderer.invoke('install-visual', url, params),
+  installTryVisual: (visual_file) => ipcRenderer.invoke('install-try-visual', visual_file),
+  removeTryVisual: () => ipcRenderer.invoke('remove-try-visual'),
 
   // External links
   openExternal: (url) => ipcRenderer.invoke('open-external', url),

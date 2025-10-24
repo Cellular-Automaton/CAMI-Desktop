@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import gol from "../../../assets/images/gol2.gif";
 import { APIContext } from "../../contexts/APIContext.jsx";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Chip } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogTitle, Chip } from "@mui/material";
 
 export default function VisualSubmission() {
     const { getAlgorithms } = useContext(APIContext);
@@ -210,7 +210,7 @@ export default function VisualSubmission() {
                     
                     <div className="flex w-full items-center justify-between mt-4 gap-5">
                         <button type="submit" className="bg-midnight-purple text-white py-2 px-4 rounded hover:bg-midnight-purple-dark w-full">Submit</button>
-                        <button type="button" className="bg-red-400 text-white py-2 px-4 rounded hover:bg-red-500 w-full">Reset</button>
+                        <button type="button" className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 w-full">Reset</button>
                     </div>
                 </form>
 
@@ -278,7 +278,12 @@ export default function VisualSubmission() {
                         </div>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setIsAlgorithmDialogOpen(false)}>Close</Button>
+                        <button
+                            className="px-4 py-2 bg-midnight-purple text-white rounded-lg hover:bg-midnight-purple-dark transition-colors"
+                            onClick={() => setIsAlgorithmDialogOpen(false)}
+                        >
+                            Close
+                        </button>
                     </DialogActions>
                 </Dialog>
             </div>

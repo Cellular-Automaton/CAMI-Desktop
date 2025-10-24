@@ -291,7 +291,7 @@ function AlgorithmSubmission() {
 
                     <div className="flex items-center justify-between mt-4 gap-5">
                         <button type="submit" className="bg-midnight-purple text-white py-2 px-4 rounded hover:bg-midnight-purple-dark w-full">Submit</button>
-                        <button onClick={handleReset} type="button" className="bg-red-400 text-white py-2 px-4 rounded hover:bg-red-500 w-full">Reset</button>
+                        <button onClick={handleReset} type="button" className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 w-full">Reset</button>
                     </div>
                 </form>
             </div>

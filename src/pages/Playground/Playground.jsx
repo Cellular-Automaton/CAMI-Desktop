@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
-import SimulationPlayer from "../../components/SimulationPlayer/SimulationPlayer.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import VisualLoader from "../VisualLoader.jsx";
-import TwoDDisplay from "../../components/2DDisplay/2DDisplay.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Playground() {
     const [gridSize, setGridSize] = useState(10);
@@ -12,17 +11,18 @@ export default function Playground() {
     const { state } = useLocation();
     const algorithmFromState = state ? state.algorithm : null;
     const visualFromState = state ? state.visual : null;
+    const isTryFromState = state ? state.isTry : false;
+    const navigate = useNavigate();
 
     const { 
         startSimulation, stopSimulation, 
         isSimulationRunning, clearAll,
         importSimulation, exportSimulation, getSimulationParameters,
-        clearFrames, parameters, setParameters, importedData
+        clearFrames, parameters, setParameters, importedData, setSelectedAlgorithm
     } = useContext(SimulationContext);
 
     useEffect(() => {
 
-        console.log('here', algorithmFromState, visualFromState);
         try {
             getSimulationParameters().then((params) => {
                 const tmp = {};
@@ -50,6 +50,10 @@ export default function Playground() {
             console.log("Cleaning up...");
             stopSimulation();
             clearAll();
+
+            if (isTryFromState) {
+                window.electron.removeTryVisual()
+            }
         }
     }, []);
 
@@ -95,50 +99,38 @@ export default function Playground() {
         });
     }, [importedData]);
 
-    const onStartSimulation = async () => {
-        const params = Object.keys(parameters).map(key => parameters[key].value);
-        Object.keys(params).forEach(key => {
-            
-            if (key.toLowerCase() === "width" || key.toLowerCase() === "height") {
-                params[key] = gridSize;
-            }
-        });
-        // Check if all parameters are set
-        if (Object.values(parameters).some(param => param.value === "")) {
-            toast.error("Please fill all parameters before starting the simulation.");
-            return;
-        }
-
-        // Clear old frames
-        clearFrames();
-
-        // Start simulation
-        await startSimulation(gridSize, params);
-    }
-
-    const onStopSimulation = () => {
-        stopSimulation();
-    }
-
     const renderVisual = async () => {
-        const visualById = await window.electron.getVisualById(visualFromState.id);
-        if (!visualById) {
-            toast.error("Visual not found: " + visualFromState.name);
-            return null;
-        }
+        let visualUrl;
         const visualFolder = await window.electron.getVisualFolder();
         const currentUrl = await window.electron.getServerURL();
         const preloadPath = "file://" + visualFolder.replace(/\\/g, "/") + "/webview_preload.js";
         const srcPath = currentUrl + "base.html";
-        const visualUrl = currentUrl + visualById.path.replace("Visuals/", "");
+
+        if (!isTryFromState) {
+            const visualById = await window.electron.getVisualById(visualFromState.id);
+            if (!visualById) {
+                toast.error("Visual not found: " + visualFromState.name);
+                return null;
+            }
+            visualUrl = currentUrl + visualById.path.replace("Visuals/", "");
+        } else {
+            visualUrl = currentUrl + "try.js";
+            setSelectedAlgorithm(algorithmFromState);
+        }
         return (
             <VisualLoader preloadPath={preloadPath} srcPath={srcPath} visualUrl={visualUrl} />
         )
     };
 
     const loadVisual = async () => {
-        const visual = await renderVisual();
-        setVisualComponent(visual);
+        try {
+            const visual = await renderVisual();
+            setVisualComponent(visual);
+        } catch (error) {
+            console.error("Error loading visual:", error);
+            toast.error("An error occurred while loading the visual. Returning to home.");
+            navigate("/Home");
+        }
     };
 
     return (

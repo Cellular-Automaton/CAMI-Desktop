@@ -14,6 +14,7 @@ import AlgorithmSubmission from "./pages/Submission/AlgorithmSubmission.jsx";
 import SelectSubmission from "./pages/Submission/SelectSubmission.jsx";
 import VisualSubmission from "./pages/Submission/VisualSubmission.jsx";
 import AdminPage from "./pages/Admin/AdminPage.jsx";
+import TryVisual from "./pages/Submission/TryVisual.jsx";
 
 export default function App() {
     // When the page is charged for the first time, it redirect to /home
@@ -53,6 +54,7 @@ export default function App() {
                             <Route path="/Submission" element={<SelectSubmission/>} />
                             <Route path="/Submission/Algorithm" element={<AlgorithmSubmission/>} />
                             <Route path="/Submission/Visual" element={<VisualSubmission/>} />
+                            <Route path="/Submission/Try" element={<TryVisual/>} />
                             <Route path="/Admin" element={<AdminPage />} />
                             <Route path="/*" element={<NotFound/>}/>
                         </Routes>

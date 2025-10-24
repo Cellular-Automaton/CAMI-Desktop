@@ -20,6 +20,7 @@ export default function VisualLoader({preloadPath, srcPath, visualUrl}) {
         if (!webview) return;
 
         const handleDomReady = async () => {
+            // webview.openDevTools();
             console.log("Webview DOM is ready:", webview);
             try {
                 webview.contentWindow.postMessage({ action: 'LOAD_VISUAL', payload: { url: visualUrl } }, '*');

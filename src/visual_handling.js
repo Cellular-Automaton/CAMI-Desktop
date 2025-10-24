@@ -86,3 +86,27 @@ ipcMain.handle('install-visual', async (event, url, visual) => {
         throw error;
     }
 });
+
+ipcMain.handle('install-try-visual', async (event, visual_file) => {
+    // visual_file is a js file
+    // Do not use eval for security reasons
+    try {
+        const visualData = Buffer.from(visual_file, 'utf-8');
+        const installPath = get_path() + `/try.js`;
+        await fs.promises.writeFile(installPath, visualData);
+        return installPath;
+    } catch (error) {
+        console.error("Error installing try visual:", error);
+        throw error;
+    }
+})
+
+ipcMain.handle('remove-try-visual', async (event) => {
+    try {
+        const installPath = get_path() + `/try.js`;
+        await fs.promises.unlink(installPath);
+    } catch (error) {
+        console.error("Error removing try visual:", error);
+        throw error;
+    }
+});
