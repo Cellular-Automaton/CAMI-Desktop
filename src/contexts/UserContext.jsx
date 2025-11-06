@@ -9,30 +9,23 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         window.electron.onUserSession((user) => {
-            console.log("User session received in UserProvider:", user);
             if (user && user.token) {
                 setUser(user);
                 setToken(user.token);
             }
         });
 
-        window.addEventListener("beforeunload", () => {
-            sessionStorage.setItem("isReload", "true");
+        window.electron.getData("user").then((data) => {
+            if (data && data.token) {
+                console.log("Restoring user session from stored data on mount");
+                setUser(data);
+                setToken(data.token);
+                setLoggedIn(true);
+            }
+        }).catch((error) => {
+            console.error("Error retrieving stored user data on mount:", error);
         });
-
-        if (sessionStorage.getItem("isReload") === "true") {
-            console.log("Page reloaded, retrieving user data from storage...");
-            window.electron.getData("user").then((data) => {
-                console.log("Stored user data:", data);
-                if (data && data.token) {
-                    setUser(data);
-                    setToken(data.token);
-                }
-            }).catch((error) => {
-                console.error("Error retrieving stored user data:", error);
-            });
-            sessionStorage.setItem("isReload", "false");
-        }
+        console.log("Logged in status on mount:", loggedIn);
     }, []);
 
     const setToken = (token) => {
