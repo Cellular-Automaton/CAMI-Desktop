@@ -1,116 +1,134 @@
 import React, { useState, useContext, useEffect } from "react";
 
-import SettingImage from "../../../assets/images/settings.svg";
-import HomeImage from "../../../assets/images/home.svg";
-import CommunityImage from "../../../assets/images/link.svg";
-import LoginImage from "../../../assets/images/login.svg";
-import AddImage from "../../../assets/images/add.svg";
-import nopicture from "../../../assets/images/nopicture.svg";
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import LoginRoundedIcon from '@mui/icons-material/LoginRounded';
+import AccountBoxRoundedIcon from '@mui/icons-material/AccountBoxRounded';
+import ForumRoundedIcon from '@mui/icons-material/ForumRounded';
+import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
+import RemoveRedEyeRoundedIcon from '@mui/icons-material/RemoveRedEyeRounded';
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
+
+import logo from "../../../assets/images/logo.png";
 
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext.jsx";
 
-const icons = [
-    {
-        name: "Home",
-        icon: HomeImage
-    },
-    {
-        name: "Community",
-        icon: CommunityImage
-    }
-    // {
-    //     name: "Settings",
-    //     icon: SettingImage
-    // }
-];
-
 export default function Navbar() {
-    const [isHovered, setIsHovered] = useState(false);
     const navigate = useNavigate();
     const { userData, loggedIn, logout } = useContext(UserContext);
 
-    const handleRedirect = (iconName) => {
-        switch (iconName) {
-            case "Home":
-                navigate("/Home");
-                break;
-            case "Community":
-                navigate("/Community");
-                break;
-            case "Settings":
-                navigate("/Settings");
-                break;
-            case "Playground":
-                navigate("/Playground");
-                break;
-            case "Information":
-                navigate("/Information");
-                break;
-            case "Submission":
-                navigate("/Submission");
-            default:
-                break;
-        }
-    };
-
   return (
     <div
-      className={`fixed top-0 flex h-full flex-col justify-center items-center transition-all duration-300 font-mono z-50
-                ${isHovered ? "w-1/5" : "w-16"}
-                bg-gradient-to-r from-midnight via-20% via-midnight to-transparent"
-                `}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+      className="
+                    fixed top-0 flex h-full flex-col justify-center
+                    items-center transition-all duration-300 font-mono z-50
+                    hover:w-96 w-16 backdrop-blur-md
+                    bg-gradient-to-r from-midnight to-transparent
+                    rounded-r-xl shadow-2xl shadow-black
+                "
         >
-            <div className="flex flex-col h-72 justify-evenly items-center w-full transition-all duration-300">
+            <div className="flex flex-col h-full justify-center items-center w-full transition-all duration-300 gap-3 pl-1.5">
 
                 {
                     loggedIn ? (
-                        <button className="flex items-center justify-start w-full p-2 pb-5 pt-5 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10"
-                            onClick={() => {logout(), navigate(0)}}>
-                            <img className="h-7 w-7" src={userData.img == null ? nopicture : userData.img} alt="User picture" />
-                            <span className="ml-2 text-white">Logout</span>
+                        <button className="
+                            flex items-center justify-start w-full p-2 pb-5 pt-5 
+                            transition-all hover:bg-midnight-purple-dark/80
+                            duration-300 overflow-hidden gap-10 h-12
+                            hover:shadow-lg hover:black rounded-l-md"
+                            onClick={() => {logout(), navigate(0)}}
+                        >
+                            <AccountBoxRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
+                            <span className="text-white">Logout</span>
                         </button>
                     ) : (
-                        <button className="flex items-center justify-start w-full p-2 pb-5 pt-5 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10"
+                        <button className="
+                            flex items-center justify-start w-full p-2 pb-5 pt-5 
+                            transition-all hover:bg-midnight-purple-dark/80
+                            duration-300 overflow-hidden gap-10 h-12
+                            hover:shadow-lg hover:black rounded-l-md"
                             onClick={() => {navigate("/Connection")}}>
-                            <img className="h-7 w-7" src={LoginImage} alt="Login" />
+                            <LoginRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
                             <span className="text-white">Login</span>
                         </button>
                     )
                 }
+                
+                <button className="
+                    flex items-center justify-start w-full p-2 pb-5 pt-5 
+                    transition-all hover:bg-midnight-purple-dark/80
+                    duration-300 overflow-hidden gap-10 h-12
+                    hover:shadow-lg hover:black rounded-l-md"
+                    onClick={() => {navigate("/Home")}}
+                >
+                    <HomeRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
+                    <span className="text-white">Home</span>
+                </button>
 
-                {icons.map((icon) => {
-                    return (
-                        <button key={icon.name} className="flex items-center justify-start w-full p-2 pb-5 pt-5 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10"
-                            onClick={() => handleRedirect(icon.name)}>
-                            <img className="h-7 w-7" src={icon.icon} alt={icon.name} />
-                            <span className="ml-2 text-white">{icon.name}</span>
-                        </button>
-                    );
-                })}
+                
+                <button className="
+                    flex items-center justify-start w-full p-2 pb-5 pt-5 
+                    transition-all hover:bg-midnight-purple-dark/80
+                    duration-300 overflow-hidden gap-10 h-12
+                    hover:shadow-lg hover:black rounded-l-md"
+                    onClick={() => {navigate("/Community")}}
+                >
+                    <ForumRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
+                    <span className="text-white">Community</span>
+                </button>
+
                 {
-                    !loggedIn ?
-                        null 
-                    : (
-                        <button className="flex items-center justify-start w-full p-2 pb-5 pt-5 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10"
-                            onClick={() => navigate("/Submission")}>
-                            <img className="h-7 w-7" src={AddImage} alt="Submission" />
-                            <span className="ml-2 text-white">Submission</span>
+                    loggedIn ?
+                        <button className="
+                            flex items-center justify-start w-full p-2 pb-5 pt-5 
+                            transition-all hover:bg-midnight-purple-dark/80
+                            duration-300 overflow-hidden gap-10 h-12
+                            hover:shadow-lg hover:black rounded-l-md"
+                            onClick={() => {navigate("/Submission")}}
+                        >
+                            <AddBoxRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
+                            <span className="text-white">Submission</span>
                         </button>
-                    )
+                    :
+                        null
                 }
+
                 {
-                    (loggedIn && userData.role === "admin") ?
-                    <button className="flex items-center justify-start w-full p-2 pb-5 pt-5 hover:bg-slate-500 transition-all duration-300 overflow-hidden gap-10"
-                        onClick={() => navigate("/Admin")}>
-                        <img className="h-7 w-7" src={SettingImage} alt="Admin" /> 
-                        <span className="ml-2 text-white">Admin</span>
-                    </button>
-                    : null
+                    loggedIn && userData.role === "admin" ?
+                        <button className="
+                            flex items-center justify-start w-full p-2 pb-5 pt-5 
+                            transition-all hover:bg-midnight-purple-dark/80
+                            duration-300 overflow-hidden gap-10 h-12
+                            hover:shadow-lg hover:black rounded-l-md"
+                            onClick={() => {navigate("/Admin")}}
+                        >
+                            <RemoveRedEyeRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
+                            <span className="text-white">Admin</span>
+                        </button>
+                    :
+                        null
                 }
+
+                {/* <button className="
+                    flex items-center justify-start w-full p-2 pb-5 pt-5 
+                    transition-all hover:bg-midnight-purple-dark/80
+                    duration-300 overflow-hidden gap-10 h-12
+                    hover:shadow-lg hover:black rounded-l-md"
+                    onClick={() => {navigate("/Settings")}}
+                >
+                    <SettingsRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
+                    <span className="text-white">Settings</span>
+                </button> */}
+            </div>
+            
+            <div className="
+                    flex items-center justify-start w-full p-2 pb-5 pt-5
+                    duration-300 overflow-hidden gap-10 h-12
+                    hover:shadow-lg hover:black rounded-l-md
+            ">
+                <img src={logo} alt="CAMI logo" className="w-12 h-auto shrink-0" />
+                <span className="text-white/50 min-w-52 text-sm mb-3 text-center h-full">CAMI v1.0.0</span>
             </div>
         </div>
     );

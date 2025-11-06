@@ -119,7 +119,7 @@ export default function Home() {
     };
 
     return (
-        <div id="home-container" className="flex flex-col relative gap-2 bg-midnight min-h-full w-full font-mono">
+        <div id="home-container" className="px-10 flex flex-col relative gap-2 bg-midnight min-h-full w-full font-mono">
             <section id="welcome" className="relative my-5 max-h-72 min-h-72 flex flex-row justify-center items-center bg-midnight-opacity rounded-lg overflow-hidden">
                 <img src={gol} alt="gol" className="absolute blur-sm rounded-lg h-full w-full object-cover opacity-40 z-0"/>
                 <h1 className="absolute text-white text-4xl text-left ml-2 z-0">{sentence}</h1>
