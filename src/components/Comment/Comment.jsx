@@ -1,13 +1,17 @@
-import React, {useState} from "react";
-import like from "../../../assets/images/like.svg";
-import dislike from "../../../assets/images/dislike.svg";
+import React, { useContext, useState } from "react";
+import { IconButton, Menu, MenuItem } from "@mui/material";
+import MenuIcon from '@mui/icons-material/Menu';
+import { UserContext } from "../../contexts/UserContext.jsx";
 import { formatDistance } from "date-fns";
 
-const Comment = ({ comment, reply }) => {
+const Comment = ({ comment, reply, onDelete }) => {
     const [isResponsesLoaded, setIsResponsesLoaded] = useState(false);
-
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const { userData } = useContext(UserContext);
+    
     return (
-        <div className="flex flex-col w-full gap-2 p-2">
+        <div className="relative flex flex-col w-full gap-2 p-2 border-2 border-midnight-purple-dark/10 rounded-md">
             <div id="author" className="flex flex-row justify-start items-baseline w-full gap-2 text-sm font-bold text-midnight-text">
                 {
                     comment.image ?
@@ -20,6 +24,36 @@ const Comment = ({ comment, reply }) => {
 
             <div id="text" className="flex flex-row justify-start items-start w-full text-sm font-bold text-midnight-text overflow-hidden text-justify">
                 {comment.contents}
+            </div>
+
+            {/* Icon button for comment options */}
+            <div className="absolute flex h-full right-0 -top-0.5 justify-center items-center">
+                <IconButton 
+                    onClick={(e) => {   
+                        setIsMenuOpen(true)
+                        setAnchorEl(e.currentTarget)
+                    }}
+                    size="large" disabled={comment.posted_by.user_id !== userData.user_id}
+                >
+                    <MenuIcon 
+                        sx={{color: comment.posted_by.user_id === userData.user_id ? "#A78BFA" : "#6B7280"}}                        
+                    />
+                </IconButton>
+                <Menu
+                    anchorEl={anchorEl}
+                    open={isMenuOpen}
+                    onClose={() => setIsMenuOpen(false)}
+                    slotProps={{
+                        list: {
+                            className: "bg-midnight text-midnight-text",
+                        }
+                    }}
+                >
+                    <MenuItem onClick={() => {
+                        setIsMenuOpen(false);
+                        onDelete(comment.id);
+                    }}>Delete Comment</MenuItem>
+                </Menu>
             </div>
 
             {/* <div id="reaction" className="w-full flex flex-row justify-start items-center gap-2 text-sm font-bold text-midnight-text">
