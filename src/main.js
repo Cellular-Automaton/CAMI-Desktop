@@ -42,10 +42,12 @@ app.whenReady().then(async () => {
 
   // Handle user session
 
-  const user = store.get('user');
   if (user) {
-    mainWindow.webContents.once('did-finish-load', () => {
-      mainWindow.webContents.send('user-session', user);
+    mainWindow.webContents.on('did-finish-load', () => {
+      const user = store.get('user');
+      if (user) {
+        mainWindow.webContents.send('user-session', user);
+      }
     });
   }
 
