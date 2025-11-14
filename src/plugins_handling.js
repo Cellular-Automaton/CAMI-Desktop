@@ -174,7 +174,10 @@ ipcMain.handle('install-plugin', async (event, url, param) => {
 
     try {
         // Start download
-        const response = await axios.get(url, { responseType: 'arraybuffer' });
+        const response = await axios.get(url, { 
+            responseType: 'arraybuffer',
+            auth: {}
+        });
         const directory = path.join(filePath, param.automaton_id);
         fs.writeFileSync(path.join(filePath, param.automaton_id + '.zip'), response.data);
         fs.mkdirSync(directory, { recursive: true });
