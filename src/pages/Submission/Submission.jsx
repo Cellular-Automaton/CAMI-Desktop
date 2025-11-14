@@ -67,7 +67,9 @@ function Submission() {
             if (!url.hostname.includes("api.github.com")) {
                 throw new Error("Invalid hostname.");
             }
-            axios.get(url.pathname).then((response) => {
+            axios.get(url.pathname, {
+                auth: {}
+            }).then((response) => {
                 if (response.status !== 200 && response.status !== 201 && response.status !== 304) {
                     throw new Error("GitHub API link is not reachable.");
                 }
