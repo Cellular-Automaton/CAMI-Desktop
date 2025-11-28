@@ -24,7 +24,7 @@ export default function Navbar() {
                     fixed top-0 flex h-full flex-col justify-center
                     items-center transition-all duration-300 font-mono z-50
                     hover:w-96 w-16 backdrop-blur-md
-                    bg-gradient-to-r from-midnight to-transparent
+                    bg-gradient-to-r from-background to-transparent
                     rounded-r-xl shadow-2xl shadow-black
                 "
         >
@@ -39,8 +39,8 @@ export default function Navbar() {
                             hover:shadow-lg hover:black rounded-l-md"
                             onClick={() => {logout(), navigate(0)}}
                         >
-                            <AccountBoxRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                            <span className="text-white">Logout</span>
+                            <AccountBoxRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
+                            <span className="text-text">Logout</span>
                         </button>
                     ) : (
                         <button className="
@@ -49,8 +49,8 @@ export default function Navbar() {
                             duration-300 overflow-hidden gap-10 h-12
                             hover:shadow-lg hover:black rounded-l-md"
                             onClick={() => {navigate("/Connection")}}>
-                            <LoginRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                            <span className="text-white">Login</span>
+                            <LoginRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
+                            <span className="text-text">Login</span>
                         </button>
                     )
                 }
@@ -62,8 +62,8 @@ export default function Navbar() {
                     hover:shadow-lg hover:black rounded-l-md"
                     onClick={() => {navigate("/Home")}}
                 >
-                    <HomeRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                    <span className="text-white">Home</span>
+                    <HomeRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
+                    <span className="text-text">Home</span>
                 </button>
 
                 
@@ -74,8 +74,8 @@ export default function Navbar() {
                     hover:shadow-lg hover:black rounded-l-md"
                     onClick={() => {navigate("/Community")}}
                 >
-                    <ForumRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                    <span className="text-white">Community</span>
+                    <ForumRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
+                    <span className="text-text">Community</span>
                 </button>
 
                 {
@@ -87,8 +87,8 @@ export default function Navbar() {
                             hover:shadow-lg hover:black rounded-l-md"
                             onClick={() => {navigate("/Submission")}}
                         >
-                            <AddBoxRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                            <span className="text-white">Submission</span>
+                            <AddBoxRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
+                            <span className="text-text">Submission</span>
                         </button>
                     :
                         null
@@ -103,8 +103,8 @@ export default function Navbar() {
                             hover:shadow-lg hover:black rounded-l-md"
                             onClick={() => {navigate("/Admin")}}
                         >
-                            <RemoveRedEyeRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                            <span className="text-white">Admin</span>
+                            <RemoveRedEyeRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
+                            <span className="text-text">Admin</span>
                         </button>
                     :
                         null
@@ -117,8 +117,8 @@ export default function Navbar() {
                     hover:shadow-lg hover:black rounded-l-md"
                     onClick={() => {navigate("/Settings")}}
                 >
-                    <SettingsRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                    <span className="text-white">Settings</span>
+                    <SettingsRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
+                    <span className="text-text">Settings</span>
                 </button>
             </div>
             
@@ -128,7 +128,7 @@ export default function Navbar() {
                     hover:shadow-lg hover:black rounded-l-md
             ">
                 <img src={logo} alt="CAMI logo" className="w-12 h-auto shrink-0" />
-                <span className="text-white/50 min-w-52 text-sm mb-3 text-center h-full">CAMI v1.0.0</span>
+                <span className="text-textAlt min-w-52 text-sm mb-3 text-center h-full">CAMI v1.0.0</span>
             </div>
         </div>
     );
