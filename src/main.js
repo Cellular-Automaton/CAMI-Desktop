@@ -152,3 +152,19 @@ ipcMain.handle('delete-data', (event, data_name) => {
       throw new Error("Error deleting data: " + error.message);
   }
 });
+
+ipcMain.handle('app-close', () => {
+  app.quit();
+});
+
+ipcMain.handle('app-minimize', () => {
+  mainWindow.minimize();
+});
+
+ipcMain.handle('app-maximize', () => {
+  if (mainWindow.isMaximized()) {
+    mainWindow.unmaximize();
+  } else {
+    mainWindow.maximize();
+  }
+});
