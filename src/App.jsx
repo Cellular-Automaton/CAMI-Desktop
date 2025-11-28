@@ -25,7 +25,7 @@ export default function App() {
         <Router>
             <div className="flex flex-row h-full">
                 <div className="fixed h-full top-0 left-0 w-16 bg-midnight"></div>
-                <Navbar />
+                <Navbar className="z-40" />
                 <SettingBar />
                 <div className="flex-grow h-full w-full pl-16">
                     <ToastContainer 

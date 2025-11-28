@@ -38,8 +38,8 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
         <button
             id={"container"} 
             className="flex flex-col relative bg-midnight-opacity rounded-md shadow-lg 
-                shadow-midnight-purple-shadow min-w-80 max-w-80 max-h-72 transition 
-                ease-in-out duration-750 hover:shadow-xl hover:shadow-midnight-purple-shadow
+                shadow-primary min-w-80 max-w-80 max-h-72 transition 
+                ease-in-out duration-750 hover:shadow-xl hover:shadow-primary
                 cursor-pointer overflow-hidden"
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
@@ -68,7 +68,7 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
                             <Tooltip key={tag.tag_id} title={tag.tag_description} placement="bottom" arrow>
                                 <Chip 
                                     label={tag.tag_name} size="small" variant="filled"
-                                    sx={{backgroundColor: "#7F6EEE", color: "white", fontFamily: "'JetBrains Mono', monospace", fontWeight: "bold"}}
+                                    sx={{backgroundColor: "var(--color-primary)", color: "white", fontFamily: "'JetBrains Mono', monospace", fontWeight: "bold"}}
                                 />
                             </Tooltip>
                         ))

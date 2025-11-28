@@ -80,7 +80,7 @@ export default function AdminPage() {
             <p className="text-white">Welcome to the admin page. Here you can manage the application settings and user accounts.</p>
 
             <div id="admin-select-controls" className="mt-10 flex flex-row gap-4 w-full h-full">
-                <button className="flex flex-col p-5 w-full h-full shadow-sm shadow-midnight-purple-shadow text-white rounded-lg"
+                <button className="flex flex-col p-5 w-full h-full shadow-sm shadow-primary text-white rounded-lg"
                     onClick={() => openAdminPopup("user")}>
                     <h2 className="text-lg mb-2 font-bold">User Management</h2>
                     <span className="text-sm opacity-70">Manage user accounts and permissions</span>
@@ -104,7 +104,7 @@ export default function AdminPage() {
                         }
                     </div>
                 </button>
-                <button className="flex flex-col p-5 w-full h-full shadow-sm shadow-midnight-purple-shadow text-white rounded-lg"
+                <button className="flex flex-col p-5 w-full h-full shadow-sm shadow-primary text-white rounded-lg"
                     onClick={() => openAdminPopup("algorithm")}>
                     <h2 className="text-lg mb-2 font-bold">Algorithm Management</h2>
                     <span className="text-sm opacity-70">Manage algorithms and their configurations</span>
@@ -129,7 +129,7 @@ export default function AdminPage() {
                     </div>
 
                 </button>
-                <button className="flex flex-col p-5 w-full h-full shadow-sm shadow-midnight-purple-shadow text-white rounded-lg"
+                <button className="flex flex-col p-5 w-full h-full shadow-sm shadow-primary text-white rounded-lg"
                     onClick={() => openAdminPopup("comment")}>
                     <h2 className="text-lg mb-2 font-bold">Comment Management</h2>
                     <span className="text-sm opacity-70">Manage user comments and feedback</span>

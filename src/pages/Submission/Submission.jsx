@@ -128,7 +128,7 @@ function Submission() {
                 <img src={gol} alt="Background" className="object-cover w-full h-full blur-sm opacity-40"/>
             </div>
         
-            <div className="flex flex-col items-center w-3/5 relative shadow-lg rounded-lg bg-midnight shadow-midnight-purple-shadow p-6 overflow-y-scroll overflow-x-hidden">
+            <div className="flex flex-col items-center w-3/5 relative shadow-lg rounded-lg bg-midnight shadow-primary p-6 overflow-y-scroll overflow-x-hidden">
                 <div className="flex items-center justify-center h-1/5 w-full my-5">
                     <h1 className="text-white text-4xl">Add a new cellular automaton</h1>
                 </div>
@@ -239,7 +239,7 @@ function Submission() {
                                         e.preventDefault();
                                         openExternalLink("https://docs.github.com/fr/rest/releases/releases?apiVersion=2022-11-28#get-the-latest-release");
                                     }}
-                                    className="text-midnight-purple" href="https://docs.github.com/fr/rest/releases/releases?apiVersion=2022-11-28#get-the-latest-release">
+                                    className="text-primary" href="https://docs.github.com/fr/rest/releases/releases?apiVersion=2022-11-28#get-the-latest-release">
                                     https://api.github.com/repos/[owner]/[repo]/releases/latest
                                 </a>)
                             </span>
@@ -263,7 +263,7 @@ function Submission() {
                             !form.image ?   
                             <button
                                 type="button"
-                                className="bg-midnight-purple text-white w-full py-2 px-4 rounded hover:bg-midnight-purple-dark"
+                                className="bg-primary text-white w-full py-2 px-4 rounded hover:bg-secondary"
                                 onClick={handleImportImage}
                             >
                                 Import image
@@ -288,7 +288,7 @@ function Submission() {
                     </div>
 
                     <div className="flex items-center justify-between mt-4 gap-5">
-                        <button type="submit" className="bg-midnight-purple text-white py-2 px-4 rounded hover:bg-midnight-purple-dark w-full">Submit</button>
+                        <button type="submit" className="bg-primary text-white py-2 px-4 rounded hover:bg-secondary w-full">Submit</button>
                         <button onClick={handleReset} type="button" className="bg-red-400 text-white py-2 px-4 rounded hover:bg-red-500 w-full">Reset</button>
                     </div>
                 </form>

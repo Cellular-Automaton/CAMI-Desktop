@@ -95,7 +95,7 @@ export default function Connection() {
 
             <div id="login-container" className=" relative flex flex-row rounded-md h-4/5 w-5/6 
                 items-center justify-center bg-midnight-opacity p-8 shadow-lg m-5
-                shadow-midnight-purple-shadow">
+                shadow-primary">
 
                 <div id="image-container" className="relative flex flex-row items-center justify-center w-1/2 h-full">
                     <img src={Lenia} alt="Logo" className="absolute rounded-md h-full w-full object-cover opacity-40 z-0 blur-sm"/>
@@ -142,10 +142,10 @@ export default function Connection() {
                                         </div>
                                     </div>
 
-                                    <button type="submit" className="w-full h-10 p-2 mt-5 rounded-md bg-midnight-purple text-white font-bold">Sign In</button>
+                                    <button type="submit" className="w-full h-10 p-2 mt-5 rounded-md bg-primary text-white font-bold">Sign In</button>
                                     <div className="flex flex-col items-center justify-end w-full h-full mt-5 gap-2">
                                         <p className="text-midnight-text text-center">Don't have an account? 
-                                            <a href="#/Connection" className="text-midnight-purple font-bold" onClick={() => setIsSignIn(false)}> Sign Up</a>
+                                            <a href="#/Connection" className="text-primary font-bold" onClick={() => setIsSignIn(false)}> Sign Up</a>
                                         </p>
                                     </div>
                                 </form>
@@ -209,7 +209,7 @@ export default function Connection() {
                                         </div>
                                     </div>
 
-                                    <button type="submit" className="w-full h-10 p-2 mt-5 rounded-md bg-midnight-purple text-white font-bold" >Sign Up</button>
+                                    <button type="submit" className="w-full h-10 p-2 mt-5 rounded-md bg-primary text-white font-bold" >Sign Up</button>
                                 </form>
                             </div>
                         </div>

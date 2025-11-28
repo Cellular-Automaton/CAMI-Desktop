@@ -34,7 +34,7 @@ export default function Navbar() {
                     loggedIn ? (
                         <button className="
                             flex items-center justify-start w-full p-2 pb-5 pt-5 
-                            transition-all hover:bg-midnight-purple-dark/80
+                            transition-all hover:bg-secondary
                             duration-300 overflow-hidden gap-10 h-12
                             hover:shadow-lg hover:black rounded-l-md"
                             onClick={() => {logout(), navigate(0)}}
@@ -45,7 +45,7 @@ export default function Navbar() {
                     ) : (
                         <button className="
                             flex items-center justify-start w-full p-2 pb-5 pt-5 
-                            transition-all hover:bg-midnight-purple-dark/80
+                            transition-all hover:bg-secondary
                             duration-300 overflow-hidden gap-10 h-12
                             hover:shadow-lg hover:black rounded-l-md"
                             onClick={() => {navigate("/Connection")}}>
@@ -57,7 +57,7 @@ export default function Navbar() {
                 
                 <button className="
                     flex items-center justify-start w-full p-2 pb-5 pt-5 
-                    transition-all hover:bg-midnight-purple-dark/80
+                    transition-all hover:bg-secondary
                     duration-300 overflow-hidden gap-10 h-12
                     hover:shadow-lg hover:black rounded-l-md"
                     onClick={() => {navigate("/Home")}}
@@ -69,7 +69,7 @@ export default function Navbar() {
                 
                 <button className="
                     flex items-center justify-start w-full p-2 pb-5 pt-5 
-                    transition-all hover:bg-midnight-purple-dark/80
+                    transition-all hover:bg-secondary
                     duration-300 overflow-hidden gap-10 h-12
                     hover:shadow-lg hover:black rounded-l-md"
                     onClick={() => {navigate("/Community")}}
@@ -82,7 +82,7 @@ export default function Navbar() {
                     loggedIn ?
                         <button className="
                             flex items-center justify-start w-full p-2 pb-5 pt-5 
-                            transition-all hover:bg-midnight-purple-dark/80
+                            transition-all hover:bg-secondary
                             duration-300 overflow-hidden gap-10 h-12
                             hover:shadow-lg hover:black rounded-l-md"
                             onClick={() => {navigate("/Submission")}}
@@ -98,7 +98,7 @@ export default function Navbar() {
                     loggedIn && userData.role === "admin" ?
                         <button className="
                             flex items-center justify-start w-full p-2 pb-5 pt-5 
-                            transition-all hover:bg-midnight-purple-dark/80
+                            transition-all hover:bg-secondary
                             duration-300 overflow-hidden gap-10 h-12
                             hover:shadow-lg hover:black rounded-l-md"
                             onClick={() => {navigate("/Admin")}}
@@ -112,7 +112,7 @@ export default function Navbar() {
 
                 {/* <button className="
                     flex items-center justify-start w-full p-2 pb-5 pt-5 
-                    transition-all hover:bg-midnight-purple-dark/80
+                    transition-all hover:bg-secondary
                     duration-300 overflow-hidden gap-10 h-12
                     hover:shadow-lg hover:black rounded-l-md"
                     onClick={() => {navigate("/Settings")}}

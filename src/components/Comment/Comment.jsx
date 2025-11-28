@@ -11,12 +11,12 @@ const Comment = ({ comment, reply, onDelete }) => {
     const { userData } = useContext(UserContext);
     
     return (
-        <div className="relative flex flex-col w-full gap-2 p-2 border-2 border-midnight-purple-dark/10 rounded-md">
+        <div className="relative flex flex-col w-full gap-2 p-2 border-2 border-secondary rounded-md">
             <div id="author" className="flex flex-row justify-start items-baseline w-full gap-2 text-sm font-bold text-midnight-text">
                 {
                     comment.image ?
                     <img src={comment.image} alt="Author" className="h-10 w-10 rounded-full"/>
-                    : <div className="h-10 w-10 rounded-full bg-midnight-purple"></div>
+                    : <div className="h-10 w-10 rounded-full bg-primary"></div>
                 }
                 <p>{comment.posted_by.username}</p>
                 <p className="text-xs opacity-80">{formatDistance(new Date(comment.inserted_at), new Date(), { addSuffix: true })}</p>
@@ -75,7 +75,7 @@ const Comment = ({ comment, reply, onDelete }) => {
             
             {/* {
                 reply === true ? null :
-                    <div id="responses" className="flex flex-col w-full gap-2 text-sm font-bold text-midnight-purple">
+                    <div id="responses" className="flex flex-col w-full gap-2 text-sm font-bold text-primary">
                         <button className="flex items-center w-fit rounded-md hover:bg-midnight transition ease-in-out duration-300 h-10 p-2"
                             onClick={() => setIsResponsesLoaded(!isResponsesLoaded)}>
                             <p>{isResponsesLoaded ? "Hide" : "Show"} responses</p>

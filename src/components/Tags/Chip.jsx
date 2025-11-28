@@ -6,20 +6,20 @@ const Chip = ({tagName, onClickCallback}) => {
     const handleHoverChip = (event) => {
         if (!isHovered) {
             event.target.classList.add("text-white");
-            event.target.classList.add("bg-midnight-purple");
-            event.target.classList.remove("text-midnight-purple");
+            event.target.classList.add("bg-primary");
+            event.target.classList.remove("text-primary");
             setIsHovered(true);
         } else {
             event.target.classList.remove("text-white");
-            event.target.classList.remove("bg-midnight-purple");
-            event.target.classList.add("text-midnight-purple");
+            event.target.classList.remove("bg-primary");
+            event.target.classList.add("text-primary");
             setIsHovered(false);
         }
     };
 
     return (
         <button
-            className="text-midnight-purple rounded-full border-midnight-purple text-xs border-2 px-2 truncate"
+            className="text-primary rounded-full border-primary text-xs border-2 px-2 truncate"
             onClick={onClickCallback}
             onMouseEnter={handleHoverChip}
             onMouseLeave={handleHoverChip}>

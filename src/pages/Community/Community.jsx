@@ -119,15 +119,15 @@ export default function Community() {
         // Get the filter
         const tagHTML = event.target;
 
-        if (tagHTML.classList.contains("text-midnight-purple")) {
-            tagHTML.classList.add("bg-midnight-purple");
-            tagHTML.classList.remove("text-midnight-purple");
+        if (tagHTML.classList.contains("text-primary")) {
+            tagHTML.classList.add("bg-primary");
+            tagHTML.classList.remove("text-primary");
             tagHTML.classList.add("text-white");
             setFilters([...filters, tag.id]);
         } else {
             tagHTML.classList.remove("text-white");
-            tagHTML.classList.add("text-midnight-purple");
-            tagHTML.classList.remove("bg-midnight-purple");
+            tagHTML.classList.add("text-primary");
+            tagHTML.classList.remove("bg-primary");
             setFilters(filters.filter((filter) => filter !== tag.id));
         }
     };
@@ -174,23 +174,23 @@ export default function Community() {
             <div id="search-bar" className="flex flex-row bg-transparent h-20 w-full p-1 justify-center items-center">
                 <div className="flex flex-row w-full h-full p-2 justify-center items-center gap-6">
                     <div id="search" className="flex flex-row items-center h-full w-fit p-2 gap-2">
-                        <input type="text" className="h-full max-w-96 min-w-80 bg-midnight text-white border-2 border-midnight-purple rounded-full p-2" placeholder="Search for a simulation..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                        <input type="text" className="h-full max-w-96 min-w-80 bg-midnight text-white border-2 border-primary rounded-full p-2" placeholder="Search for a simulation..." value={search} onChange={(e) => setSearch(e.target.value)} />
                         
                         <div className="w-2 min-w-2"></div>
 
                         <div className="w-5 min-w-5"></div>
 
-                        <button id="Filter" className="flex bg-midnight-opacity rounded-full grow-0 shrink-0 shadow-md shadow-midnight-purple-shadow h-10 w-10 items-center p-1 overflow-visible" onClick={enableFilterPopup}>
+                        <button id="Filter" className="flex bg-midnight-opacity rounded-full grow-0 shrink-0 shadow-md shadow-primary h-10 w-10 items-center p-1 overflow-visible" onClick={enableFilterPopup}>
                             <img src={filter} alt="Filter" className="h-10 w-10"/>
                     
                             {/* POPUP FOR FILTER */}
-                            <div id="filter-popup" className="absolute bg-midnight shadow-sm shadow-midnight-purple-shadow max-w-1/4 w-fit h-fit rounded-lg p-4 hidden z-10">
+                            <div id="filter-popup" className="absolute bg-midnight shadow-sm shadow-primary max-w-1/4 w-fit h-fit rounded-lg p-4 hidden z-10">
                                 {/* Filter options go here which looks like chips */}
                                 <div className="flex flex-row flex-wrap gap-x-2 gap-y-1 text-xs justify-between" onMouseLeave={disableFilterPopup}>
                                     {
                                         tags.map((tag => {
                                             return (
-                                                <button key={tag.id} id={tag.name} obj={tag} className="text-midnight-purple rounded-full border-midnight-purple border-2 py-1 px-4" onClick={(e) => handleFilterChip(e, tag)}>{tag.name}</button>
+                                                <button key={tag.id} id={tag.name} obj={tag} className="text-primary rounded-full border-primary border-2 py-1 px-4" onClick={(e) => handleFilterChip(e, tag)}>{tag.name}</button>
                                             )
                                         }))
                                     }

@@ -129,7 +129,7 @@ export default function AdminAlgorithm({ closeCallback }) {
                             onClick={() => handleDeleteAlgorithm(selectedAlgorithm?.automaton_id)}>
                             Yes
                         </button>
-                        <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
+                        <button className="mt-5 p-2 bg-primary text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
                             onClick={() => setIsValidationOpen(false)}>
                             No
                         </button>
@@ -138,7 +138,7 @@ export default function AdminAlgorithm({ closeCallback }) {
             </Dialog>
 
             <div className="w-full flex justify-center">
-                <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 transition hover:opacity-50 ease-in-out duration-200"
+                <button className="mt-5 p-2 bg-primary text-white rounded-lg w-32 transition hover:opacity-50 ease-in-out duration-200"
                     onClick={closeCallback}>
                     Close
                 </button>
