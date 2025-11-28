@@ -110,7 +110,7 @@ export default function Navbar() {
                         null
                 }
 
-                {/* <button className="
+                <button className="
                     flex items-center justify-start w-full p-2 pb-5 pt-5 
                     transition-all hover:bg-secondary
                     duration-300 overflow-hidden gap-10 h-12
@@ -119,7 +119,7 @@ export default function Navbar() {
                 >
                     <SettingsRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
                     <span className="text-white">Settings</span>
-                </button> */}
+                </button>
             </div>
             
             <div className="

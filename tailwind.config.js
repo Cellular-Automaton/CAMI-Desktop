@@ -24,6 +24,7 @@ module.exports = {
         background: 'var(--color-background)',
         backgroundAlt: 'var(--color-background-alt)',
         text: 'var(--color-text)',
+        textAlt: 'var(--color-text-alt)',
       },
     },
   },

@@ -2,9 +2,7 @@ import React, { useContext } from "react";
 import { useEffect, useState} from "react";
 import HorizontalScroll from "../../components/HorizontalScroll/HorizontalScroll.jsx";
 import Informations from "../../components/Informations/Informations.jsx";
-import {fakeData, favoriteFakeData} from "../../../assets/data/fakeData.jsx";
 import gol from "../../../assets/images/gol.gif";
-import spinner from "../../../assets/images/spinner.svg";
 
 import { UserContext } from "../../contexts/UserContext.jsx";
 import { APIContext } from "../../contexts/APIContext.jsx";
@@ -121,7 +119,7 @@ export default function Home() {
     return (
         <div id="home-container" className="px-10 flex flex-col relative gap-2 bg-midnight min-h-full w-full font-mono">
             <section id="welcome" className="relative my-5 h-96 flex flex-row justify-center items-center rounded-lg overflow-hidden">
-                <div className="absolute w-full h-full bg-gradient-to-b from-transparent via-transparent to-primary z-10"/>
+                <div className="absolute w-full h-full bg-gradient-to-b from-transparent via-transparent to-background z-10"/>
                 <img src={gol} alt="gol" className="absolute blur-sm rounded-lg h-full w-full object-cover opacity-40"/>
                 <h1 className="absolute text-white text-4xl text-left ml-2">{sentence}</h1>
             </section>
