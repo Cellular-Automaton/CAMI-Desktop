@@ -9,6 +9,14 @@ html, body, #root {
     padding: 0;
 }
 
+.drag {
+    -webkit-app-region: drag;
+}
+
+.no-drag {
+    -webkit-app-region: no-drag;
+}
+
 /* Custom minimalist scrollbar */
 * {
     scrollbar-width: thin; /* Firefox */

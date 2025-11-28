@@ -15,13 +15,14 @@ const createWindow = () => {
     height: 600,
     minHeight: 600,
     minWidth: 800,
+    frame: false,
+    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: false,
       contextIsolation: true
     },
     autoHideMenuBar: true,
-    //frame: false // Pour être frameless
   });
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);

@@ -13,6 +13,7 @@ import Community from "./pages/Community/Community.jsx";
 import Connection from "./pages/Connection/Connection.jsx";
 import Submission from "./pages/Submission/Submission.jsx";
 import AdminPage from "./pages/Admin/AdminPage.jsx";
+import SettingBar from "./components/SettingBar/SettingBar.jsx";
 
 export default function App() {
     // When the page is charged for the first time, it redirect to /home
@@ -23,6 +24,7 @@ export default function App() {
     return (
         <Router>
             <div className="flex flex-row h-full">
+                <SettingBar />
                 <div className="fixed h-full top-0 left-0 w-16 bg-midnight"></div>
                 <Navbar />
                 <div className="flex-grow h-full w-full pl-16">
