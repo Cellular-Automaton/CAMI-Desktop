@@ -122,6 +122,7 @@ const COLOR_THEMES = [
 const THEMES = [
     {
         key: "light",
+        isDark: false,
         background: '#F5F5F5',
         backgroundAlt: '#DCDCDC',
         text: '#1A1A1A',
@@ -129,20 +130,15 @@ const THEMES = [
     },
     {
         key: "dark",
+        isDark: true,
         background: '#0A0A0A',
         backgroundAlt: '#191919',
         text: '#FFFFFF',
         textAlt: '#BDBDBD',
     },
     {
-        key: "aquamarine",
-        background: '#0A1428',
-        backgroundAlt: '#142038',
-        text: '#E8F2FF',
-        textAlt: '#A8C7E7',
-    },
-    {
         key: "midnight",
+        isDark: true,
         background: '#0C1221',
         backgroundAlt: '#161D2E',
         text: '#E6EBF5',
@@ -150,6 +146,7 @@ const THEMES = [
     },
     {
         key: "charcoal",
+        isDark: true,
         background: '#1A1D23',
         backgroundAlt: '#25282F',
         text: '#F0F0F0',
@@ -157,6 +154,7 @@ const THEMES = [
     },
     {
         key: "burgundy",
+        isDark: true,
         background: '#1A0D14',
         backgroundAlt: '#2A1721',
         text: '#F5E6EE',
@@ -164,6 +162,7 @@ const THEMES = [
     },
     {
         key: "forest",
+        isDark: true,
         background: '#0D1A12',
         backgroundAlt: '#16261C',
         text: '#E8F5EC',
@@ -171,6 +170,7 @@ const THEMES = [
     },
     {
         key: "slate",
+        isDark: true,
         background: '#151B24',
         backgroundAlt: '#1F2730',
         text: '#E8EDF3',

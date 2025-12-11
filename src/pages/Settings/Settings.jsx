@@ -57,9 +57,9 @@ const Settings = () => {
                                 themes.map((theme) => (
                                     <button
                                         key={theme.key}
-                                        className={`flex flex-col size-20 justify-center items-center p-4 rounded-lg hover:scale-110 transition-transform duration-300
+                                        className={`flex flex-col size-24 justify-center items-center p-4 rounded-lg hover:scale-110 transition-transform duration-300
                                             bg-midnight-opacity hover:bg-midnight-hover ${currentTheme.key === theme.key ? 'ring-4' : ''}
-                                            ${currentTheme.key === 'dark' ? 'ring-white' : 'ring-black'}
+                                            ${currentTheme.isDark ? 'ring-white' : 'ring-black'}
                                         `}
                                         style={{backgroundColor: theme.background}}
                                         onClick={() => {
@@ -86,9 +86,9 @@ const Settings = () => {
                                 colorThemes.map((color) => (
                                     <button 
                                         key={color.key}
-                                        className={`flex flex-col size-20 justify-center items-center p-4 rounded-lg hover:scale-110 transition-transform duration-300
+                                        className={`flex flex-col size-24 justify-center items-center p-4 rounded-lg hover:scale-110 transition-transform duration-300
                                             bg-midnight-opacity hover:bg-midnight-hover ${currentColorTheme.key === color.key ? 'ring-4' : ''}
-                                            ${currentTheme.key === 'dark' ? 'ring-white' : 'ring-black'}
+                                            ${currentTheme.isDark ? 'ring-white' : 'ring-black'}
                                             `}
                                         style={{backgroundColor: color.primary}}
                                         onClick={() => {
