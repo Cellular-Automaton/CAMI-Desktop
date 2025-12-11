@@ -4,6 +4,7 @@ import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { SimulationProvider, useSimulation } from "./contexts/SimulationContext.jsx";
 import { ToastContainer } from "react-toastify";
+import { ThemeManagerInstance } from "./utils/Themes.jsx";
 
 import Navbar from "./components/Navbar/Navbar.jsx";
 import Playground from "./pages/Playground/Playground.jsx";
@@ -20,6 +21,20 @@ export default function App() {
     // When the page is charged for the first time, it redirect to /home
     useEffect(() => { // Temporary I think
         window.location.replace("#/Home");
+    }, []);
+
+
+    // Load themes from storage on app start
+    useEffect(() => {
+        const loadThemes = async () => {
+            const storedColorTheme = await window.electron.getData('color-theme');
+            const storedTheme = await window.electron.getData('theme');
+            if (storedColorTheme) {
+                await ThemeManagerInstance.applyColorTheme(storedColorTheme);
+                await ThemeManagerInstance.applyTheme(storedTheme);
+            }
+        }
+        loadThemes();
     }, []);
 
     return (

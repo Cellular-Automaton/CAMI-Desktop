@@ -32,7 +32,7 @@ class ThemeManager {
         return this.currentTheme;
     }
 
-    applyColorTheme(key) {
+    async applyColorTheme(key) {
         if (!key)
             return;
         
@@ -44,11 +44,12 @@ class ThemeManager {
         root.style.setProperty('--color-primary', theme.primary);
         root.style.setProperty('--color-secondary', theme.secondary);
         root.style.setProperty('--color-accent', theme.accent);
-        root.setAttribute('data-color', name);
+        root.dataset.color = theme.key;
         this.currentColor = theme;
+        await window.electron.storeData('color-theme', key);
     }
 
-    applyTheme(key) {
+    async applyTheme(key) {
         if (!key)
             return;
 
@@ -61,8 +62,9 @@ class ThemeManager {
         root.style.setProperty('--color-background-alt', theme.backgroundAlt);
         root.style.setProperty('--color-text', theme.text);
         root.style.setProperty('--color-text-alt', theme.textAlt);
-        root.setAttribute('data-theme', name);
+        root.dataset.theme = theme.key;
         this.currentTheme = theme;
+        await window.electron.storeData('theme', key);
     }
 }
 
@@ -120,7 +122,7 @@ const COLOR_THEMES = [
 const THEMES = [
     {
         key: "light",
-        background: '#FFFAFA',
+        background: '#F5F5F5',
         backgroundAlt: '#DCDCDC',
         text: '#1A1A1A',
         textAlt: '#333333',
@@ -131,6 +133,48 @@ const THEMES = [
         backgroundAlt: '#191919',
         text: '#FFFFFF',
         textAlt: '#BDBDBD',
+    },
+    {
+        key: "aquamarine",
+        background: '#0A1428',
+        backgroundAlt: '#142038',
+        text: '#E8F2FF',
+        textAlt: '#A8C7E7',
+    },
+    {
+        key: "midnight",
+        background: '#0C1221',
+        backgroundAlt: '#161D2E',
+        text: '#E6EBF5',
+        textAlt: '#9BA8C4',
+    },
+    {
+        key: "charcoal",
+        background: '#1A1D23',
+        backgroundAlt: '#25282F',
+        text: '#F0F0F0',
+        textAlt: '#B8BCC4',
+    },
+    {
+        key: "burgundy",
+        background: '#1A0D14',
+        backgroundAlt: '#2A1721',
+        text: '#F5E6EE',
+        textAlt: '#D4A8BF',
+    },
+    {
+        key: "forest",
+        background: '#0D1A12',
+        backgroundAlt: '#16261C',
+        text: '#E8F5EC',
+        textAlt: '#A8D4B8',
+    },
+    {
+        key: "slate",
+        background: '#151B24',
+        backgroundAlt: '#1F2730',
+        text: '#E8EDF3',
+        textAlt: '#A5B4C7',
     }
 ]
 
