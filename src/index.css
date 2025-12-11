@@ -89,3 +89,29 @@ body {
 .taskbar-button:hover {
     color: #ff0000; /* Change color on hover */
 }
+
+/* Toast Customization */
+.Toastify__toast {
+  background-color: var(--color-background-alt) !important;
+  color: var(--color-text) !important;
+  border-radius: 8px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+.Toastify__progress-bar {
+  background: var(--color-primary) !important;
+}
+
+.Toastify__progress-bar--success {
+    background: var(--color-accent) !important;
+}
+
+.Toastify__close-button {
+  color: var(--color-text-alt) !important;
+  opacity: 0.7;
+}
+
+.Toastify__close-button:hover {
+  color: var(--color-text) !important;
+  opacity: 1;
+}

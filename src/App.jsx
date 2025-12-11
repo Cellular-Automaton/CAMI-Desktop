@@ -54,8 +54,6 @@ export default function App() {
                         pauseOnFocusLoss
                         draggable
                         pauseOnHover
-                        theme="dark"
-                        toastStyle={{ backgroundColor: "#242423", color: "#ffffff" }}
                     />
                     <SimulationProvider>
                         <Routes>
