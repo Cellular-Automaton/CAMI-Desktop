@@ -184,6 +184,8 @@ export default function Home() {
                 className="hidden flex-col w-full h-full bg-midnight-opacity absolute left-0 -top-full z-10">
                 <Informations onCloseCallback={closeInformationPanel} algorithm={selectedAlgorithm} />
             </div>
+
+            <div id="footer" className="w-full min-h-10"></div>
         </div>
     );
 }
