@@ -11,7 +11,7 @@ import { APIContext } from "../../contexts/APIContext.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Chip, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Button, Tooltip, TextField } from "@mui/material";
+import { Chip, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Button, Tooltip, TextField, Menu, MenuItem } from "@mui/material";
 import DownloadIcon from '@mui/icons-material/Download';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import AddCommentIcon from '@mui/icons-material/AddComment';
@@ -24,12 +24,25 @@ const Informations = ({algorithm, onCloseCallback}) => {
     const [comments, setComments] = useState([]);
     const [isAlgorithmInstalled, setIsAlgorithmInstalled] = useState(false);
     const [image, setImage] = useState(null);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [commentIdToDelete, setCommentIdToDelete] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [sortOrder, setSortOrder] = useState('newest');
+
     const { userData, loggedIn } = useContext(UserContext);
     const { addAlgorithmComment, getAlgorithmComments, downloadAlgorithm, deleteComment } = useContext(APIContext);
     const { setSelectedAlgorithm } = useContext(SimulationContext);
-    const [openDialog, setOpenDialog] = useState(false);
-    const [commentIdToDelete, setCommentIdToDelete] = useState(null);
+
     const navigate = useNavigate();
+    const isMenuOpen = Boolean(anchorEl);
+
+    const sortedComments = [...comments].sort((a, b) => {
+        if (sortOrder === 'newest') {
+            return new Date(b.inserted_at) - new Date(a.inserted_at);
+        } else {
+            return new Date(a.inserted_at) - new Date(b.inserted_at);
+        }
+    });
 
     useEffect(() => {
         if (algorithm !== null && algorithm !== undefined && Object.keys(algorithm).length !== 0) {
@@ -139,6 +152,19 @@ const Informations = ({algorithm, onCloseCallback}) => {
             console.error("Error deleting comment:", error);
             toast.error("Failed to delete comment.");
         }
+    }
+
+    const handleSortClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    }
+
+    const handleSortClose = () => {
+        setAnchorEl(null);
+    }
+
+    const handleSortSelect = (order) => {
+        setSortOrder(order);
+        setAnchorEl(null);
     }
 
     return (
@@ -251,11 +277,71 @@ const Informations = ({algorithm, onCloseCallback}) => {
                                     color: 'var(--color-primary)',
                                 }
                             }}
+                            onClick={handleSortClick}
                         >
                             <SortIcon sx={{ mr: 1 }} />
-                            Sort By
+                            Sort By: {sortOrder === 'newest' ? ' Newest' : ' Oldest'}
                         </Button>
-
+                        
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={isMenuOpen}
+                            onClose={() => handleSortClose()}
+                            slotProps={{
+                                paper: {
+                                    sx: {
+                                        width: anchorEl?.offsetWidth || "auto"
+                                    }
+                                }
+                            }}
+                            sx={{
+                                '& .MuiPaper-root': {
+                                    backgroundColor: 'var(--color-background)',
+                                    color: 'var(--color-text)',
+                                }
+                            }}
+                        >
+                            <MenuItem 
+                                onClick={() => handleSortSelect('newest')}
+                                selected={sortOrder === 'newest'}
+                                sx={{
+                                    "&:hover": { 
+                                        backgroundColor: 'var(--color-secondary) !important',
+                                        color: 'var(--color-text-primary) !important'
+                                    },
+                                    "&.Mui-selected": { 
+                                        backgroundColor: 'var(--color-primary)',
+                                        color: 'var(--color-text-primary)'
+                                    },
+                                    "&.Mui-selected:hover": { 
+                                        backgroundColor: 'var(--color-secondary)',
+                                        color: 'var(--color-text-primary)'
+                                    }
+                                }}
+                            >
+                                Newest
+                            </MenuItem>
+                            <MenuItem 
+                                onClick={() => handleSortSelect('oldest')}
+                                selected={sortOrder === 'oldest'}
+                                sx={{
+                                    "&:hover": { 
+                                        backgroundColor: 'var(--color-secondary) !important',
+                                        color: 'var(--color-text-primary) !important'
+                                    },
+                                    "&.Mui-selected": { 
+                                        backgroundColor: 'var(--color-primary)',
+                                        color: 'var(--color-text-primary)'
+                                    },
+                                    "&.Mui-selected:hover": { 
+                                        backgroundColor: 'var(--color-secondary)',
+                                        color: 'var(--color-text-primary)'
+                                    }
+                                }}
+                            >
+                                Oldest
+                            </MenuItem>
+                        </Menu>
                     </div>
 
                     <div id="comment-posting" className="flex flex-col w-full mb-5">
@@ -324,7 +410,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
                                 </div>
                             :
                                 <div id="results" className="flex flex-row flex-wrap gap-10 h-fit w-full p-5 font-mono justify-center">
-                                    {comments.map((comment) => {
+                                    {sortedComments.map((comment) => {
                                         return (
                                             <Comment key={comment.id} comment={comment} onDelete={onTryDeleteComment} />
                                         )
