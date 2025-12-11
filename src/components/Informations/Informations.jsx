@@ -85,10 +85,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
         // Call the API to add the comment
         addAlgorithmComment(commentData)
             .then((response) => {
-                // Reset the form
-                document.getElementById("own-comment").reset();
                 fetchComments();
-
             })
             .catch((error) => {
                 console.error("Error adding comment:", error);
@@ -137,7 +134,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
     }
 
     return (
-        <div id="container" className="flex flex-col overflow-y-auto w-full min-h-full relative bg-background p-5 pt-10 z-10">
+        <div id="container" className="flex flex-col overflow-y-auto w-full h-fit relative bg-background pt-10 z-10">
 
             <div className="px-32">
 
@@ -226,7 +223,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
 
                 <div id="divider" className="w-full h-px bg-accent mb-5"></div>
 
-                <div id="algorithm-comments" className="flex flex-col w-full h-full mt-5">
+                <div id="algorithm-comments" className="flex flex-col w-full h-fit mt-5">
                     <div className="flex flex-row justify-start items-center w-full mb-10 gap-5">
                         <h1 className="flex flex-col text-3xl w-fit items-center text-left font-bold text-text">{comments.length} Comments</h1>
 
@@ -259,6 +256,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
                             onSubmit={(e) => {
                                 e.preventDefault();
                                 const formData = new FormData(e.target);
+                                e.target.reset();
                                 onSubmitComment(formData);
                             }}
                         >
@@ -310,14 +308,14 @@ const Informations = ({algorithm, onCloseCallback}) => {
                         </form>
                     </div>
 
-                    <div id="peoples-comments" className="flex flex-col w-full gap-5 mb-10">
+                    <div id="all-comments" className="flex flex-col w-full gap-5 mb-10">
                         {
                             !isCommentFetchComplete ? 
                                 <div id="loading-spinner" className="flex h-full w-full justify-center items-center">
                                     <img src={spinner} alt="Loading..." className="animate-spin size-10" />
                                 </div>
                             :
-                                <div id="results" className="flex flex-row flex-wrap gap-x-8 gap-y-4 h-full w-full p-5 max-w-full font-mono justify-center overflow-y-auto">
+                                <div id="results" className="flex flex-row flex-wrap gap-10 h-fit w-full p-5 font-mono justify-center">
                                     {comments.map((comment) => {
                                         return (
                                             <Comment key={comment.id} comment={comment} onDelete={onTryDeleteComment} />
@@ -335,20 +333,35 @@ const Informations = ({algorithm, onCloseCallback}) => {
                 onClose={() => setOpenDialog(false)}
                 slotProps={{
                     paper: {
-                        className: "!bg-midnight !text-white",
+                        className: "!bg-background !text-text",
                     }
                 }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogTitle className="!text-text">Confirm Deletion</DialogTitle>
                 <DialogContent>
-                    <DialogContentText className="!text-white">
+                    <DialogContentText className="!text-textAlt">
                         Are you sure you want to delete this comment?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="text" onClick={() => setOpenDialog(false)} color="primary">
+                    <Button 
+                        variant="text"
+                        sx={{
+                            color: "var(--color-text)",
+                            '&:hover': {
+                                backgroundColor: 'var(--color-background-alt)',
+                                color: 'var(--color-primary)',
+                            },
+                            '&:active': {
+                                backgroundColor: 'var(--color-background-alt)',
+                            },
+                            '& .MuiTouchRipple-root': {
+                                color: 'var(--color-primary)',
+                            }
+                        }}
+                        onClick={() => setOpenDialog(false)} color="primary">
                         Cancel
                     </Button>
                     <Button variant="contained" onClick={() => {
