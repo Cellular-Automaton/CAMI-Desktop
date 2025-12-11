@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import close from "../../../assets/images/close.svg";
 import like from "../../../assets/images/like.svg";
 import dislike from "../../../assets/images/dislike.svg";
@@ -33,6 +33,8 @@ const Informations = ({algorithm, onCloseCallback}) => {
     const { addAlgorithmComment, getAlgorithmComments, downloadAlgorithm, deleteComment } = useContext(APIContext);
     const { setSelectedAlgorithm } = useContext(SimulationContext);
 
+    const algorithmContainerRef = useRef(null);
+
     const navigate = useNavigate();
     const isMenuOpen = Boolean(anchorEl);
 
@@ -65,20 +67,30 @@ const Informations = ({algorithm, onCloseCallback}) => {
             }
         });
 
-        window.addEventListener('navigate-back', () => {
-            onCloseCallback();
-        });
+        window.addEventListener('navigate-back', handleNavigateBack);
+
         return () => {
-            window.removeEventListener('navigate-back', () => {});
+            window.removeEventListener('navigate-back', handleNavigateBack);
         }
     }, [algorithm]);
 
+    useEffect(() => {
+        return () => {
+            resetScroll();
+            window.dispatchEvent(new CustomEvent('remove-return-button'));
+        };
+    }, []);
+
+    const handleNavigateBack = () => {
+        resetScroll();
+        onCloseCallback();
+    };
+
     const resetScroll = () => {
-        const algorithmContainer = document.getElementById("algorithm");
-        if (algorithmContainer) {
+        if (algorithmContainerRef.current) {
             setTimeout(() => {
-                algorithmContainer.scrollTo(0, 0);
-            }, 200);
+                algorithmContainerRef.current.scrollTop = 0;
+            }, 500);
         }
     };
 
@@ -168,7 +180,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
     }
 
     return (
-        <div id="container" className="flex flex-col overflow-y-auto w-full h-fit relative bg-background pt-10 z-10">
+        <div id="container" ref={algorithmContainerRef} className="flex flex-col overflow-y-auto w-full h-fit relative bg-background pt-10 z-10">
 
             <div className="px-32">
 

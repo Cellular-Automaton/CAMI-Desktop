@@ -13,8 +13,13 @@ const SettingBar = () => {
             setIsReturnButtonVisible(true);
         });
 
+        window.addEventListener('remove-return-button', () => {
+            setIsReturnButtonVisible(false);
+        });
+
         return () => {
             window.removeEventListener('request-return-button');
+            window.removeEventListener('remove-return-button');
         }
     }, []);
 
