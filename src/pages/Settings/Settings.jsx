@@ -41,77 +41,88 @@ const Settings = () => {
                 </Tabs>
             </Box>
 
-            <div id="container" className="px-32 py-16 w-full h-full text-wrap overflow-hidden">
+            <div id="container" className="px-32 py-16 w-full h-full text-wrap overflow-y-auto">
 
-                <div id="appearance-tab-panel" role="tabpanel" hidden={tabIndex !== 0} className="flex flex-col gap-5 w-full h-full bg-background">
-                    <div>
-                        <h1 className="text-3xl text-text font-bold">Appearance Settings</h1>
-                        <p className="text-lg text-textAlt">Here you can customize the appearance of the application.</p>
-                    </div>
+                {
+                    tabIndex === 0 && (
+                        <div id="appearance-tab-panel" role="tabpanel" className="flex flex-col gap-5 w-full h-full bg-background">
+                            <div>
+                                <h1 className="text-3xl text-text font-bold">Appearance Settings</h1>
+                                <p className="text-lg text-textAlt">Here you can customize the appearance of the application.</p>
+                            </div>
 
-                    <div>
-                        <h2 className="text-xl text-text font-bold mt-5">Themes</h2>
-                        <p className="text-md text-textAlt mb-3">Select a theme for the application.</p>
-                        <div className="flex flex-row flex-wrap gap-4">
-                            {
-                                themes.map((theme) => (
-                                    <button
-                                        key={theme.key}
-                                        className={`flex flex-col size-24 justify-center items-center p-4 rounded-lg hover:scale-110 transition-transform duration-300
-                                            bg-midnight-opacity hover:bg-midnight-hover ${currentTheme.key === theme.key ? 'ring-4' : ''}
-                                            ${currentTheme.isDark ? 'ring-white' : 'ring-black'}
-                                        `}
-                                        style={{backgroundColor: theme.background}}
-                                        onClick={() => {
-                                            applyTheme(theme.key);
-                                        }}
-                                    >
-                                        <div
-                                            className="text-white font-bold text-lg"
-                                            style={{color: theme.text}}
-                                        >
-                                            {theme.key.charAt(0).toUpperCase() + theme.key.slice(1)}
-                                        </div>
-                                    </button>
-                                ))
-                            }
+                            <div>
+                                <h2 className="text-xl text-text font-bold mt-5">Themes</h2>
+                                <p className="text-md text-textAlt mb-3">Select a theme for the application.</p>
+                                <div className="flex flex-row flex-wrap gap-4">
+                                    {
+                                        themes.map((theme) => (
+                                            <button
+                                                key={theme.key}
+                                                className={`flex flex-col size-24 justify-center items-center p-4 rounded-lg hover:scale-110 transition-transform duration-300
+                                                    bg-midnight-opacity hover:bg-midnight-hover ${currentTheme.key === theme.key ? 'ring-4' : ''}
+                                                    ${currentTheme.isDark ? 'ring-white' : 'ring-black'}
+                                                `}
+                                                style={{backgroundColor: theme.background}}
+                                                onClick={() => {
+                                                    applyTheme(theme.key);
+                                                }}
+                                            >
+                                                <div
+                                                    className="text-white font-bold text-lg"
+                                                    style={{color: theme.text}}
+                                                >
+                                                    {theme.key.charAt(0).toUpperCase() + theme.key.slice(1)}
+                                                </div>
+                                            </button>
+                                        ))
+                                    }
+                                </div>
+                            </div>
+
+                            <div>
+                                <h2 className="text-xl text-text font-bold mt-5">Color Themes</h2>
+                                <p className="text-md text-textAlt mb-3">Select a color accentuation for the application.</p>
+                                <div className="flex flex-row flex-wrap gap-4">
+                                    {
+                                        colorThemes.map((color) => (
+                                            <button 
+                                                key={color.key}
+                                                className={`flex flex-col size-24 justify-center items-center p-4 rounded-lg hover:scale-110 transition-transform duration-300
+                                                    bg-midnight-opacity hover:bg-midnight-hover ${currentColorTheme.key === color.key ? 'ring-4' : ''}
+                                                    ${currentTheme.isDark ? 'ring-white' : 'ring-black'}
+                                                    `}
+                                                style={{backgroundColor: color.primary}}
+                                                onClick={() => {
+                                                    applyColorTheme(color.key);
+                                                }}
+                                            >
+                                                <div
+                                                    className="font-bold text-lg"
+                                                    style={{color: color.textPrimary}}
+                                                >
+                                                    {color.key.charAt(0).toUpperCase() + color.key.slice(1)}
+                                                </div>
+                                            </button>
+                                        ))
+                                    }
+                                </div>
+                            </div>
+
+                            <div id="footer" className="w-full min-h-10"></div>
                         </div>
-                    </div>
+                    )
+                }
 
-                    <div>
-                        <h2 className="text-xl text-text font-bold mt-5">Color Themes</h2>
-                        <p className="text-md text-textAlt mb-3">Select a color accentuation for the application.</p>
-                        <div className="flex flex-row flex-wrap gap-4">
-                            {
-                                colorThemes.map((color) => (
-                                    <button 
-                                        key={color.key}
-                                        className={`flex flex-col size-24 justify-center items-center p-4 rounded-lg hover:scale-110 transition-transform duration-300
-                                            bg-midnight-opacity hover:bg-midnight-hover ${currentColorTheme.key === color.key ? 'ring-4' : ''}
-                                            ${currentTheme.isDark ? 'ring-white' : 'ring-black'}
-                                            `}
-                                        style={{backgroundColor: color.primary}}
-                                        onClick={() => {
-                                            applyColorTheme(color.key);
-                                        }}
-                                    >
-                                        <div
-                                            className="font-bold text-lg"
-                                            style={{color: color.textPrimary}}
-                                        >
-                                            {color.key.charAt(0).toUpperCase() + color.key.slice(1)}
-                                        </div>
-                                    </button>
-                                ))
-                            }
+                {
+                    tabIndex === 1 && (
+                        <div id="wip-tab-panel" role="tabpanel" className="flex flex-col justify-center items-center w-full h-full bg-background">
+                            <h1 className="text-2xl text-text font-bold">Work In Progress</h1>
+                            <p className="text-md text-textAlt">This section is under development. Stay tuned for more features!</p>
+                            <div id="footer" className="w-full min-h-10"></div>
                         </div>
-                    </div>
-                </div>
-
-                <div id="wip-tab-panel" role="tabpanel" hidden={tabIndex !== 1} className="flex flex-col justify-center items-center w-full h-full bg-background">
-                    <h1 className="text-2xl text-text font-bold">Work In Progress</h1>
-                    <p className="text-md text-textAlt">This section is under development. Stay tuned for more features!</p>
-                </div>
+                    )
+                }
 
             </div>
         </div>
