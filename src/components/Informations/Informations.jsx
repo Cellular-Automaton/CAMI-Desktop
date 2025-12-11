@@ -43,6 +43,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
         } else {
             setIsAlgorithmPresent(false);
         }
+
         window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
             if (isInstalled) {
                 setIsAlgorithmInstalled(true);
@@ -50,6 +51,13 @@ const Informations = ({algorithm, onCloseCallback}) => {
                 setIsAlgorithmInstalled(false);
             }
         });
+
+        window.addEventListener('navigate-back', () => {
+            onCloseCallback();
+        });
+        return () => {
+            window.removeEventListener('navigate-back', () => {});
+        }
     }, [algorithm]);
 
     const resetScroll = () => {
