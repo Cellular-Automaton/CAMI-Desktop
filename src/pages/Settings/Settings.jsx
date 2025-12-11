@@ -96,7 +96,8 @@ const Settings = () => {
                                         }}
                                     >
                                         <div
-                                            className="text-white font-bold text-lg"
+                                            className="font-bold text-lg"
+                                            style={{color: color.textPrimary}}
                                         >
                                             {color.key.charAt(0).toUpperCase() + color.key.slice(1)}
                                         </div>
