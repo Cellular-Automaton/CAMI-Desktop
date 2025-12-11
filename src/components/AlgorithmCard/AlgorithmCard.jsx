@@ -1,29 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
-import view from "../../../assets/images/view.svg";
-import comment from "../../../assets/images/comment.svg";
-import like from "../../../assets/images/like.svg";
-import download from "../../../assets/images/download.svg";
-import Tag from "../Tags/Chip.jsx";
+import React, { useState, useEffect } from "react";
 import star from "../../../assets/images/star.svg";
-import { APIContext } from "../../contexts/APIContext.jsx";
 import { Chip, Tooltip } from "@mui/material";
 
 
 const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
     const [image, setImage] = useState(null);
-    const onMouseEnter = (e) => {
-        const target = e.currentTarget;
-        const imageContainer = target.querySelector("#image-container");
-
-        // imageContainer.classList.remove("blur-sm");
-    };
-    
-    const onMouseLeave = (e) => {
-        const target = e.currentTarget;
-        const imageContainer = target.querySelector("#image-container");
-
-        // imageContainer.classList.add("blur-sm");
-    };
 
     useEffect(() => {
         if (algorithm.image[0] !== undefined && algorithm.image[0].contents_binary) {
@@ -38,11 +19,10 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
         <button
             id={"container"} 
             className="flex p-2 flex-col-reverse relative bg-backgroundAlt rounded-md shadow-lg w-96 h-64
-                transition ease-in-out duration-750 hover:ring-primary hover:ring-4
+                transition ease-in-out duration-750 hover:ring-primary hover:ring-4 min-w-56
                 cursor-pointer hover:scale-110 hover:z-10"
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-            onClick={() => {onClickCallback(algorithm)}}>
+            onClick={() => {onClickCallback(algorithm)}}
+            >
 
             {
                 favorite && (
