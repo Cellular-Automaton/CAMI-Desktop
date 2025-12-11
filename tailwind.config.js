@@ -20,6 +20,7 @@ module.exports = {
         primary: 'var(--color-primary)',
         secondary: 'var(--color-secondary)',
         accent: 'var(--color-accent)',
+        textPrimary: 'var(--color-text-primary)',
 
         background: 'var(--color-background)',
         backgroundAlt: 'var(--color-background-alt)',

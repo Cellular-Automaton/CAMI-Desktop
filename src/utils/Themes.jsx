@@ -44,6 +44,7 @@ class ThemeManager {
         root.style.setProperty('--color-primary', theme.primary);
         root.style.setProperty('--color-secondary', theme.secondary);
         root.style.setProperty('--color-accent', theme.accent);
+        root.style.setProperty('--color-text-primary', theme.textPrimary);
         root.dataset.color = theme.key;
         this.currentColor = theme;
         await window.electron.storeData('color-theme', key);
@@ -74,48 +75,63 @@ const COLOR_THEMES = [
         primary: '#7F6EEE',
         secondary: '#6B5BB8',
         accent: '#9a8df2',
+        textPrimary: '#000000',
     },
     {
         key: "red",
         primary: '#EE6E7F',
         secondary: '#B86B5B',
         accent: '#f29a8d',
+        textPrimary: '#000000',
     },
     {
         key: "gold",
         primary: '#EEBA6E',
         secondary: '#B88F5B',
         accent: '#f2d39a',
+        textPrimary: '#000000',
     },
     {
         key: "green",
         primary: '#6EEE7F',
         secondary: '#5BB86B',
         accent: '#9af2d3',
+        textPrimary: '#000000',
     },
     {
         key: "blue",
         primary: '#6E7FEE',
         secondary: '#5B6BB8',
         accent: '#9aadef',
+        textPrimary: '#000000',
     },
     {
         key: "cyan",
         primary: '#6EE7FF',
         secondary: '#5BB8C8',
         accent: '#9af2ff',
+        textPrimary: '#000000',
+    },
+    {
+        key: "navy",
+        primary: '#2C5F8D',
+        secondary: '#1E4263',
+        accent: '#4A8EC2',
+        textPrimary: '#FFFFFF',
     },
     {
         key: "pink",
         primary: '#EE6EFF',
         secondary: '#B85BB8',
         accent: '#f29aff',
+        textPrimary: '#000000',
     },
     {
         key: "orange",
         primary: '#FF8C6E',
         secondary: '#B86B5B',
         accent: '#ffb99a',
+        textPrimary: '#000000',
     },
 ];
 
