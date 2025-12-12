@@ -13,21 +13,28 @@ import logo from "../../../assets/images/logo.png";
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext.jsx";
+import { useNavigateBack } from "../../contexts/NavigateBackContext.jsx";
 
 export default function Navbar() {
     const navigate = useNavigate();
     const { userData, loggedIn, logout } = useContext(UserContext);
+    const { setIsReturnButtonVisible, setReturnCallback } = useNavigateBack();
 
-  return (
-    <div
-      className="
-                    fixed top-0 flex h-full flex-col justify-center
-                    items-center transition-all duration-300 font-mono z-50
-                    hover:w-96 w-16 backdrop-blur-md
-                    bg-gradient-to-r from-background to-transparent
-                    rounded-r-xl shadow-2xl shadow-black
-                "
-        >
+    const navigateTo = (path) => {
+        setIsReturnButtonVisible(false);
+        setReturnCallback(null);
+        navigate(path);
+    }
+
+    return (
+        <div
+        className="
+            fixed top-0 flex h-full flex-col justify-center
+            items-center transition-all duration-300 font-mono z-50
+            hover:w-96 w-16 backdrop-blur-md
+            bg-gradient-to-r from-background to-transparent
+            rounded-r-xl shadow-2xl shadow-backgroundAlt
+        ">
             <div className="flex flex-col h-full justify-center items-center w-full transition-all duration-300 gap-3 pl-1.5">
 
                 {
@@ -37,7 +44,7 @@ export default function Navbar() {
                             transition-all hover:bg-secondary
                             duration-300 overflow-hidden gap-10 h-12
                             hover:shadow-lg hover:black rounded-l-md"
-                            onClick={() => {logout(), navigate(0)}}
+                            onClick={() => {logout(), navigateTo(0)}}
                         >
                             <AccountBoxRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
                             <span className="text-text">Logout</span>
@@ -48,7 +55,7 @@ export default function Navbar() {
                             transition-all hover:bg-secondary
                             duration-300 overflow-hidden gap-10 h-12
                             hover:shadow-lg hover:black rounded-l-md"
-                            onClick={() => {navigate("/Connection")}}>
+                            onClick={() => {navigateTo("/Connection")}}>
                             <LoginRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
                             <span className="text-text">Login</span>
                         </button>
@@ -60,7 +67,7 @@ export default function Navbar() {
                     transition-all hover:bg-secondary
                     duration-300 overflow-hidden gap-10 h-12
                     hover:shadow-lg hover:black rounded-l-md"
-                    onClick={() => {navigate("/Home")}}
+                    onClick={() => {navigateTo("/Home")}}
                 >
                     <HomeRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
                     <span className="text-text">Home</span>
@@ -72,7 +79,7 @@ export default function Navbar() {
                     transition-all hover:bg-secondary
                     duration-300 overflow-hidden gap-10 h-12
                     hover:shadow-lg hover:black rounded-l-md"
-                    onClick={() => {navigate("/Community")}}
+                    onClick={() => {navigateTo("/Community")}}
                 >
                     <ForumRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
                     <span className="text-text">Community</span>
@@ -85,7 +92,7 @@ export default function Navbar() {
                             transition-all hover:bg-secondary
                             duration-300 overflow-hidden gap-10 h-12
                             hover:shadow-lg hover:black rounded-l-md"
-                            onClick={() => {navigate("/Submission")}}
+                            onClick={() => {navigateTo("/Submission")}}
                         >
                             <AddBoxRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
                             <span className="text-text">Submission</span>
@@ -101,7 +108,7 @@ export default function Navbar() {
                             transition-all hover:bg-secondary
                             duration-300 overflow-hidden gap-10 h-12
                             hover:shadow-lg hover:black rounded-l-md"
-                            onClick={() => {navigate("/Admin")}}
+                            onClick={() => {navigateTo("/Admin")}}
                         >
                             <RemoveRedEyeRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
                             <span className="text-text">Admin</span>
@@ -115,7 +122,7 @@ export default function Navbar() {
                     transition-all hover:bg-secondary
                     duration-300 overflow-hidden gap-10 h-12
                     hover:shadow-lg hover:black rounded-l-md"
-                    onClick={() => {navigate("/Settings")}}
+                    onClick={() => {navigateTo("/Settings")}}
                 >
                     <SettingsRoundedIcon sx={{ color: "var(--color-text)", fontSize: 32 }} />
                     <span className="text-text">Settings</span>

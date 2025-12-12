@@ -23,7 +23,7 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
             id={"container"} 
             className="flex p-2 flex-col-reverse relative bg-backgroundAlt rounded-md shadow-lg w-full h-64
                 transition ease-in-out duration-750 hover:ring-primary hover:ring-4 min-w-56
-                cursor-pointer hover:scale-110 hover:z-20"
+                cursor-pointer hover:scale-110 hover:z-20 focus:z-20 focus:scale-110"
             onClick={() => {
                 setIsReturnButtonVisible(true);
                 onClickCallback(algorithm);

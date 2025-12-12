@@ -253,7 +253,7 @@ export default function Community() {
                             <img src={spinner} alt="Loading..." className="animate-spin h-20 w-20" />
                         </div>
                         :
-                        <div id="results" className="grid grid-cols-2 h-full w-full p-5 gap-x-5 gap-y-5 overflow-y-auto overflow-x-hidden">
+                        <div id="results" className="grid grid-cols-3 h-full w-full p-5 gap-x-5 gap-y-5 overflow-y-auto overflow-x-hidden">
                             {
                                 filteredAlgorithms.map((algorithm) => {
                                     return (
