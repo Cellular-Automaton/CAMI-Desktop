@@ -1,9 +1,4 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import close from "../../../assets/images/close.svg";
-import like from "../../../assets/images/like.svg";
-import dislike from "../../../assets/images/dislike.svg";
-import view from "../../../assets/images/view.svg";
-import download from "../../../assets/images/download.svg";
 import Comment from "../Comment/Comment.jsx";
 import spinner from "../../../assets/images/spinner.svg";
 import { UserContext } from "../../contexts/UserContext.jsx";
@@ -12,6 +7,8 @@ import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Chip, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Button, Tooltip, TextField, Menu, MenuItem } from "@mui/material";
+import { useNavigateBack } from "../../contexts/NavigateBackContext.jsx";
+
 import DownloadIcon from '@mui/icons-material/Download';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import AddCommentIcon from '@mui/icons-material/AddComment';
@@ -29,8 +26,23 @@ const Informations = ({algorithm, onCloseCallback}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [sortOrder, setSortOrder] = useState('newest');
 
-    const { userData, loggedIn } = useContext(UserContext);
-    const { addAlgorithmComment, getAlgorithmComments, downloadAlgorithm, deleteComment } = useContext(APIContext);
+    const { 
+        userData,
+        loggedIn
+    } = useContext(UserContext);
+    const { 
+        addAlgorithmComment,
+        getAlgorithmComments,
+        downloadAlgorithm,
+        deleteComment
+    } = useContext(APIContext);
+    const {
+        isReturnButtonVisible,
+        showReturnButton,
+        setReturnCallback,
+        hideReturnButton,
+        handleReturn
+    } = useNavigateBack();
     const { setSelectedAlgorithm } = useContext(SimulationContext);
 
     const algorithmContainerRef = useRef(null);
@@ -66,13 +78,26 @@ const Informations = ({algorithm, onCloseCallback}) => {
                 setIsAlgorithmInstalled(false);
             }
         });
+    }, [algorithm]);
+
+    useEffect(() => {
+        setReturnCallback(() => {
+            resetScroll();
+            onCloseCallback();
+        });
+    }, []);
+
+    useEffect(() => {
+        const handleNavigateBack = () => {
+            resetScroll();
+            onCloseCallback();
+        };
 
         window.addEventListener('navigate-back', handleNavigateBack);
-
         return () => {
             window.removeEventListener('navigate-back', handleNavigateBack);
         }
-    }, [algorithm]);
+    }, []);
 
     useEffect(() => {
         return () => {
@@ -80,11 +105,6 @@ const Informations = ({algorithm, onCloseCallback}) => {
             window.dispatchEvent(new CustomEvent('remove-return-button'));
         };
     }, []);
-
-    const handleNavigateBack = () => {
-        resetScroll();
-        onCloseCallback();
-    };
 
     const resetScroll = () => {
         if (algorithmContainerRef.current) {

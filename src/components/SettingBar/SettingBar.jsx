@@ -1,27 +1,18 @@
 import React, { useEffect } from "react";
+
+import { useNavigateBack } from "../../contexts/NavigateBackContext.jsx";
+
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import CropSquareRoundedIcon from '@mui/icons-material/CropSquareRounded';
 import MinimizeRoundedIcon from '@mui/icons-material/MinimizeRounded';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 
 const SettingBar = () => {
-    const [isReturnButtonVisible, setIsReturnButtonVisible] = React.useState(false);
-
-    useEffect(() => {
-        // Listen to window event to add return button when requested
-        window.addEventListener('request-return-button', () => {
-            setIsReturnButtonVisible(true);
-        });
-
-        window.addEventListener('remove-return-button', () => {
-            setIsReturnButtonVisible(false);
-        });
-
-        return () => {
-            window.removeEventListener('request-return-button');
-            window.removeEventListener('remove-return-button');
-        }
-    }, []);
+    const {
+        isReturnButtonVisible,
+        hideReturnButton,
+        handleReturn
+    } = useNavigateBack();
 
     function handleClose() {
         window.electron.onCloseApp();
@@ -35,13 +26,8 @@ const SettingBar = () => {
         window.electron.onMaximizeApp();
     }
 
-    function handleReturn() {
-        window.dispatchEvent(new CustomEvent('navigate-back'));
-        setIsReturnButtonVisible(false);
-    }
-
     return (
-        <div className="flex fixed -top-1 w-full ml-16 pr-16 h-10 z-20 justify-between items-center drag">
+        <div className="flex fixed -top-1 w-full ml-16 pr-16 h-10 z-40 justify-between items-center drag">
             <div className="flex flex-row justify-center items-center no-drag">
                 {
                     isReturnButtonVisible &&

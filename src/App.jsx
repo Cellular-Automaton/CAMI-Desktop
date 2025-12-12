@@ -16,6 +16,7 @@ import Submission from "./pages/Submission/Submission.jsx";
 import AdminPage from "./pages/Admin/AdminPage.jsx";
 import SettingBar from "./components/SettingBar/SettingBar.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
+import { NavigateBackProvider } from "./contexts/NavigateBackContext.jsx";
 
 export default function App() {
     // When the page is charged for the first time, it redirect to /home
@@ -39,40 +40,42 @@ export default function App() {
 
     return (
         <Router>
-            <div className="flex flex-row h-full">
-                <div className="fixed h-full top-0 left-0 w-16 bg-background"></div>
-                <Navbar className="z-40" />
-                <SettingBar />
-                <div className="flex-grow h-full w-full pl-16">
-                    <ToastContainer 
-                        position="top-right"
-                        autoClose={5000}
-                        hideProgressBar={false}
-                        newestOnTop={false}
-                        closeOnClick
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable
-                        pauseOnHover
-                    />
-                    <SimulationProvider>
-                        <Routes>
-                            <Route path="/Home" element={<Home />} />
-                            <Route path="/Playground" 
-                                element={
-                                        <Playground/>
-                                }/>
-                            <Route path="/Information" element={<SimulationInformation/>} />
-                            <Route path="/Community" element={<Community/>} />
-                            <Route path="/Connection" element={<Connection/>} />
-                            <Route path="/Submission" element={<Submission/>} />
-                            <Route path="/Admin" element={<AdminPage />} />
-                            <Route path="/Settings" element={<Settings />} />
-                            <Route path="/*" element={<NotFound/>}/>
-                        </Routes>
-                    </SimulationProvider>
+            <NavigateBackProvider>
+                <div className="flex flex-row h-full">
+                    <div className="fixed h-full top-0 left-0 w-16 bg-background"></div>
+                    <Navbar className="z-40" />
+                    <SettingBar />
+                    <div className="flex-grow h-full w-full pl-16">
+                        <ToastContainer 
+                            position="top-right"
+                            autoClose={5000}
+                            hideProgressBar={false}
+                            newestOnTop={false}
+                            closeOnClick
+                            rtl={false}
+                            pauseOnFocusLoss
+                            draggable
+                            pauseOnHover
+                        />
+                            <SimulationProvider>
+                                <Routes>
+                                    <Route path="/Home" element={<Home />} />
+                                    <Route path="/Playground" 
+                                        element={
+                                                <Playground/>
+                                        }/>
+                                    <Route path="/Information" element={<SimulationInformation/>} />
+                                    <Route path="/Community" element={<Community/>} />
+                                    <Route path="/Connection" element={<Connection/>} />
+                                    <Route path="/Submission" element={<Submission/>} />
+                                    <Route path="/Admin" element={<AdminPage />} />
+                                    <Route path="/Settings" element={<Settings />} />
+                                    <Route path="/*" element={<NotFound/>}/>
+                                </Routes>
+                            </SimulationProvider>
+                    </div>
                 </div>
-            </div>
+            </NavigateBackProvider>
         </Router>
     );
 }

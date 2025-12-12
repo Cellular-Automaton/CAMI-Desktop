@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import star from "../../../assets/images/star.svg";
 import { Chip, Tooltip } from "@mui/material";
+import { useNavigateBack } from "../../contexts/NavigateBackContext.jsx";
 
 
 const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
     const [image, setImage] = useState(null);
+    const { setIsReturnButtonVisible } = useNavigateBack();
 
     useEffect(() => {
         if (algorithm.image[0] !== undefined && algorithm.image[0].contents_binary) {
@@ -15,15 +17,16 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
             setImage("https://asset.gecdesigns.com/img/background-templates/gradient-triangle-abstract-background-template-10032405-1710079376651-cover.webp");
         }
     }, [algorithm.image]);
+
     return (
         <button
             id={"container"} 
-            className="flex p-2 flex-col-reverse relative bg-backgroundAlt rounded-md shadow-lg w-96 h-64
+            className="flex p-2 flex-col-reverse relative bg-backgroundAlt rounded-md shadow-lg w-full h-64
                 transition ease-in-out duration-750 hover:ring-primary hover:ring-4 min-w-56
-                cursor-pointer hover:scale-110 hover:z-10"
+                cursor-pointer hover:scale-110 hover:z-20"
             onClick={() => {
-                window.dispatchEvent(new CustomEvent('request-return-button'));
-                onClickCallback(algorithm)
+                setIsReturnButtonVisible(true);
+                onClickCallback(algorithm);
             }}>
 
             {
