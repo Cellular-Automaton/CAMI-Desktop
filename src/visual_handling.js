@@ -87,6 +87,25 @@ ipcMain.handle('install-visual', async (event, url, visual) => {
     }
 });
 
+ipcMain.handle('uninstall-visual', async (event, visual_id) => {
+    try {
+        const visualIndex = visualManager.visuals.findIndex(v => v.bdd_id === visual_id);
+        if (visualIndex === -1) {
+            throw new Error(`Visual with id ${visual_id} not found.`);
+        }
+        const visual = visualManager.visuals[visualIndex];
+        const dirPath = get_path() + `/${visual_id}`;
+        // Remove visual files
+        await fs.promises.rm(dirPath, { recursive: true, force: true });
+        // Remove from visual manager
+        visualManager.visuals.splice(visualIndex, 1);
+        await save_visual_manager();
+    } catch (error) {
+        console.error("Error uninstalling visual:", error);
+        throw error;
+    }
+});
+
 ipcMain.handle('install-try-visual', async (event, visual_file) => {
     // visual_file is a js file
     // Do not use eval for security reasons

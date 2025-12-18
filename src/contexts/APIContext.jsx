@@ -253,8 +253,13 @@ export const APIProvider = ({ children }) => {
     const downloadVisual = async (visualLink) => {
         const url = visualLink;
 
+        console.log("Downloading visual from link:", url);
         try {
-            const response = await axios.get(url, {headers: {Authorization: undefined}});
+            const response = await axios.get(url, {
+                headers: {
+                    Authorization: undefined
+                }
+            });
             const asset = response.data.assets[0];
             if (!asset)
                 throw new Error(`No asset found for visual.`);
@@ -526,6 +531,26 @@ export const APIProvider = ({ children }) => {
         }
     }
 
+    const getVisualLinkedToAlgorithm = async (algorithmId) => {
+        const url = `${apiUrl}/plugin_manager/automaton/${algorithmId}`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            toast.error('Failed to fetch visuals linked to the algorithm. Please try later.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            throw error;
+        }
+    }
+
     return (
         <APIContext.Provider value={
             { 
@@ -533,7 +558,8 @@ export const APIProvider = ({ children }) => {
                 getAlgorithmComments, getTags, postAlgorithmTags, downloadAlgorithm, setAlgorithmTags,
                 getAllAccounts, getAllComments, getAllAlgorithms, getUserById, getAlgorithmById,
                 deleteComment, deleteUser, deleteAlgorithm, updateUser,
-                getLastestUsers, getLastestAlgorithms, getLastestComments, downloadVisual
+                getLastestUsers, getLastestAlgorithms, getLastestComments, downloadVisual,
+                getVisualLinkedToAlgorithm
             }
         }>
             {children}
