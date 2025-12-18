@@ -7,6 +7,7 @@ import AdminAlgorithm from "./AdminAlgorithm.jsx";
 import AdminComment from "./AdminComment.jsx";
 import { APIContext } from "../../contexts/APIContext.jsx";
 import { formatDistance } from "date-fns";
+import { NavigateBackContext } from "../../contexts/NavigateBackContext.jsx";
 
 export default function AdminPage() {
     const [type, setType] = useState("");
@@ -15,6 +16,7 @@ export default function AdminPage() {
     const [fiveLastComments, setFiveLastComments] = useState([]);
     const [fiveLastVisuals, setFiveLastVisuals] = useState([]);
     const { getLastestUsers, getLastestAlgorithms, getLastestComments } = useContext(APIContext);
+    const { showReturnButton, setReturnCallback } = useContext(NavigateBackContext);
 
     useEffect(() => {
         getLatest();
@@ -45,17 +47,22 @@ export default function AdminPage() {
     const openAdminPopup = (type) => {
         const popup = document.getElementById("admin-popup");
 
-        
         setType(type);
         popup.classList.add("bottom-0");
         popup.classList.remove("bottom-full");
-        
+
+        showReturnButton();
+        setReturnCallback(() => {
+            console.log("Closing admin popup from callback");
+            closeAdminPopup();
+        });
     }
 
     const closeAdminPopup = () => {
         const popup = document.getElementById("admin-popup");
         getLatest();
 
+        console.log("Closing admin popup");
         popup.classList.remove("bottom-0");
         popup.classList.add("bottom-full");
     }
