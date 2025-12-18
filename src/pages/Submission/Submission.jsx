@@ -123,14 +123,14 @@ function Submission() {
     };
 
     return (
-        <div id="submission-content" className="w-full h-full flex flex-col items-center justify-center p-4 bg-midnight font-mono relative text-white">
-            <div className="absolute top-0 left-0 w-full h-full bg-midnight-opacity">
+        <div id="submission-content" className="w-full h-full flex flex-col items-center justify-center bg-background font-mono relative text-text">
+            <div className="absolute top-0 left-0 w-full h-full bg-background">
                 <img src={gol} alt="Background" className="object-cover w-full h-full blur-sm opacity-40"/>
             </div>
         
-            <div className="flex flex-col items-center w-3/5 relative shadow-lg rounded-lg bg-midnight shadow-primary p-6 overflow-y-scroll overflow-x-hidden">
-                <div className="flex items-center justify-center h-1/5 w-full my-5">
-                    <h1 className="text-white text-4xl">Add a new cellular automaton</h1>
+            <div className="flex flex-col items-center justify-center w-3/5 h-full relative bg-background p-10">
+                <div className="flex items-center justify-center h-fit w-full my-5">
+                    <h1 className="text-text text-4xl">Add a new cellular automaton</h1>
                 </div>
 
                 <form 
@@ -146,7 +146,7 @@ function Submission() {
                                 value={form.name}
                                 onChange={handleChange}
                                 required
-                                className="w-full p-2 border border-gray-300 rounded bg-midnight text-white"
+                                className="w-full p-2 border border-gray-300 rounded bg-backgroundAlt text-text"
                             />
                         </label>
                     </div>
@@ -159,7 +159,23 @@ function Submission() {
                                 multiple
                                 value={form.tags}
                                 onChange={(e) => setForm((prev) => ({ ...prev, tags: e.target.value }))}
-                                sx={{ width: "100%", border: "1px solid #FFFFFF", color: "white" }}
+                                sx={{ 
+                                    width: "100%",
+                                    border: "1px solid #FFFFFF",
+                                    color: "var(--color-text-primary)",
+                                    backgroundColor: "var(--color-background-alt)",
+                                    "& .MuiSvgIcon-root": {
+                                        color: "var(--color-text)",
+                                    }
+                                }}
+                                MenuProps={{
+                                    sx: {
+                                        "& .MuiPaper-root": {
+                                            backgroundColor: "var(--color-background-alt)",
+                                            color: "var(--color-text)",
+                                        },
+                                    },
+                                }}
                                 renderValue={(selected) => (
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, padding: "2px", borderRadius: "4px" }}>
                                         {
@@ -173,7 +189,7 @@ function Submission() {
                                                         <Chip
                                                             key={tag.id}
                                                             label={tag.name} size="small" variant="filled"
-                                                            sx={{backgroundColor: "#7F6EEE", color: "white", fontFamily: "'JetBrains Mono', monospace", fontWeight: "bold"}}
+                                                            sx={{backgroundColor: "var(--color-primary)", color: "var(--color-text-primary)", fontFamily: "'JetBrains Mono', monospace", fontWeight: "bold"}}
                                                         />
                                                     </Tooltip>
 
@@ -211,7 +227,7 @@ function Submission() {
                                 onChange={handleChange}
                                 required
                                 style={{ resize: "none" }}
-                                className="w-full h-48 p-2 border border-gray-300 rounded bg-midnight text-white"
+                                className="w-full h-48 p-2 border border-gray-300 rounded bg-backgroundAlt text-text"
                             />
                         </label>
                     </div>
@@ -225,7 +241,7 @@ function Submission() {
                                 onChange={handleChange}
                                 required
                                 style={{ resize: "none" }}
-                                className="w-full h-48 p-2 border border-gray-300 rounded bg-midnight text-white"
+                                className="w-full h-48 p-2 border border-gray-300 rounded bg-backgroundAlt text-text"
                             />
                         </label>
                     </div>
@@ -249,7 +265,7 @@ function Submission() {
                                 value={form.link}
                                 onChange={handleChange}
                                 required
-                                className="w-full p-2 border border-gray-300 rounded bg-midnight text-white"
+                                className="w-full p-2 border border-gray-300 rounded bg-backgroundAlt text-text"
                             />
                         </label>
                     </div>
@@ -260,16 +276,18 @@ function Submission() {
                         </label>
 
                         {
-                            !form.image ?   
-                            <button
-                                type="button"
-                                className="bg-primary text-white w-full py-2 px-4 rounded hover:bg-secondary"
-                                onClick={handleImportImage}
-                            >
-                                Import image
-                            </button>
+                            !form.image ?
+                            <div className="flex flex-col justify-center items-center h-24 my-2">
+                                <button
+                                    type="button"
+                                    className="bg-primary text-textPrimary w-full py-2 px-4 rounded hover:bg-secondary"
+                                    onClick={handleImportImage}
+                                >
+                                    Import image
+                                </button>
+                            </div>
                             :
-                            <div className="flex flex-row justify-between items-center my-2 p-2 w-full h-24 bg-midnight-opacity rounded">
+                            <div className="flex flex-row justify-between items-center my-2 p-2 w-full h-24 bg-backgroundAlt rounded">
                                 <div className="h-full flex flex-row items-center justify-center gap-5">
                                     <img src={URL.createObjectURL(new Blob([form.image]))} alt="Imported" className="h-full max-h-48 object-fill" />
                                     <p className="text-sm text-center max-w-xs overflow-hidden text-ellipsis">
@@ -279,7 +297,7 @@ function Submission() {
                                 <button
                                     type="button"
                                     onClick={() => setForm((prev) => ({ ...prev, image: null }))}
-                                    className="hover:bg-red-500 rounded w-1/12 h-full"
+                                    className="hover:bg-red-600 rounded w-1/12 h-full"
                                 >
                                     X
                                 </button>
@@ -288,8 +306,8 @@ function Submission() {
                     </div>
 
                     <div className="flex items-center justify-between mt-4 gap-5">
-                        <button type="submit" className="bg-primary text-white py-2 px-4 rounded hover:bg-secondary w-full">Submit</button>
-                        <button onClick={handleReset} type="button" className="bg-red-400 text-white py-2 px-4 rounded hover:bg-red-500 w-full">Reset</button>
+                        <button type="submit" className="bg-primary text-textPrimary py-2 px-4 rounded hover:bg-secondary w-full">Submit</button>
+                        <button onClick={handleReset} type="button" className="bg-red-600 text-white py-2 px-4 rounded hover:bg-opacity-50 w-full">Reset</button>
                     </div>
                 </form>
             </div>
