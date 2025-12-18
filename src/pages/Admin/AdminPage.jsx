@@ -87,7 +87,7 @@ export default function AdminPage() {
                 <p className="text-textAlt">Welcome to the admin page. Here you can manage the application settings and user accounts.</p>
             </div>
 
-            <div id="admin-select-container" className="flex flex-col mt-10 py-10 px-10 gap-6 w-full h-full overflow-y-scroll">
+            <div id="admin-select-container" className="flex flex-col mt-10 py-10 px-20 gap-6 w-full h-full overflow-y-scroll overflow-x-hidden">
 
                 <button className="flex flex-col bg-backgroundAlt p-5 w-full h-fit 
                     text-text rounded-lg hover:scale-105 hover:ring-4 hover:ring-primary
