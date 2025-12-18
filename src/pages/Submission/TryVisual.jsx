@@ -105,24 +105,23 @@ export default function TryVisual() {
     }
 
     return (
-        <div id="submission-content" className="w-full h-full flex flex-col items-center justify-center p-4 bg-midnight font-mono relative text-white">
-            <div className="absolute top-0 left-0 w-full h-full bg-midnight-opacity">
+        <div id="submission-content" className="w-full h-full flex flex-col items-center justify-center p-4 bg-background font-mono relative text-text">
+            <div className="absolute top-0 left-0 w-full h-full bg-backgroundAlt">
                 <img src={gol} alt="Background" className="object-cover w-full h-full blur-sm opacity-40"/>
             </div>
                 
-            <div className="flex flex-col items-center w-3/5 relative shadow-lg rounded-lg bg-midnight shadow-midnight-purple-shadow p-6 overflow-x-hidden">
+            <div className="flex flex-col items-center w-3/5 relative shadow-lg rounded-lg bg-backgroundAlt shadow-midnight-purple-shadow p-6 overflow-x-hidden">
                 <div className="flex flex-col items-center justify-center h-1/5 w-full my-5">
-                    <h1 className="text-white text-4xl">Try your visual</h1>
+                    <h1 className="text-text text-4xl">Try your visual</h1>
                 </div>
-                <p className="text-white/70 text-lg">Here you can try your visual before submitting it to CAMI's community. Simply provide the necessary details and test it out!</p>
-
+                <p className="text-textAlt text-lg">Here you can try your visual before submitting it to CAMI's community. Simply provide the necessary details and test it out!</p>
                 {/* Selection container */}
                 <div className="w-full">
                     <div className="w-full">
-                        <label htmlFor="algorithm-select" className="block mt-4 mb-2 text-white text-lg">Select Algorithm:</label>
+                        <label htmlFor="algorithm-select" className="block mt-4 mb-2 text-text text-lg">Select Algorithm:</label>
                         <button
                             id="algorithm-select"
-                            className="w-full p-3 bg-midnight-purple text-white rounded-lg hover:bg-midnight-purple-dark transition-colors"
+                            className="w-full p-3 bg-primary text-textPrimary rounded-lg hover:bg-secondary transition-colors"
                             onClick={() => setIsDialogOpen(true)}
                         >
                             {selectedAlgorithm ? selectedAlgorithm.name : "Select an Algorithm"}
@@ -130,10 +129,10 @@ export default function TryVisual() {
                     </div>
 
                     <div>
-                        <label htmlFor="visual-select" className="block mt-4 mb-2 text-white text-lg">User visual:</label>
+                        <label htmlFor="visual-select" className="block mt-4 mb-2 text-text text-lg">User visual:</label>
                         <button
                             id="visual-select"
-                            className="w-full p-3 bg-midnight-purple text-white rounded-lg hover:bg-midnight-purple-dark transition-colors"
+                            className="w-full p-3 bg-primary text-textPrimary rounded-lg hover:bg-secondary transition-colors"
                             onClick={() => onClickVisualSelect()}
                         >
                             {visualName ? visualName : "Select the visual you want to test"}
@@ -143,7 +142,7 @@ export default function TryVisual() {
 
                 <div id="button-group" className="flex w-full justify-between mt-4">
                     <button
-                        className="px-4 py-2 w-1/2 bg-midnight-purple text-white rounded-lg hover:bg-midnight-purple-dark transition-colors"
+                        className="px-4 py-2 w-1/2 bg-primary text-textPrimary rounded-lg hover:bg-secondary transition-colors"
                         onClick={() => onClickStart()}
                     >
                         Start
