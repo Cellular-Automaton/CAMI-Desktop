@@ -57,23 +57,22 @@ function AlgorithmSubmission() {
         window.electron.openExternal(url);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
 
         // Check link validity
         try {
-            const url = new URL(form.link);
-            if (!url.hostname.includes("api.github.com")) {
+            const url = form.link;
+            if (!url.includes("api.github.com")) {
                 throw new Error("Invalid hostname.");
             }
-            axios.get(url.pathname).then((response) => {
-                if (response.status !== 200 && response.status !== 201 && response.status !== 304) {
-                    throw new Error("GitHub API link is not reachable.");
-                }
+            await axios.get(url, {
+                auth: {}
             }).catch((error) => {
-                return error;
+                throw new Error("Unable to reach the provided link.", error);
             });
+
         } catch (error) {
             toast.error(error.message + " Please provide a valid GitHub API link.", {
                 position: "top-right",
@@ -84,7 +83,6 @@ function AlgorithmSubmission() {
 
         // Send to the API
         addAlgorithm(form).then((response) => {
-            
             setAlgorithmTags(response.data.automaton_id, form.tags);
             navigate("/Home");
         }).catch((error) => {

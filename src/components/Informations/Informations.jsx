@@ -13,8 +13,7 @@ import { APIContext } from "../../contexts/APIContext.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Chip, Tooltip, Dialog } from "@mui/material";
-import axios from "axios";
+import { Chip, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Button, Tooltip } from "@mui/material";
 
 
 const Informations = ({algorithm, onCloseCallback}) => {
@@ -26,9 +25,10 @@ const Informations = ({algorithm, onCloseCallback}) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const { userData, loggedIn } = useContext(UserContext);
-    const { addAlgorithmComment, getAlgorithmComments, downloadAlgorithm, downloadVisual } = useContext(APIContext);
+    const { addAlgorithmComment, getAlgorithmComments, downloadAlgorithm, deleteComment, downloadVisual } = useContext(APIContext);
     const { setSelectedAlgorithm } = useContext(SimulationContext);
-
+    const [openDialog, setOpenDialog] = useState(false);
+    const [commentIdToDelete, setCommentIdToDelete] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -146,6 +146,21 @@ const Informations = ({algorithm, onCloseCallback}) => {
         }
     }
 
+    const onTryDeleteComment = async (commentId) => {
+        setOpenDialog(true);
+        setCommentIdToDelete(commentId);
+    }
+
+    const onDeleteComment = async (commentId) => {
+        try {
+            await deleteComment(commentId);
+            setComments(comments.filter(comment => comment.id !== commentId));
+        } catch (error) {
+            console.error("Error deleting comment:", error);
+            toast.error("Failed to delete comment.");
+        }
+    }
+
     return (
         <div id="container" className="flex flex-col max-h-screen min-h-screen w-full relative bg-midnight p-5 z-50">
 
@@ -251,11 +266,11 @@ const Informations = ({algorithm, onCloseCallback}) => {
                                     <div id="loading-spinner" className="flex h-full w-full justify-center items-center">
                                         <img src={spinner} alt="Loading..." className="animate-spin size-10" />
                                     </div>
-                                    :
+                                :
                                     <div id="results" className="flex flex-row flex-wrap gap-x-8 gap-y-4 h-full w-full p-5 max-w-full font-mono justify-center overflow-y-auto">
                                         {comments.map((comment) => {
                                             return (
-                                                <Comment key={comment.id} comment={comment} />
+                                                <Comment key={comment.id} comment={comment} onDelete={onTryDeleteComment} />
                                             )
                                         })}
                                     </div>
@@ -305,6 +320,36 @@ const Informations = ({algorithm, onCloseCallback}) => {
                     <VisualSelector onSelect={handleLaunchAlgorithm} />
             </Dialog>
 
+            {/* Diakog for confirm if user want to delete a comment */}
+            <Dialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                slotProps={{
+                    paper: {
+                        className: "!bg-midnight !text-white",
+                    }
+                }}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    <DialogContentText className="!text-white">
+                        Are you sure you want to delete this comment?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="text" onClick={() => setOpenDialog(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button variant="contained" onClick={() => {
+                        setOpenDialog(false);
+                        onDeleteComment(commentIdToDelete);
+                    }} color="warning">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };

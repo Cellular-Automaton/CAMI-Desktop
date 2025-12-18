@@ -228,7 +228,9 @@ export const APIProvider = ({ children }) => {
 
 
         try {
-            const response = await axios.get(url, {headers: {Authorization: undefined}});
+            const response = await axios.get(url, {
+                auth: {}
+            });
             const assets = response.data.assets;
             const asset = assets.find(a => a.name.toLowerCase().includes(osMap[os]));
             if (!asset)
