@@ -1,29 +1,12 @@
-import React, { useState, useEffect, useContext } from "react";
-import view from "../../../assets/images/view.svg";
-import comment from "../../../assets/images/comment.svg";
-import like from "../../../assets/images/like.svg";
-import download from "../../../assets/images/download.svg";
-import Tag from "../Tags/Chip.jsx";
+import React, { useState, useEffect } from "react";
 import star from "../../../assets/images/star.svg";
-import { APIContext } from "../../contexts/APIContext.jsx";
 import { Chip, Tooltip } from "@mui/material";
+import { useNavigateBack } from "../../contexts/NavigateBackContext.jsx";
 
 
 const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
     const [image, setImage] = useState(null);
-    const onMouseEnter = (e) => {
-        const target = e.currentTarget;
-        const imageContainer = target.querySelector("#image-container");
-
-        imageContainer.classList.remove("blur-sm");
-    };
-    
-    const onMouseLeave = (e) => {
-        const target = e.currentTarget;
-        const imageContainer = target.querySelector("#image-container");
-
-        imageContainer.classList.add("blur-sm");
-    };
+    const { setIsReturnButtonVisible } = useNavigateBack();
 
     useEffect(() => {
         if (algorithm.image[0] !== undefined && algorithm.image[0].contents_binary) {
@@ -34,16 +17,17 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
             setImage("https://asset.gecdesigns.com/img/background-templates/gradient-triangle-abstract-background-template-10032405-1710079376651-cover.webp");
         }
     }, [algorithm.image]);
+
     return (
         <button
             id={"container"} 
-            className="flex flex-col relative bg-midnight-opacity rounded-md shadow-lg 
-                shadow-midnight-purple-shadow min-w-80 max-w-80 max-h-72 transition 
-                ease-in-out duration-750 hover:shadow-xl hover:shadow-midnight-purple-shadow
-                cursor-pointer overflow-hidden"
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-            onClick={() => {onClickCallback(algorithm)}}>
+            className="flex p-2 flex-col-reverse relative bg-backgroundAlt rounded-md shadow-lg w-full h-64
+                transition ease-in-out duration-750 hover:ring-primary hover:ring-4 min-w-56
+                cursor-pointer hover:scale-110 hover:z-20 focus:z-20 focus:scale-110"
+            onClick={() => {
+                setIsReturnButtonVisible(true);
+                onClickCallback(algorithm);
+            }}>
 
             {
                 favorite && (
@@ -53,46 +37,36 @@ const AlgorithmCard = ({algorithm, onClickCallback, favorite}) => {
                 )
             }
 
-            <div id={"image-container"} className="flex flex-col blur-sm justify-center items-center w-full h-3/5 gap-3 transition ease-in-out duration-150 overflow-hidden">
-                <img src={image} alt="Algorithm" className="h-full w-full object-cover overflow-hidden"/>
+            <div id={"image-container"} className="absolute inset-0 p-2 flex flex-col justify-center rounded-md items-center gap-3 transition ease-in-out duration-150 overflow-hidden">
+                <img src={image} alt="Algorithm" className="h-full w-full rounded-md object-cover overflow-hidden"/>
             </div>
 
-            <div id="text-container" className="flex flex-col justify-center items-center w-full h-2/5 gap-2 p-4">
-                <div id="title" className="flex flex-row justify-start w-full h-2/4 text-l font-bold text-midnight-text">
+            <div id="text-container" 
+                className="flex relative flex-col z-10 justify-center items-center  rounded-b-md rounded-t-none w-full h-20 gap-2 p-4 backdrop-blur-md">
+
+                <div className="absolute inset-0 -z-10 bg-gradient-to-t from-backgroundAlt to-transparent backdrop-blur-md"></div>
+
+                <div id="title" className="flex flex-row justify-start w-full h-2/4 text-l font-bold text-text">
                     {algorithm.name}
                 </div>
 
-                <div id={"tags-container"} className="flex flex-row justify-start items-center w-full h-1/4 gap-1 pb-2">
+                <div id={"tags-container"} className="flex flex-row justify-start items-center w-full h-2/4 gap-1 pb-2">
                     {  
                         algorithm.tags.map((tag) => (
                             <Tooltip key={tag.tag_id} title={tag.tag_description} placement="bottom" arrow>
                                 <Chip 
                                     label={tag.tag_name} size="small" variant="filled"
-                                    sx={{backgroundColor: "#7F6EEE", color: "white", fontFamily: "'JetBrains Mono', monospace", fontWeight: "bold"}}
+                                    sx={{
+                                        backgroundColor: "var(--color-primary)",
+                                        color: "var(--color-text-primary)",
+                                        fontFamily: "'JetBrains Mono', monospace", 
+                                        fontWeight: "bold"
+                                    }}
                                 />
                             </Tooltip>
                         ))
                     }
                 </div>
-
-                {/* <div id="statistics" className="flex flex-row justify-evenly w-full h-1/4 text-sm font-bold text-midnight-text">
-                    <div id="view" className="flex flex-row justify-center items-center gap-1">
-                        <p>1.5k{algorithm.view}</p>
-                        <img src={view} alt="View" className="h-5 w-5"/>
-                    </div>
-                    <div id="download" className="flex flex-row justify-center items-center gap-1">
-                        <p>1.5k{algorithm.download}</p>
-                        <img src={download} alt="Download" className="h-5 w-5"/>
-                    </div>
-                    <div id="like" className="flex flex-row justify-center items-center gap-1">
-                        <p>1.5k{algorithm.likes}</p>
-                        <img src={like} alt="Like" className="h-5 w-5"/>
-                    </div>
-                    <div id="comment" className="flex flex-row justify-center items-center gap-1">
-                        <p>1.5k{algorithm.comment}</p>
-                        <img src={comment} alt="Comment" className="h-5 w-5"/>
-                    </div>
-                </div> */}
             </div>
         </button>
     )

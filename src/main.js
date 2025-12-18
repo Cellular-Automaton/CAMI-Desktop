@@ -15,20 +15,21 @@ const createWindow = () => {
     height: 600,
     minHeight: 600,
     minWidth: 800,
+    frame: false,
+    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: false,
       contextIsolation: true
     },
     autoHideMenuBar: true,
-    //frame: false // Pour être frameless
   });
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -149,5 +150,21 @@ ipcMain.handle('delete-data', (event, data_name) => {
       return;
   } catch (error) {
       throw new Error("Error deleting data: " + error.message);
+  }
+});
+
+ipcMain.handle('app-close', () => {
+  app.quit();
+});
+
+ipcMain.handle('app-minimize', () => {
+  mainWindow.minimize();
+});
+
+ipcMain.handle('app-maximize', () => {
+  if (mainWindow.isMaximized()) {
+    mainWindow.unmaximize();
+  } else {
+    mainWindow.maximize();
   }
 });

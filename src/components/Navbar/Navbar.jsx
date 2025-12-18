@@ -13,82 +13,94 @@ import logo from "../../../assets/images/logo.png";
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext.jsx";
+import { useNavigateBack } from "../../contexts/NavigateBackContext.jsx";
 
 export default function Navbar() {
     const navigate = useNavigate();
     const { userData, loggedIn, logout } = useContext(UserContext);
+    const { setIsReturnButtonVisible, setReturnCallback } = useNavigateBack();
 
-  return (
-    <div
-      className="
-                    fixed top-0 flex h-full flex-col justify-center
-                    items-center transition-all duration-300 font-mono z-50
-                    hover:w-96 w-16 backdrop-blur-md
-                    bg-gradient-to-r from-midnight to-transparent
-                    rounded-r-xl shadow-2xl shadow-black
-                "
-        >
+    const navigateTo = (path) => {
+        setIsReturnButtonVisible(false);
+        setReturnCallback(null);
+        navigate(path);
+    }
+
+    return (
+        <div
+        className="
+            fixed top-0 flex h-full flex-col justify-center
+            items-center transition-all duration-300 font-mono z-50
+            hover:w-96 focus-within:w-96 w-16 backdrop-blur-md
+            bg-gradient-to-r from-background to-transparent
+            rounded-r-xl shadow-2xl shadow-backgroundAlt
+        ">
             <div className="flex flex-col h-full justify-center items-center w-full transition-all duration-300 gap-3 pl-1.5">
 
                 {
                     loggedIn ? (
                         <button className="
-                            flex items-center justify-start w-full p-2 pb-5 pt-5 
-                            transition-all hover:bg-midnight-purple-dark/80
-                            duration-300 overflow-hidden gap-10 h-12
-                            hover:shadow-lg hover:black rounded-l-md"
-                            onClick={() => {logout(), navigate(0)}}
+                                flex items-center justify-start w-full p-2 pb-5 pt-5 text-text
+                                transition-all hover:bg-secondary focus-visible:bg-secondary
+                                duration-300 overflow-hidden gap-10 h-12
+                                hover:shadow-lg hover:text-textPrimary focus-visible:shadow-lg focus-visible:text-textPrimary rounded-l-md
+                            "
+                            onClick={() => {logout(), navigateTo(0)}}
                         >
-                            <AccountBoxRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                            <span className="text-white">Logout</span>
+                            <AccountBoxRoundedIcon sx={{ color: "inherit", fontSize: 32 }} />
+                            <span className="text-inherit font-bold">Logout</span>
                         </button>
                     ) : (
                         <button className="
-                            flex items-center justify-start w-full p-2 pb-5 pt-5 
-                            transition-all hover:bg-midnight-purple-dark/80
-                            duration-300 overflow-hidden gap-10 h-12
-                            hover:shadow-lg hover:black rounded-l-md"
-                            onClick={() => {navigate("/Connection")}}>
-                            <LoginRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                            <span className="text-white">Login</span>
+                                flex items-center justify-start w-full p-2 pb-5 pt-5 text-text
+                                transition-all hover:bg-secondary focus-visible:bg-secondary
+                                duration-300 overflow-hidden gap-10 h-12
+                                hover:shadow-lg hover:text-textPrimary focus-visible:shadow-lg focus-visible:text-textPrimary rounded-l-md
+                            "
+                            onClick={() => {navigateTo("/Connection")}}>
+                            <LoginRoundedIcon sx={{ color: "inherit", fontSize: 32 }} />
+                            <span className="text-inherit font-bold">Login</span>
                         </button>
                     )
                 }
                 
                 <button className="
-                    flex items-center justify-start w-full p-2 pb-5 pt-5 
-                    transition-all hover:bg-midnight-purple-dark/80
-                    duration-300 overflow-hidden gap-10 h-12
-                    hover:shadow-lg hover:black rounded-l-md"
-                    onClick={() => {navigate("/Home")}}
+                        flex items-center justify-start w-full p-2 pb-5 pt-5 text-text
+                        transition-all hover:bg-secondary focus-visible:bg-secondary
+                        duration-300 overflow-hidden gap-10 h-12
+                        hover:shadow-lg hover:text-textPrimary focus-visible:shadow-lg focus-visible:text-textPrimary rounded-l-md
+                    "
+                    onClick={() => {navigateTo("/Home")}}
                 >
-                    <HomeRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                    <span className="text-white">Home</span>
+                    <HomeRoundedIcon sx={{ color: "inherit", fontSize: 32 }} />
+                    <span className="text-inherit font-bold">Home</span>
                 </button>
 
                 
                 <button className="
-                    flex items-center justify-start w-full p-2 pb-5 pt-5 
-                    transition-all hover:bg-midnight-purple-dark/80
-                    duration-300 overflow-hidden gap-10 h-12
-                    hover:shadow-lg hover:black rounded-l-md"
-                    onClick={() => {navigate("/Community")}}
+                        flex items-center justify-start w-full p-2 pb-5 pt-5 text-text
+                        transition-all hover:bg-secondary focus-visible:bg-secondary
+                        duration-300 overflow-hidden gap-10 h-12
+                        hover:shadow-lg hover:text-textPrimary focus-visible:shadow-lg focus-visible:text-textPrimary rounded-l-md
+                    "
+                    onClick={() => {navigateTo("/Community")}}
                 >
-                    <ForumRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                    <span className="text-white">Community</span>
+                    <ForumRoundedIcon sx={{ color: "inherit", fontSize: 32 }} />
+                    <span className="text-inherit font-bold">Community</span>
                 </button>
 
                 {
                     loggedIn ?
                         <button className="
-                            flex items-center justify-start w-full p-2 pb-5 pt-5 
-                            transition-all hover:bg-midnight-purple-dark/80
+                            flex items-center justify-start w-full p-2 pb-5 pt-5 text-text
+                            transition-all hover:bg-secondary focus-visible:bg-secondary
                             duration-300 overflow-hidden gap-10 h-12
-                            hover:shadow-lg hover:black rounded-l-md"
-                            onClick={() => {navigate("/Submission")}}
+                            hover:shadow-lg hover:text-textPrimary focus-visible:shadow-lg focus-visible:text-textPrimary rounded-l-md
+                        "
+                            onClick={() => {navigateTo("/Submission")}}
                         >
-                            <AddBoxRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                            <span className="text-white">Submission</span>
+                            <AddBoxRoundedIcon sx={{ color: "inherit", fontSize: 32 }} />
+                            <span className="text-inherit font-bold">Submission</span>
                         </button>
                     :
                         null
@@ -97,29 +109,31 @@ export default function Navbar() {
                 {
                     loggedIn && userData.role === "admin" ?
                         <button className="
-                            flex items-center justify-start w-full p-2 pb-5 pt-5 
-                            transition-all hover:bg-midnight-purple-dark/80
+                            flex items-center justify-start w-full p-2 pb-5 pt-5 text-text
+                            transition-all hover:bg-secondary focus-visible:bg-secondary
                             duration-300 overflow-hidden gap-10 h-12
-                            hover:shadow-lg hover:black rounded-l-md"
-                            onClick={() => {navigate("/Admin")}}
+                            hover:shadow-lg hover:text-textPrimary focus-visible:shadow-lg focus-visible:text-textPrimary rounded-l-md
+                        "
+                            onClick={() => {navigateTo("/Admin")}}
                         >
-                            <RemoveRedEyeRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                            <span className="text-white">Admin</span>
+                            <RemoveRedEyeRoundedIcon sx={{ color: "inherit", fontSize: 32 }} />
+                            <span className="text-inherit font-bold">Admin</span>
                         </button>
                     :
                         null
                 }
 
-                {/* <button className="
-                    flex items-center justify-start w-full p-2 pb-5 pt-5 
-                    transition-all hover:bg-midnight-purple-dark/80
-                    duration-300 overflow-hidden gap-10 h-12
-                    hover:shadow-lg hover:black rounded-l-md"
-                    onClick={() => {navigate("/Settings")}}
+                <button className="
+                        flex items-center justify-start w-full p-2 pb-5 pt-5 text-text
+                        transition-all hover:bg-secondary focus-visible:bg-secondary
+                        duration-300 overflow-hidden gap-10 h-12
+                        hover:shadow-lg hover:text-textPrimary focus-visible:shadow-lg focus-visible:text-textPrimary rounded-l-md
+                    "
+                    onClick={() => {navigateTo("/Settings")}}
                 >
-                    <SettingsRoundedIcon sx={{ color: "#FFFFFF", fontSize: 32 }} />
-                    <span className="text-white">Settings</span>
-                </button> */}
+                    <SettingsRoundedIcon sx={{ color: "inherit", fontSize: 32 }} />
+                    <span className="text-inherit font-bold">Settings</span>
+                </button>
             </div>
             
             <div className="
@@ -128,7 +142,7 @@ export default function Navbar() {
                     hover:shadow-lg hover:black rounded-l-md
             ">
                 <img src={logo} alt="CAMI logo" className="w-12 h-auto shrink-0" />
-                <span className="text-white/50 min-w-52 text-sm mb-3 text-center h-full">CAMI v1.0.0</span>
+                <span className="text-textAlt min-w-52 text-sm mb-3 text-center h-full">CAMI v1.0.0</span>
             </div>
         </div>
     );

@@ -45,7 +45,7 @@ const SimulationInformation = () => {
                 </div>
                 <div id='algorithm-start-download' className='flex flex-col w-full h-1/6 justify-center items-center'>
                     <button className='flex flex-col justify-center items-center w-4/5 h-2/5 py-4 gap-4
-                        bg-midnight-purple text-midnight-text rounded-3xl mx-auto'>
+                        bg-primary text-midnight-text rounded-3xl mx-auto'>
                         <p className='text-lg font-bold'>Download / Start</p>
                     </button>
                 </div>

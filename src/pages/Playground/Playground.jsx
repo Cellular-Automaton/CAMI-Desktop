@@ -156,13 +156,13 @@ export default function Playground() {
                     <div className="flex flex-col gap-2 justify-center items-center">
                         <div id="import-export" className="flex flex-row justify-center w-full gap-2 items-center">
                             <button className="
-                                flex flex-col justify-center items-center w-1/2 h-10 bg-midnight-purple text-white rounded-lg
+                                flex flex-col justify-center items-center w-1/2 h-10 bg-primary text-white rounded-lg
                                 hover:opacity-75 transition ease-in-out duration-300"
                                 onClick={() => {importSimulation(algorithmFromState.automaton_id);}}>
                                 Import
                             </button>
                             <button className="
-                                flex flex-col justify-center items-center w-1/2 h-10 bg-midnight-purple text-white rounded-lg
+                                flex flex-col justify-center items-center w-1/2 h-10 bg-primary text-white rounded-lg
                                 hover:opacity-75 transition ease-in-out duration-300"
                                 onClick={exportSimulation} >
                                 Export

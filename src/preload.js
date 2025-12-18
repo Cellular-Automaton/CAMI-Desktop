@@ -37,5 +37,10 @@ contextBridge.exposeInMainWorld('electron', {
   deleteData: (data_name) => ipcRenderer.invoke('delete-data', data_name),
 
   // User session event
-  onUserSession: (func) => { ipcRenderer.on('user-session', (event, ...args) => func(...args)); }
+  onUserSession: (func) => { ipcRenderer.on('user-session', (event, ...args) => func(...args)); },
+
+  // Window controls
+  onCloseApp: (func) => ipcRenderer.invoke('app-close'),
+  onMaximizeApp: (func) => ipcRenderer.invoke('app-maximize'),
+  onMinimizeApp: (func) => ipcRenderer.invoke('app-minimize'),
 });
