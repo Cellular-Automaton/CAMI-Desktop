@@ -163,24 +163,24 @@ export default function TryVisual() {
                 maxWidth="lg"
                 slotProps={{ 
                     paper: { 
-                        className: "!rounded-lg !text-white !bg-midnight"
+                        className: "!rounded-lg !text-text !bg-background"
                     }
                 }}
             >
                 <DialogTitle>Select an Algorithm</DialogTitle>
                 <DialogContent className="flex flex-col">
-                    <div className="flex flex-col flex-1 w-full my-4 sticky top-0 z-20 bg-midnight">
+                    <div className="flex flex-col flex-1 w-full my-4 sticky top-0 z-20 bg-background">
                         <input
                             type="text"
                             placeholder="Search algorithms..."
-                            className="p-2 w-full border border-gray-300 rounded bg-midnight text-white"
+                            className="p-2 w-full border border-gray-300 rounded bg-backgroundAlt text-text"
                             value={search}
                             onChange={(e) => {
                                 setSearch(e.target.value);
                             }}
                         >
                         </input>
-                        <div className="w-full h-4 bg-midnight"></div>
+                        <div className="w-full h-4 bg-background"></div>
                     </div>
 
                     <div className="flex flex-row mt-2 flex-wrap gap-4 justify-center items-center">
@@ -190,6 +190,7 @@ export default function TryVisual() {
                                     return (
                                         <button className={`
                                             relative size-52 bg-white rounded-lg overflow-hidden
+                                            hover:scale-105 focus-visible:scale-105 transition-all duration-200
                                             ${algorithm.selected ? "ring-4 ring-midnight-purple" : ""}
                                             `} key={algorithm.automaton_id}
                                             onClick={() => {
