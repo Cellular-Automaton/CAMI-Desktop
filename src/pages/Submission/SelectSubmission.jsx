@@ -12,7 +12,7 @@ export default function SelectSubmission() {
 
     return (
         <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-background font-mono text-text relative">
-            <div className="absolute top-0 left-0 w-full h-full bg-midnight-opacity">
+            <div className="absolute top-0 left-0 w-full h-full bg-backgroundAlt">
                 <img src={gol} alt="Background" className="object-cover w-full h-full blur-sm opacity-30" />
             </div>
 

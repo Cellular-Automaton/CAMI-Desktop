@@ -21,9 +21,6 @@ export default function VisualSubmission() {
     useEffect(() => {
         const getAllAlgorithms = async () => {
             let algorithms = await getAlgorithms();
-            // algorithms = algorithms.concat(algorithms).concat(algorithms);
-            // algorithms = algorithms.concat(algorithms).concat(algorithms);
-            // algorithms = algorithms.concat(algorithms).concat(algorithms);
             algorithms = algorithms.map((prev) => {
                 return {...prev, selected: false}
             })
@@ -79,137 +76,140 @@ export default function VisualSubmission() {
     }
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-midnight font-mono text-white relative">
-            <div className="absolute top-0 left-0 w-full h-full bg-midnight-opacity">
+        <div className="w-full h-full flex flex-col items-center px-6 bg-background font-mono text-white relative">
+            <div className="absolute top-0 left-0 w-full h-full bg-backgroundAlt">
                 <img src={gol} alt="Background" className="object-cover w-full h-full blur-sm opacity-30" />
             </div>
 
-            <div className="z-10 w-3/5 bg-midnight shadow-lg shadow-midnight-purple-shadow rounded-lg p-8 flex flex-col gap-6 items-center">
-                <div className="flex items-center justify-center h-1/5 w-full my-5">
-                    <h1 className="text-white text-4xl">Add a new visualization</h1>
-                </div>
+            <div className="z-10 h-full w-3/5 justify-center bg-background px-8 flex flex-col gap-6 items-center">
+
                 <form
                     onSubmit={handleSubmit}
-                    className="w-full flex flex-col gap-4"
+                    className="w-full h-full flex flex-col gap-4 justify-center"
                 >
-                    <div>
-                        <label>
-                            Name:
-                            <input
-                                name="name"
-                                type="text"
-                                value={form.name}
-                                onChange={handleChange}
-                                required
-                                className="w-full p-2 border border-gray-300 rounded bg-midnight text-white"
-                            />
-                        </label>
-                    </div>
-
-                    <div>
-                        <label>
-                            Description:
-                            <textarea
-                                name="description"
-                                value={form.description}
-                                onChange={handleChange}
-                                required
-                                className="w-full p-2 border border-gray-300 rounded bg-midnight text-white"
-                            />
-                        </label>
-                    </div>
-
-                    <div >
-                        <label className="w-full">
-                            Related algorithms:
-                        </label>
-                        <div className="flex flex-row justify-between items-center gap-4 min-h-10">
-                            <div className="
-                                w-full h-full min-h-10 flex flex-row flex-wrap gap-2 border items-center 
-                                border-gray-300 rounded bg-midnight text-white
-                                px-3
-                            ">
-                                {
-                                    selectedAlgorithm.map((algorithm) => (
-                                        <Chip
-                                            size="small"
-                                            key={algorithm.automaton_id}
-                                            label={algorithm.name}
-                                            className="m-1 !bg-midnight-purple !text-white"
-                                            onDelete={() => {
-                                                setSelectedAlgorithm((prev) => prev.filter((a) => a.automaton_id !== algorithm.automaton_id));
-                                            }}
-                                        />
-                                    ))
-                                }
-                            </div>
-                            <button type="button" className="w-1/4 h-full min-h-10 bg-midnight-purple rounded hover:bg-midnight-purple-dark"
-                                onClick={(e) => setIsAlgorithmDialogOpen(true)}
-                            >
-                                Add
-                            </button>
+                    <h1 className="text-text text-4xl mb-10">Add a new visualization</h1>
+                    <div className="flex flex-col gap-4">
+                        <div>
+                            <label>
+                                Name:
+                                <input
+                                    name="name"
+                                    type="text"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full p-2 border border-gray-300 rounded bg-backgroundAlt text-text"
+                                />
+                            </label>
                         </div>
-                    </div>
 
-                    <div>
-                        <label>
-                            <span className="w-full text-left">Github link to release:</span>
-                            <span className="text-xs opacity-70 w-full text-left">(e.g., 
-                                <a 
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        openExternalLink("https://docs.github.com/fr/rest/releases/releases?apiVersion=2022-11-28#get-the-latest-release");
-                                    }}
-                                    className="text-midnight-purple" href="https://docs.github.com/fr/rest/releases/releases?apiVersion=2022-11-28#get-the-latest-release">
-                                    https://api.github.com/repos/[owner]/[repo]/releases/latest
-                                </a>)
-                            </span>
-                            <input
-                                name="link"
-                                type="url"
-                                value={form.link}
-                                onChange={handleChange}
-                                required
-                                className="w-full p-2 border border-gray-300 rounded bg-midnight text-white"
-                            />
-                        </label>
-                    </div>
+                        <div>
+                            <label>
+                                Description:
+                                <textarea
+                                    name="description"
+                                    value={form.description}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full p-2 border border-gray-300 rounded bg-backgroundAlt text-text"
+                                />
+                            </label>
+                        </div>
 
-                    <div>
-                        <label className="justify-center flex flex-col items-center">
-                            <span className="w-full text-left">Image:</span>
-                        </label>
-
-                        {
-                            !form.image ?   
-                            <button
-                                type="button"
-                                className="bg-midnight-purple text-white w-full py-2 px-4 rounded hover:bg-midnight-purple-dark"
-                                onClick={handleImportImage}
-                            >
-                                Import image
-                            </button>
-                            :
-                            <div className="flex flex-row justify-between items-center my-2 p-2 w-full h-24 bg-midnight-opacity rounded">
-                                <div className="h-full flex flex-row items-center justify-center gap-5">
-                                    <img src={URL.createObjectURL(new Blob([form.image]))} alt="Imported" className="h-full max-h-48 object-fill" />
-                                    <p className="text-sm text-center max-w-xs overflow-hidden text-ellipsis">
-                                        {imagePath.split("\\").pop()}
-                                    </p>
+                        <div >
+                            <label className="w-full">
+                                Related algorithms:
+                            </label>
+                            <div className="flex flex-row justify-between items-center gap-4 min-h-10">
+                                <div className="
+                                    w-full h-full min-h-10 flex flex-row flex-wrap gap-2 border items-center 
+                                    border-gray-300 rounded bg-backgroundAlt text-text
+                                    px-3
+                                ">
+                                    {
+                                        selectedAlgorithm.map((algorithm) => (
+                                            <Chip
+                                                size="small"
+                                                key={algorithm.automaton_id}
+                                                label={algorithm.name}
+                                                className="m-1 !bg-primary !text-textPrimary"
+                                                onDelete={() => {
+                                                    setSelectedAlgorithm((prev) => prev.filter((a) => a.automaton_id !== algorithm.automaton_id));
+                                                }}
+                                            />
+                                        ))
+                                    }
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={() => setForm((prev) => ({ ...prev, image: null }))}
-                                    className="hover:bg-red-500 rounded w-1/12 h-full"
+                                <button type="button" className="w-1/4 h-full min-h-10 bg-primary rounded hover:bg-secondary text-textPrimary"
+                                    onClick={(e) => setIsAlgorithmDialogOpen(true)}
                                 >
-                                    X
+                                    Add
                                 </button>
                             </div>
-                        }
+                        </div>
+
+                        <div>
+                            <label>
+                                <span className="w-full text-left">Github link to release:</span>
+                                <span className="text-xs opacity-70 w-full text-left">(e.g., 
+                                    <a 
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            openExternalLink("https://docs.github.com/fr/rest/releases/releases?apiVersion=2022-11-28#get-the-latest-release");
+                                        }}
+                                        className="text-primary" href="https://docs.github.com/fr/rest/releases/releases?apiVersion=2022-11-28#get-the-latest-release">
+                                        https://api.github.com/repos/[owner]/[repo]/releases/latest
+                                    </a>)
+                                </span>
+                                <input
+                                    name="link"
+                                    type="url"
+                                    value={form.link}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full p-2 border border-gray-300 rounded bg-backgroundAlt text-text"
+                                />
+                            </label>
+                        </div>
+
+                        <div>
+                            <label className="justify-center flex flex-col items-center">
+                                <span className="w-full text-left">Image:</span>
+                            </label>
+
+                            {
+                                !form.image ?
+                                <div className="flex flex-col justify-center items-center py-2 my-2 h-24">
+                                    <button
+                                        type="button"
+                                        className="bg-primary text-textPrimary w-full py-2 px-4 rounded hover:bg-secondary"
+                                        onClick={handleImportImage}
+                                    >
+                                        Import image
+                                    </button>
+                                </div> 
+                                :
+                                <div className="flex flex-row justify-between items-center my-2 p-2 w-full h-24 bg-backgroundAlt rounded">
+                                    <div className="h-full flex flex-row items-center justify-center gap-5">
+                                        <img src={URL.createObjectURL(new Blob([form.image]))} alt="Imported" className="h-full max-h-48 object-fill" />
+                                        <p className="text-sm text-center max-w-xs overflow-hidden text-ellipsis">
+                                            {imagePath.split("\\").pop()}
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setForm((prev) => ({ ...prev, image: null }))}
+                                        className="hover:bg-red-500 rounded w-1/12 h-full"
+                                    >
+                                        X
+                                    </button>
+                                </div>
+                            }
+                        </div>
                     </div>
                     
                     <div className="flex w-full items-center justify-between mt-4 gap-5">
-                        <button type="submit" className="bg-midnight-purple text-white py-2 px-4 rounded hover:bg-midnight-purple-dark w-full">Submit</button>
+                        <button type="submit" className="bg-primary text-textPrimary py-2 px-4 rounded hover:bg-secondary w-full">Submit</button>
                         <button type="button" className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 w-full">Reset</button>
                     </div>
                 </form>
@@ -221,24 +221,24 @@ export default function VisualSubmission() {
                     maxWidth="lg"
                     slotProps={{ 
                         paper: { 
-                            className: "!rounded-lg !text-white !bg-midnight"
+                            className: "!rounded-lg !text-text !bg-backgroundAlt"
                         }
                     }}
                 >
                     <DialogTitle>Select an Algorithm</DialogTitle>
                     <DialogContent className="flex flex-col">
-                        <div className="flex flex-col flex-1 w-full my-4 sticky top-0 z-20 bg-midnight">
+                        <div className="flex flex-col flex-1 w-full my-4 sticky top-0 z-20 bg-backgroundAlt">
                             <input
                                 type="text"
                                 placeholder="Search algorithms..."
-                                className="p-2 w-full border border-gray-300 rounded bg-midnight text-white"
+                                className="p-2 w-full border border-gray-300 rounded bg-backgroundAlt text-text"
                                 value={search}
                                 onChange={(e) => {
                                     setSearch(e.target.value);
                                 }}
                             >
                             </input>
-                            <div className="w-full h-4 bg-midnight"></div>
+                            <div className="w-full h-4 bg-backgroundAlt"></div>
                         </div>
 
                         <div className="flex flex-row mt-2 flex-wrap gap-4 justify-center items-center">
@@ -247,7 +247,8 @@ export default function VisualSubmission() {
                                     {
                                         return (
                                             <button className={`
-                                                relative size-52 bg-white rounded-lg overflow-hidden
+                                                relative size-52 bg-background rounded-lg overflow-hidden
+                                                hover:scale-105 focus-visible:scale-105 transition-all duration-200
                                                 ${algorithm.selected ? "ring-4 ring-midnight-purple" : ""}
                                                 `} key={algorithm.automaton_id}
                                                 onClick={() => {
