@@ -2,18 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useContext } from "react";
 import { APIContext } from "../../contexts/APIContext.jsx";
 import { useNavigate } from "react-router-dom";
+import { IconButton, Menu, TextField, MenuItem, Chip } from "@mui/material";
 
-import filter from "../../../assets/images/filter.svg";
+import SearchIcon from '@mui/icons-material/Search';
+import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import spinner from "../../../assets/images/spinner.svg";
 
 import AlgorithmCard from "../../components/AlgorithmCard/AlgorithmCard.jsx";
 import Informations from "../../components/Informations/Informations.jsx";
-import { set } from "date-fns";
 
 export default function Community() {
     const [filters, setFilters] = useState([]);
     const [tags, setTags] = useState([]);
-    const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false);
     const [isInformationPanelOpen, setIsInformationPanelOpen] = useState(false);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState({});
     const [algorithms, setAlgorithms] = useState([]);
@@ -21,16 +21,21 @@ export default function Community() {
     const [isFetchComplete, setIsFetchComplete] = useState(false);
     const { getAlgorithms, getTags } = useContext(APIContext);
     const [search, setSearch] = useState("");
+    const [anchorEl, setAnchorEl] = useState(null);
+
     const navigate = useNavigate();
+    const filteredAlgorithms = [...algorithms].filter((algorithm) => {
+        // Check if the algorithm matches the search query and filters
+        const nameMatch = algorithm.name.toLowerCase().includes(search.toLowerCase());
+        const filterMatch = filters.length === 0 || algorithm.tags.some((tag) => filters.includes(tag.tag_id));
+        return nameMatch && filterMatch;
+    });
 
     useEffect(() => {
-        window.addEventListener("resize", configureFilterPopup);
-
         // Fetch algorithms from the API
         getAlgorithms().then((algos) => {
             setAlgorithms(algos);
             setNotFilteredAlgorithms(algos);
-            configureFilterPopup();
         }).catch((error) => {
             navigate("/Home");
         });
@@ -40,10 +45,6 @@ export default function Community() {
         }).catch((error) => {
             console.error("Error fetching tags:", error);
         });
-
-        return () => {
-            window.removeEventListener("resize", configureFilterPopup);
-        };
     }, []);
 
     useEffect(() => {
@@ -86,48 +87,21 @@ export default function Community() {
         setAlgorithms(filteredAlgorithms);
     }, [filters]);
 
-    const configureFilterPopup = () => {
-        // Put just bellow the filter button
-        const filterPopup = document.getElementById("filter-popup");
-        const filterButton = document.getElementById("Filter");
-        const filterButtonRect = filterButton.getBoundingClientRect();
-        const filterPopupRect = filterPopup.getBoundingClientRect();
 
-        const filterPopupX = (filterButtonRect.left - (filterButtonRect.right - filterButtonRect.left)) - (filterPopupRect.width / 2); // Centered on the button
-        const filterPopupY = filterButtonRect.y + filterButtonRect.height + 10; // 10px below the button
-
-        filterPopup.style.left = `${filterPopupX}px`;
-        filterPopup.style.top = `${filterPopupY}px`;
-    };
-
-    const disableFilterPopup = () => {
-        const filterPopup = document.getElementById("filter-popup");
-
-        filterPopup.style.display = "none";
-        setIsFilterPopupOpen(false);
-    };
-
-    const enableFilterPopup = () => {
-        const filterPopup = document.getElementById("filter-popup");
-
-        filterPopup.style.display = "block";
-        configureFilterPopup();
-        setIsFilterPopupOpen(true);
-    };
 
     const handleFilterChip = (event, tag) => {
         // Get the filter
         const tagHTML = event.target;
 
-        if (tagHTML.classList.contains("text-midnight-purple")) {
-            tagHTML.classList.add("bg-midnight-purple");
-            tagHTML.classList.remove("text-midnight-purple");
-            tagHTML.classList.add("text-white");
+        if (tagHTML.classList.contains("text-primary")) {
+            tagHTML.classList.add("bg-primary");
+            tagHTML.classList.remove("text-primary");
+            tagHTML.classList.add("text-text-primary");
             setFilters([...filters, tag.id]);
         } else {
-            tagHTML.classList.remove("text-white");
-            tagHTML.classList.add("text-midnight-purple");
-            tagHTML.classList.remove("bg-midnight-purple");
+            tagHTML.classList.remove("text-text-primary");
+            tagHTML.classList.add("text-primary");
+            tagHTML.classList.remove("bg-primary");
             setFilters(filters.filter((filter) => filter !== tag.id));
         }
     };
@@ -170,60 +144,131 @@ export default function Community() {
     };
 
     return (
-        <div id="community" className="flex flex-col relative gap-2 bg-midnight h-full w-full font-mono">
+        <div id="community" className="flex flex-col relative gap-2 bg-background h-full pt-5 w-full font-mono">
             <div id="search-bar" className="flex flex-row bg-transparent h-20 w-full p-1 justify-center items-center">
                 <div className="flex flex-row w-full h-full p-2 justify-center items-center gap-6">
-                    <div id="search" className="flex flex-row items-center h-full w-fit p-2 gap-2">
-                        <input type="text" className="h-full max-w-96 min-w-80 bg-midnight text-white border-2 border-midnight-purple rounded-full p-2" placeholder="Search for a simulation..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                        
-                        <div className="w-2 min-w-2"></div>
 
-                        <div className="w-5 min-w-5"></div>
-
-                        <button id="Filter" className="flex bg-midnight-opacity rounded-full grow-0 shrink-0 shadow-md shadow-midnight-purple-shadow h-10 w-10 items-center p-1 overflow-visible" onClick={enableFilterPopup}>
-                            <img src={filter} alt="Filter" className="h-10 w-10"/>
-                    
-                            {/* POPUP FOR FILTER */}
-                            <div id="filter-popup" className="absolute bg-midnight shadow-sm shadow-midnight-purple-shadow max-w-1/4 w-fit h-fit rounded-lg p-4 hidden z-10">
-                                {/* Filter options go here which looks like chips */}
-                                <div className="flex flex-row flex-wrap gap-x-2 gap-y-1 text-xs justify-between" onMouseLeave={disableFilterPopup}>
-                                    {
-                                        tags.map((tag => {
-                                            return (
-                                                <button key={tag.id} id={tag.name} obj={tag} className="text-midnight-purple rounded-full border-midnight-purple border-2 py-1 px-4" onClick={(e) => handleFilterChip(e, tag)}>{tag.name}</button>
-                                            )
-                                        }))
+                    <div id="search" className="flex flex-row justify-center items-center h-full w-full p-2 gap-2">
+                        <TextField
+                            variant="standard"
+                            className="h-full w-1/3 min-w-80 bg-background text-text border-2 border-primary rounded-full p-2"
+                            placeholder="Search for a simulation..." value={search} onChange={(e) => setSearch(e.target.value)}
+                            slotProps={{
+                                input: {
+                                    startAdornment: (
+                                        <SearchIcon
+                                            sx={{ mr: 1 }}
+                                            fontSize="large"
+                                            className="text-primary"
+                                        />
+                                    )
+                                }
+                            }}
+                            sx={{
+                                '& .MuiInputBase-input': {
+                                    color: 'var(--color-text)',
+                                    '&::placeholder': {
+                                        color: 'var(--color-text-alt)',
+                                        opacity: 0.7,
                                     }
-                                </div>
+                                },
+                                '& .MuiInput-underline:before': {
+                                    borderBottomColor: 'var(--color-text-alt)',
+                                },
+                                '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+                                    borderBottomColor: 'var(--color-primary)',
+                                },
+                                '& .MuiInput-underline:after': {
+                                    borderBottomColor: 'var(--color-primary)',
+                                },
+                            }}
+                        />
+
+                        <IconButton
+                            id="Filter"
+                            className="text-text"
+                            onClick={(e) => {
+                                setAnchorEl(e.currentTarget);
+                            }}
+                            size="large"
+                        >
+                            <FilterListRoundedIcon
+                                className="text-primary"
+                                fontSize="large"
+                            />
+                        </IconButton>
+
+                        {/* Filter popup with Menu */}
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={anchorEl !== null}
+                            onClose={() => setAnchorEl(null)}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'center',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'center',
+                            }}
+                            slotProps={{
+                                paper: {
+                                    sx: {
+                                        width: 'fit-content',
+                                        maxWidth: '25%',
+                                        padding: '1rem',
+                                        backgroundColor: 'var(--color-background)',
+                                        borderRadius: '0.5rem',
+                                        marginTop: '0.5rem',
+                                    }
+                                }
+                            }}
+                        >
+                            <div className="flex flex-row flex-wrap gap-x-2 gap-y-1 text-xs justify-between">
+                                {
+                                    tags.map((tag) => (
+                                        <button 
+                                            key={tag.id}
+                                            id={tag.name}
+                                            obj={tag}
+                                            className="text-primary rounded-full border-primary border-2 py-1 px-4 font-mono hover:scale-105 transition-all duration-200"
+                                            onClick={(e) => handleFilterChip(e, tag)}
+                                        >
+                                            {tag.name}
+                                        </button>
+                                    ))
+                                }
                             </div>
-                        </button>
+                        </Menu>
                     </div>
 
                 </div>
             </div>
 
-            {
-                !isFetchComplete ? 
-                    <div id="loading-spinner" className="flex h-full w-full justify-center items-center">
-                        <img src={spinner} alt="Loading..." className="animate-spin h-20 w-20" />
-                    </div>
-                    :
-                    <div id="results" className="flex flex-row flex-wrap gap-x-8 gap-y-4 h-full w-full p-5 max-w-full font-mono justify-center overflow-y-auto">
-                        {
-                            algorithms.map((algorithm) => {
-                                
-                                return (
-                                    <AlgorithmCard key={algorithm.automaton_id} algorithm={algorithm} onClickCallback={openInformationPanel} />
-                                )
-                            })
-                        }
-                    </div>
-            }
+            
+            <div className="px-20 h-full w-full overflow-y-auto">
+                {
+                    !isFetchComplete ? 
+                        <div id="loading-spinner" className="flex h-full w-full justify-center items-center">
+                            <img src={spinner} alt="Loading..." className="animate-spin h-20 w-20" />
+                        </div>
+                        :
+                        <div id="results" className="grid grid-cols-3 h-full w-full p-5 gap-x-5 gap-y-5 overflow-y-auto overflow-x-hidden">
+                            {
+                                filteredAlgorithms.map((algorithm) => {
+                                    return (
+                                        <AlgorithmCard key={algorithm.automaton_id} algorithm={algorithm} onClickCallback={openInformationPanel} />
+                                    )
+                                })
+                            }
+                        </div>
+                }
+            </div>
 
 
             {/* INFORMATION PANEL :) */}
             <div id="information-panel"
-                className="hidden flex-col w-full h-full bg-midnight-opacity absolute left-0 -top-full">
+                className="hidden flex-col w-full h-full bg-midnight-opacity absolute left-0 -top-full z-20">
                 <Informations onCloseCallback={closeInformationPanel} algorithm={selectedAlgorithm} />
             </div>
         </div>

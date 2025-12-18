@@ -9,16 +9,24 @@ module.exports = {
       mono: ['JetBrains Mono', 'monospace'],
     },
       colors: {
-        'midnight': '#242423',
-        'midnight-opacity': '#47474650',
+        'midnight': '#0A0A0A',
+        'midnight-opacity': '#191919',
         'midnight-text': '#BDBDBD',
-        'midnight-purple': '#7F6EEE',
-        'midnight-purple-dark': '#6B5BB8',
-        'midnight-purple-shadow': '#9a8df2',
+
         'midnight-red': '#C62828',
         'midnight-blue': '#1E88E5',
         'midnight-green': '#2E7D32',
-      }
+
+        primary: 'var(--color-primary)',
+        secondary: 'var(--color-secondary)',
+        accent: 'var(--color-accent)',
+        textPrimary: 'var(--color-text-primary)',
+
+        background: 'var(--color-background)',
+        backgroundAlt: 'var(--color-background-alt)',
+        text: 'var(--color-text)',
+        textAlt: 'var(--color-text-alt)',
+      },
     },
   },
   plugins: [

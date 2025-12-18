@@ -2,9 +2,7 @@ import React, { useContext } from "react";
 import { useEffect, useState} from "react";
 import HorizontalScroll from "../../components/HorizontalScroll/HorizontalScroll.jsx";
 import Informations from "../../components/Informations/Informations.jsx";
-import {fakeData, favoriteFakeData} from "../../../assets/data/fakeData.jsx";
 import gol from "../../../assets/images/gol.gif";
-import spinner from "../../../assets/images/spinner.svg";
 
 import { UserContext } from "../../contexts/UserContext.jsx";
 import { APIContext } from "../../contexts/APIContext.jsx";
@@ -119,13 +117,14 @@ export default function Home() {
     };
 
     return (
-        <div id="home-container" className="px-10 flex flex-col relative gap-2 bg-midnight min-h-full w-full font-mono">
-            <section id="welcome" className="relative my-5 max-h-72 min-h-72 flex flex-row justify-center items-center bg-midnight-opacity rounded-lg overflow-hidden">
-                <img src={gol} alt="gol" className="absolute blur-sm rounded-lg h-full w-full object-cover opacity-40 z-0"/>
-                <h1 className="absolute text-white text-4xl text-left ml-2 z-0">{sentence}</h1>
+        <div id="home-container" className="px-10 flex flex-col relative gap-2 bg-background min-h-full w-full font-mono">
+            <section id="welcome" className="relative my-5 h-96 flex flex-row justify-center items-center rounded-lg overflow-hidden">
+                <div className="absolute w-full h-full bg-gradient-to-b from-transparent via-transparent to-background z-10"/>
+                <img src={gol} alt="gol" className="absolute blur-sm rounded-lg h-full w-full object-cover opacity-40"/>
+                <h1 className="absolute text-text text-4xl text-left ml-2">{sentence}</h1>
             </section>
             <section id="last_simulations" className="flex flex-col gap-2 my-3">
-                <h2 className="text-midnight-text text-3xl text-left">Last Simulations</h2>
+                <h2 className="text-textAlt text-3xl text-left">Last Simulations</h2>
 
                 {
                     !isRecentAlgorithmsFetched ?
@@ -133,7 +132,7 @@ export default function Home() {
                             <Skeleton variant="rectangular" animation="wave" width="100%" height="100%" />
                         </div>
                         : recentAlgorithms.length === 0 ?
-                            <div className="flex justify-center items-center h-40 w-full text-white">
+                            <div className="flex justify-center items-center h-40 w-full text-text">
                                 No recent simulations available.
                             </div>
                             :
@@ -142,7 +141,7 @@ export default function Home() {
 
             </section>
             <section id="new_algorithms" className="flex flex-col gap-2 my-3">
-                <h2 className="text-midnight-text text-3xl text-left">New Algorithms</h2>
+                <h2 className="text-textAlt text-3xl text-left">New Algorithms</h2>
 
                 {
                     !isNewAlgorithmsFetched ?
@@ -150,7 +149,7 @@ export default function Home() {
                             <Skeleton variant="rectangular" animation="wave" width="100%" height="100%" />
                         </div>
                         : newAlgorithms.length === 0 ?
-                            <div className="flex justify-center items-center h-40 w-full text-white">
+                            <div className="flex justify-center items-center h-40 w-full text-text">
                                 No new simulations available.
                             </div>
                             :
@@ -162,14 +161,14 @@ export default function Home() {
                 loggedIn ?
 
                 <section id="favorites" className="flex flex-col gap-2 my-3">
-                    <h2 className="text-midnight-text text-3xl text-left">Favorites</h2>
+                    <h2 className="text-textAlt text-3xl text-left">Favorites</h2>
                     {
                     !isFavoriteAlgorithmsFetched ?
                         <div id="loading-favorite-algorithms" className="flex justify-center items-center h-10 w-full">
                             <Skeleton variant="rectangular" animation="wave" width="100%" height="100%" />
                         </div>
                         : favoriteAlgorithms.length === 0 ?
-                            <div className="flex justify-center items-center h-40 w-full text-white">
+                            <div className="flex justify-center items-center h-40 w-full text-text">
                                 No favorite simulations available.
                             </div>
                             :
@@ -182,9 +181,11 @@ export default function Home() {
 
             {/* INFORMATION PANEL :) */}
             <div id="information-panel"
-                className="hidden flex-col w-full h-full bg-midnight-opacity absolute left-0 -top-full">
+                className="hidden flex-col w-full h-screen bg-background absolute left-0 -top-full z-30 overflow-hidden">
                 <Informations onCloseCallback={closeInformationPanel} algorithm={selectedAlgorithm} />
             </div>
+
+            <div id="footer" className="w-full min-h-10"></div>
         </div>
     );
 }

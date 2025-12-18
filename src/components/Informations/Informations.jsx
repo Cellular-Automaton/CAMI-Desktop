@@ -1,9 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
-import close from "../../../assets/images/close.svg";
-import like from "../../../assets/images/like.svg";
-import dislike from "../../../assets/images/dislike.svg";
-import view from "../../../assets/images/view.svg";
-import download from "../../../assets/images/download.svg";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import Comment from "../Comment/Comment.jsx";
 import spinner from "../../../assets/images/spinner.svg";
 import VisualSelector from "../VisualSelector/VisualSelector.jsx";
@@ -13,7 +8,13 @@ import { APIContext } from "../../contexts/APIContext.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Chip, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Button, Tooltip } from "@mui/material";
+import { Chip, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText, Button, Tooltip, TextField, Menu, MenuItem } from "@mui/material";
+import { useNavigateBack } from "../../contexts/NavigateBackContext.jsx";
+
+import DownloadIcon from '@mui/icons-material/Download';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import AddCommentIcon from '@mui/icons-material/AddComment';
+import SortIcon from '@mui/icons-material/Sort';
 
 
 const Informations = ({algorithm, onCloseCallback}) => {
@@ -29,7 +30,40 @@ const Informations = ({algorithm, onCloseCallback}) => {
     const { setSelectedAlgorithm } = useContext(SimulationContext);
     const [openDialog, setOpenDialog] = useState(false);
     const [commentIdToDelete, setCommentIdToDelete] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [sortOrder, setSortOrder] = useState('newest');
+
+    const { 
+        userData,
+        loggedIn
+    } = useContext(UserContext);
+    const { 
+        addAlgorithmComment,
+        getAlgorithmComments,
+        downloadAlgorithm,
+        deleteComment
+    } = useContext(APIContext);
+    const {
+        isReturnButtonVisible,
+        showReturnButton,
+        setReturnCallback,
+        hideReturnButton,
+        handleReturn
+    } = useNavigateBack();
+    const { setSelectedAlgorithm } = useContext(SimulationContext);
+
+    const algorithmContainerRef = useRef(null);
+
     const navigate = useNavigate();
+    const isMenuOpen = Boolean(anchorEl);
+
+    const sortedComments = [...comments].sort((a, b) => {
+        if (sortOrder === 'newest') {
+            return new Date(b.inserted_at) - new Date(a.inserted_at);
+        } else {
+            return new Date(a.inserted_at) - new Date(b.inserted_at);
+        }
+    });
 
     useEffect(() => {
         if (algorithm !== null && algorithm !== undefined && Object.keys(algorithm).length !== 0) {
@@ -43,6 +77,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
         } else {
             setIsAlgorithmPresent(false);
         }
+
         window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
             if (isInstalled) {
                 setIsAlgorithmInstalled(true);
@@ -52,12 +87,37 @@ const Informations = ({algorithm, onCloseCallback}) => {
         });
     }, [algorithm]);
 
+    useEffect(() => {
+        setReturnCallback(() => {
+            resetScroll();
+            onCloseCallback();
+        });
+    }, []);
+
+    useEffect(() => {
+        const handleNavigateBack = () => {
+            resetScroll();
+            onCloseCallback();
+        };
+
+        window.addEventListener('navigate-back', handleNavigateBack);
+        return () => {
+            window.removeEventListener('navigate-back', handleNavigateBack);
+        }
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            resetScroll();
+            window.dispatchEvent(new CustomEvent('remove-return-button'));
+        };
+    }, []);
+
     const resetScroll = () => {
-        const algorithmContainer = document.getElementById("algorithm");
-        if (algorithmContainer) {
+        if (algorithmContainerRef.current) {
             setTimeout(() => {
-                algorithmContainer.scrollTo(0, 0);
-            }, 200);
+                algorithmContainerRef.current.scrollTop = 0;
+            }, 500);
         }
     };
 
@@ -85,10 +145,7 @@ const Informations = ({algorithm, onCloseCallback}) => {
         // Call the API to add the comment
         addAlgorithmComment(commentData)
             .then((response) => {
-                // Reset the form
-                document.getElementById("own-comment").reset();
                 fetchComments();
-
             })
             .catch((error) => {
                 console.error("Error adding comment:", error);
@@ -161,156 +218,270 @@ const Informations = ({algorithm, onCloseCallback}) => {
         }
     }
 
+    const handleSortClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    }
+
+    const handleSortClose = () => {
+        setAnchorEl(null);
+    }
+
+    const handleSortSelect = (order) => {
+        setSortOrder(order);
+        setAnchorEl(null);
+    }
+
     return (
-        <div id="container" className="flex flex-col max-h-screen min-h-screen w-full relative bg-midnight p-5 z-50">
+        <div id="container" ref={algorithmContainerRef} className="flex flex-col overflow-y-auto w-full h-fit relative bg-background pt-10 z-10">
 
-            {/* CLOSE BUTTON */}
-            <button 
-                className="fixed flex bg-midnight rounded-full grow-0
-                    shrink-0 shadow-md shadow-midnight-purple-shadow h-10 w-10 items-center p-1
-                    top-10 left-25 hover:bg-midnight-purple
-                    transition ease-in-out duration-300"
-                     onClick={() => {onCloseCallback(), resetScroll()}}>
-                <img src={close} alt="Close" className="h-10 w-10"/>
-            </button>
+            <div className="px-32">
 
-            <div id="information-container" className="flex flex-row justify-center w-full h-full gap-5 p-4 scroll-smooth">
-                <div id="algorithm" className="h-full w-4/5 px-5 gap-5 overflow-y-scroll">
+                <div id="algorithm-information">
+                    <div id="algorithm-image" className="relative overflow-hidden rounded-md">
+                        <img src={image} alt="Algorithm" className="w-full h-96 object-cover rounded-md"/>
+                        <div className="absolute top-0 left-0 z-10 w-full h-96 backdrop-blur-sm bg-gradient-to-t from-background to-transparent"></div>
+                    </div>
 
-                    <div id="algorithm-infos" className="flex flex-col justify-center items-center w-full gap-10 p-4 rounded-md overflow-hidden bg-midnight-opacity shadow-md shadow-midnight-purple-shadow mb-5">
-                        <div id={"image-container"} className="flex flex-col justify-center items-center w-full h-3/5 gap-3 transition ease-in-out duration-150 overflow-hidden">
-                            <img src={image} alt="Algorithm" className="h-full w-full object-cover z-50"/>
-                        </div>
+                    <div id="algorithm-text" className="flex flex-col justify-between items-center mt-5 mb-10">
+                        <h1 className="text-4xl w-full text-left mb-5 font-bold text-text">
+                            {isAlgorithmPresent ? algorithm.name : "Algorithm Not Found"}
+                        </h1>
 
-                        <div id="title" className="flex flex-row w-full text-4xl font-bold text-midnight-text">
-                            <p className="w-full">
-                                {algorithm.name}
-                            </p>
+                        <div className="flex flex-col w-full justify-start">
+                            <h2 className="text-lg font-bold mb-2 text-textAlt">Tags:</h2>
 
-                            {/* <div id="algorithm-like" className="flex flex-row w-full justify-end gap-2 text-sm font-bold text-midnight-text">
-                                <button id="algorithm-dislike" className="flex flex-row items-center rounded-md hover:bg-midnight transition ease-in-out duration-300 h-10 p-2 gap-2">
-                                    <img src={like} alt="Like" className="h-7 w-7"/>
-                                    <p>1k</p>
-                                </button>
-                                <button id="algorithm-dislike" className="flex flex-row items-center rounded-md hover:bg-midnight transition ease-in-out duration-300 h-10 p-2 gap-2">
-                                    <img src={dislike} alt="Dislike" className="h-7 w-7"/>
-                                    <p>3</p>
-                                </button>
-                            </div> */}
-
-                        </div>
-
-                        {/* <div id="statistics" className="flex flex-row justify-start w-full text-sm font-bold text-midnight-text gap-4">
-                            <div id="view" className="flex flex-row justify-center items-center gap-1">
-                                <img src={view} alt="View" className="h-7 w-7"/>
-                                <p>2k{algorithm.view}</p>
+                            <div id="tags" className="flex flex-row mb-2 justify-start w-full font-bold text- gap-2 pb-2">
+                                {
+                                    isAlgorithmPresent && algorithm.tags.map((tag) => (
+                                        <Tooltip key={tag.tag_id} title={tag.tag_description} placement="bottom" arrow>
+                                            <Chip 
+                                                label={tag.tag_name} size="small" variant="filled"
+                                                sx={
+                                                    {backgroundColor: "var(--color-primary)", color: "var(--color-text-primary)", fontFamily: "'JetBrains Mono', monospace", fontWeight: "bold"}
+                                                }
+                                            />
+                                        </Tooltip>
+                                    ))
+                                }
                             </div>
-                            <div id="download" className="flex flex-row justify-center items-center gap-1">
-                                <img src={download} alt="Download" className="h-7 w-7"/>
-                                <p>898{algorithm.download}</p>
-                            </div>
-                        </div> */}
-
-                        <div id="tags" className="flex flex-row justify-start w-full font-bold text-midnight-text gap-2 pb-2">
-                            {
-                                isAlgorithmPresent && algorithm.tags.map((tag) => (
-                                    <Tooltip key={tag.tag_id} title={tag.tag_description} placement="bottom" arrow>
-                                        <Chip 
-                                            label={tag.tag_name} size="small" variant="filled"
-                                            sx={{backgroundColor: "#7F6EEE", color: "white", fontFamily: "'JetBrains Mono', monospace", fontWeight: "bold"}}
-                                        />
-                                    </Tooltip>
-                                ))
-                            }
                         </div>
-                        
-                        <div id="description" className="flex flex-row justify-start w-full h-fit text-sm font-bold text-midnight-text text-justify pb-5">
-                            {algorithm.description}
+
+                        <div className="flex flex-col w-full justify-start mt-5">
+                            <h2 className="text-xl w-full text-left font-bold mb-2 text-textAlt">Description:</h2>
+                            <h3 className="text-lg w-full text-left text-textAlt">{isAlgorithmPresent ? algorithm.description : ""}</h3>
+                        </div>
+
+                        <div className="flex flex-col w-full justify-start mt-5">
+                            <h2 className="text-xl w-full text-left font-bold mb-2 text-textAlt">Parameters:</h2>
+                            <h3 className="text-lg w-full text-left text-textAlt">{isAlgorithmPresent ? algorithm.contents : ""}</h3>
                         </div>
 
                     </div>
 
-                    <div id="comments" className="flex flex-col justify-center items-center w-full gap-2 p-4 rounded-md overflow-hidden bg-midnight-opacity shadow-md shadow-midnight-purple-shadow mb-5">
-                        <div id="comment-title" className="flex flex-row justify-start w-full text-2xl font-bold text-midnight-text">
-                            {comments.length} Comments
-                        </div>
+                    <div id="algorithm-button" className="flex flex-row gap-5 w-full h-10 mb-10">
+                        <Button
+                            variant="contained"
+                            className="w-1/2"
+                            sx={{
+                                backgroundColor: "var(--color-primary)",
+                                color: "var(--color-text-primary)",
+                                '&.Mui-disabled': {
+                                    backgroundColor: 'var(--color-primary)',
+                                    color: 'var(--color-text-primary)',
+                                    opacity: 0.5,
+                                },
+                            }}
+                            disabled={isAlgorithmInstalled}
+                            onClick={handleDownloadAlgorithm}
+                        >
+                            <DownloadIcon sx={{ mr: 1 }} />
+                            Download {algorithm.name}
+                        </Button>
 
-                        {
-                            loggedIn ?
-                                <form id="own-comment" className="relative flex flex-col w-full pb-5 gap-2" 
-                                    onSubmit={(e) => {
-                                        e.preventDefault();
-                                        const formData = new FormData(e.target);
-                                        onSubmitComment(formData);
-                                    }}>
-                                    <input 
-                                    type="text" placeholder="Write a comment..." name="comment"
-                                    className="w-full h-full text-sm bg-midnight-opacity rounded-sm p-2 text-midnight-text placeholder:text-midnight-text border-t-0 border-l-0 border-r-0"/>
-
-                                    <div id="button" className="flex flex-row justify-end w-full gap-2 text-midnight-text">
-                                        <button className="flex justify-center text-white bg-midnight-purple-shadow items-center rounded-md px-5 py-2
-                                            transition ease-in-out duration-300">
-                                                Post a comment
-                                        </button>
-                                    </div>
-                                </form>
-                            :
-                            null
-                        }
-
-
-                        {/* Comment list */}
-                        <div id="comment-list" className="flex flex-col justify-start items-start w-full gap-2">
-                            {
-                                !isCommentFetchComplete ? 
-                                    <div id="loading-spinner" className="flex h-full w-full justify-center items-center">
-                                        <img src={spinner} alt="Loading..." className="animate-spin size-10" />
-                                    </div>
-                                :
-                                    <div id="results" className="flex flex-row flex-wrap gap-x-8 gap-y-4 h-full w-full p-5 max-w-full font-mono justify-center overflow-y-auto">
-                                        {comments.map((comment) => {
-                                            return (
-                                                <Comment key={comment.id} comment={comment} onDelete={onTryDeleteComment} />
-                                            )
-                                        })}
-                                    </div>
-                            }
-                        </div>
+                        <Button 
+                            variant="contained"
+                            className="w-1/2"
+                            sx={{
+                                backgroundColor: "var(--color-primary)",
+                                color: "var(--color-text-primary)",
+                                '&.Mui-disabled': {
+                                    backgroundColor: 'var(--color-primary)',
+                                    color: 'var(--color-text-primary)',
+                                    opacity: 0.5,
+                                },
+                            }}
+                            disabled={!isAlgorithmInstalled}
+                            onClick={handleLaunchAlgorithm}
+                        >
+                            <PlayArrowIcon sx={{ mr: 1 }} />
+                            Start {algorithm.name}
+                        </Button>
                     </div>
-
                 </div>
 
-                <div id="parameters" className="flex flex-col h-full w-1/5 gap-5">
-                    
-                    <div id="parameters-container" className="flex flex-col w-full h-full gap-2 p-4 rounded-md overflow-hidden bg-midnight-opacity shadow-md shadow-midnight-purple-shadow">
-                        <div id="title" className="flex flex-row justify-start w-full text-xl font-bold text-midnight-text">
-                            Parameters
-                        </div>
-                        <div id="parameters-list" className="flex flex-col justify-start items-start w-full gap-2 text-sm font-bold text-midnight-text">
-                            {
-                                algorithm.contents
-                            }
-                        </div>
-                    </div>
-                    {
-                        isAlgorithmInstalled ?
-                            <div className="flex flex-row w-full h-fit gap-2 overflow-hidden">
-                                <button onClick={handleVisualization} id="install" className="flex w-full justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
-                                    transition ease-in-out duration-300 hover:bg-midnight-purple">
-                                    Choose visualization
-                                </button>
-                                {/* <button onClick={() => {handleUninstallAlgorithm}} id="uninstall" className="flex w-full justify-center items-center text-white bg-midnight-red rounded-md px-5 py-2
-                                    transition ease-in-out duration-300 hover:bg-midnight-red hover:opacity-80">
-                                    Uninstall
-                                </button> */}
-                            </div>
-                            :
-                            <button onClick={handleDownloadAlgorithm} id="download" className="flex justify-center items-center text-white bg-midnight-purple-shadow rounded-md px-5 py-2
-                                transition ease-in-out duration-300 hover:bg-midnight-purple">
-                                Download
-                            </button>
-                    }
+                <div id="divider" className="w-full h-px bg-accent mb-5"></div>
 
+                <div id="algorithm-comments" className="flex flex-col w-full h-fit mt-5">
+                    <div className="flex flex-row justify-start items-center w-full mb-10 gap-5">
+                        <h1 className="flex flex-col text-3xl w-fit items-center text-left font-bold text-text">{comments.length} Comments</h1>
+
+                        <Button
+                            variant="text"
+                            className="w-48"
+                            sx={{ 
+                                color: "var(--color-text)",
+                                '&:hover': {
+                                    backgroundColor: 'var(--color-background-alt)',
+                                    color: 'var(--color-primary)',
+                                },
+                                '&:active': {
+                                    backgroundColor: 'var(--color-background-alt)',
+                                },
+                                '& .MuiTouchRipple-root': {
+                                    color: 'var(--color-primary)',
+                                }
+                            }}
+                            onClick={handleSortClick}
+                        >
+                            <SortIcon sx={{ mr: 1 }} />
+                            Sort By: {sortOrder === 'newest' ? ' Newest' : ' Oldest'}
+                        </Button>
+                        
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={isMenuOpen}
+                            onClose={() => handleSortClose()}
+                            slotProps={{
+                                paper: {
+                                    sx: {
+                                        width: anchorEl?.offsetWidth || "auto"
+                                    }
+                                }
+                            }}
+                            sx={{
+                                '& .MuiPaper-root': {
+                                    backgroundColor: 'var(--color-background)',
+                                    color: 'var(--color-text)',
+                                }
+                            }}
+                        >
+                            <MenuItem 
+                                onClick={() => handleSortSelect('newest')}
+                                selected={sortOrder === 'newest'}
+                                sx={{
+                                    "&:hover": { 
+                                        backgroundColor: 'var(--color-secondary) !important',
+                                        color: 'var(--color-text-primary) !important'
+                                    },
+                                    "&.Mui-selected": { 
+                                        backgroundColor: 'var(--color-primary)',
+                                        color: 'var(--color-text-primary)'
+                                    },
+                                    "&.Mui-selected:hover": { 
+                                        backgroundColor: 'var(--color-secondary)',
+                                        color: 'var(--color-text-primary)'
+                                    }
+                                }}
+                            >
+                                Newest
+                            </MenuItem>
+                            <MenuItem 
+                                onClick={() => handleSortSelect('oldest')}
+                                selected={sortOrder === 'oldest'}
+                                sx={{
+                                    "&:hover": { 
+                                        backgroundColor: 'var(--color-secondary) !important',
+                                        color: 'var(--color-text-primary) !important'
+                                    },
+                                    "&.Mui-selected": { 
+                                        backgroundColor: 'var(--color-primary)',
+                                        color: 'var(--color-text-primary)'
+                                    },
+                                    "&.Mui-selected:hover": { 
+                                        backgroundColor: 'var(--color-secondary)',
+                                        color: 'var(--color-text-primary)'
+                                    }
+                                }}
+                            >
+                                Oldest
+                            </MenuItem>
+                        </Menu>
+                    </div>
+
+                    <div id="comment-posting" className="flex flex-col w-full mb-5">
+                        <form 
+                            className="w-full"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                const formData = new FormData(e.target);
+                                e.target.reset();
+                                onSubmitComment(formData);
+                            }}
+                        >
+                            <div className="w-full mb-2">
+                                <TextField
+                                    variant="standard"
+                                    name="comment"
+                                    placeholder="Add a comment..."
+                                    className="w-full"
+                                    sx={{
+                                        '& .MuiInputBase-input': {
+                                            color: 'var(--color-text)',
+                                            '&::placeholder': {
+                                                color: 'var(--color-text-alt)',
+                                                opacity: 0.7,
+                                            }
+                                        },
+                                        '& .MuiInput-underline:before': {
+                                            borderBottomColor: 'var(--color-text-alt)',
+                                        },
+                                        '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+                                            borderBottomColor: 'var(--color-primary)',
+                                        },
+                                        '& .MuiInput-underline:after': {
+                                            borderBottomColor: 'var(--color-primary)',
+                                        },
+                                    }}
+                                />
+                            </div>
+
+                            <div className="flex flex-row w-full mb-2 justify-end">
+                                <Button
+                                    sx={{
+                                        backgroundColor: "var(--color-primary)",
+                                        color: "var(--color-text-primary)",
+                                        '&.Mui-disabled': {
+                                            backgroundColor: 'var(--color-primary)',
+                                            color: 'var(--color-text-primary)',
+                                            opacity: 0.5,
+                                        },
+                                    }}
+                                    variant="contained"
+                                    type="submit"
+                                >
+                                    <AddCommentIcon sx={{ mr: 1 }} />
+                                    Post Comment
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="all-comments" className="flex flex-col w-full gap-5 mb-10">
+                        {
+                            !isCommentFetchComplete ? 
+                                <div id="loading-spinner" className="flex h-full w-full justify-center items-center">
+                                    <img src={spinner} alt="Loading..." className="animate-spin size-10" />
+                                </div>
+                            :
+                                <div id="results" className="flex flex-row flex-wrap gap-10 h-fit w-full p-5 font-mono justify-center">
+                                    {sortedComments.map((comment) => {
+                                        return (
+                                            <Comment key={comment.id} comment={comment} onDelete={onTryDeleteComment} />
+                                        )
+                                    })}
+                                </div>
+                        }
+                    </div>
                 </div>
             </div>
         
@@ -326,20 +497,35 @@ const Informations = ({algorithm, onCloseCallback}) => {
                 onClose={() => setOpenDialog(false)}
                 slotProps={{
                     paper: {
-                        className: "!bg-midnight !text-white",
+                        className: "!bg-background !text-text",
                     }
                 }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogTitle className="!text-text">Confirm Deletion</DialogTitle>
                 <DialogContent>
-                    <DialogContentText className="!text-white">
+                    <DialogContentText className="!text-textAlt">
                         Are you sure you want to delete this comment?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="text" onClick={() => setOpenDialog(false)} color="primary">
+                    <Button 
+                        variant="text"
+                        sx={{
+                            color: "var(--color-text)",
+                            '&:hover': {
+                                backgroundColor: 'var(--color-background-alt)',
+                                color: 'var(--color-primary)',
+                            },
+                            '&:active': {
+                                backgroundColor: 'var(--color-background-alt)',
+                            },
+                            '& .MuiTouchRipple-root': {
+                                color: 'var(--color-primary)',
+                            }
+                        }}
+                        onClick={() => setOpenDialog(false)} color="primary">
                         Cancel
                     </Button>
                     <Button variant="contained" onClick={() => {

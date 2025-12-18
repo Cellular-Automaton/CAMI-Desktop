@@ -9,6 +9,39 @@ html, body, #root {
     padding: 0;
 }
 
+:root {
+    --color-primary: #7F6EEE;
+    --color-secondary: #6B5BB8;
+    --color-accent: #9a8df2;
+
+    --color-background: #0A0A0A;
+    --color-background-alt: #191919;
+    --color-text: #FFFFFF;
+    --color-text-alt: #BDBDBD;
+}
+
+[data-theme="dark"] {
+    --color-background: #0A0A0A;
+    --color-background-alt: #191919;
+    --color-text: #FFFFFF;
+    --color-text-alt: #BDBDBD;
+}
+
+[data-theme="light"] {
+    --color-background: #FFFAFA;
+    --color-background-alt: #DCDCDC;
+    --color-text: #1A1A1A;
+    --color-text-alt: #4D4D4D;
+}
+
+.drag {
+    -webkit-app-region: drag;
+}
+
+.no-drag {
+    -webkit-app-region: no-drag;
+}
+
 /* Custom minimalist scrollbar */
 * {
     scrollbar-width: thin; /* Firefox */
@@ -55,4 +88,30 @@ body {
 
 .taskbar-button:hover {
     color: #ff0000; /* Change color on hover */
+}
+
+/* Toast Customization */
+.Toastify__toast {
+  background-color: var(--color-background-alt) !important;
+  color: var(--color-text) !important;
+  border-radius: 8px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+.Toastify__progress-bar {
+  background: var(--color-primary) !important;
+}
+
+.Toastify__progress-bar--success {
+    background: var(--color-accent) !important;
+}
+
+.Toastify__close-button {
+  color: var(--color-text-alt) !important;
+  opacity: 0.7;
+}
+
+.Toastify__close-button:hover {
+  color: var(--color-text) !important;
+  opacity: 1;
 }

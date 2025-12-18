@@ -2,7 +2,6 @@ import React, {useState, useEffect, useContext} from "react";
 import { CardMedia, Divider, TextField, Card, CardActionArea, CardContent, Dialog, Avatar, Tooltip } from "@mui/material";
 
 import { APIContext } from "../../contexts/APIContext.jsx";
-import { set } from "date-fns";
 
 export default function AdminAlgorithm({ closeCallback }) {
     const [searchTerm, setSearchTerm] = useState("");
@@ -48,14 +47,20 @@ export default function AdminAlgorithm({ closeCallback }) {
     }, []);
 
     return (
-        <div className="bg-midnight w-full h-full p-5 flex flex-col">
-            <h2 className="text-2xl font-bold text-white mb-4">Algorithm Management</h2>
-            <p className="text-white">Here you can manage the algorithms used in the application.</p>
-            <Divider sx={{ my: 2, backgroundColor: 'white', height: '1px' }} flexItem />
+        <div className="bg-background w-full h-full pt-10 px-10 flex flex-col">
+            <div className="px-5">
+                <h2 className="text-2xl font-bold text-text mb-4">Algorithm Management</h2>
+                <p className="text-text">Here you can manage the algorithms used in the application.</p>
+            </div>
+            <Divider sx={{ my: 2, backgroundColor: 'var(--color-text-alt)', height: '1px' }} flexItem />
 
              <div className="w-full flex flex-row justify-center">
                 <TextField label="Search Algorithm" variant="outlined" className="!w-1/5 !rounded-sm"
-                    sx={{ input: { color: 'white' }, label: { color: 'white' }, fieldset: { borderColor: 'white' } }}
+                    sx={{ 
+                        input: { color: 'var(--color-text)', backgroundColor: 'var(--color-background-alt)' },
+                        label: { color: 'var(--color-text-alt)' },
+                        fieldset: { borderColor: 'var(--color-text-alt)' }
+                    }}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -65,10 +70,14 @@ export default function AdminAlgorithm({ closeCallback }) {
 
                 {
                     filteredAlgorithms.length === 0 ? (
-                        <p className="text-white">No algorithms found.</p>
+                        <p className="text-text">No algorithms found.</p>
                     ) : (
                     filteredAlgorithms.map((alg) => (
-                        <Card key={alg.automaton_id} className="!bg-midnight-opacity !text-white !h-1/4 !w-1/3 overflow-y-hidden text-ellipsis">
+                        <Card key={alg.automaton_id} className="
+                            !bg-backgroundAlt !text-text !h-1/4 !w-1/3 overflow-y-hidden text-ellipsis
+                            hover:scale-105 hover:ring-4 hover:ring-primary !transition-all duration-200
+                            focus-within:scale-105 focus-within:ring-4 focus-within:ring-primary
+                        ">
                             <CardActionArea className="!h-full" onClick={() => setSelectedAlgorithm(alg)}>
                                 <CardMedia sx={{ height: 140}} image={alg?.image[0]?.contents_binary ? `data:image/png;base64,${alg.image[0].contents_binary}` : "https://citygem.app/wp-content/uploads/2024/08/placeholder-1-1.png"} title={alg.name} />
                                 <CardContent className="!h-full w-full">
@@ -87,7 +96,7 @@ export default function AdminAlgorithm({ closeCallback }) {
                 <div className="w-full h-2/3">
                     <img src={selectedAlgorithm?.image[0]?.contents_binary ? `data:image/png;base64,${selectedAlgorithm?.image[0].contents_binary}` : "https://citygem.app/wp-content/uploads/2024/08/placeholder-1-1.png"} alt={selectedAlgorithm?.name} className="w-full h-48 object-cover" />
                 </div>
-                <div className="bg-midnight p-5 flex flex-col text-white font-mono">
+                <div className="bg-background p-5 flex flex-col text-text font-mono">
                     <div>
                         <h3 className="text-2xl font-bold mb-2">{selectedAlgorithm?.name}</h3>
                         <p className="text-sm opacity-70">{selectedAlgorithm?.description}</p>
@@ -122,27 +131,20 @@ export default function AdminAlgorithm({ closeCallback }) {
             </Dialog>
 
             <Dialog open={isValidationOpen} onClose={() => setIsValidationOpen(false)} className="flex flex-col p-5">
-                <div className="bg-midnight p-5 flex flex-col text-white font-mono">
+                <div className="bg-background p-5 flex flex-col text-text font-mono">
                     <h2 className="text-lg font-bold pb-5">Are you sure to delete this algorithm?</h2>
                     <div className="flex flex-row-reverse gap-5 mt-5">
                         <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
                             onClick={() => handleDeleteAlgorithm(selectedAlgorithm?.automaton_id)}>
                             Yes
                         </button>
-                        <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
+                        <button className="mt-5 p-2 bg-primary text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
                             onClick={() => setIsValidationOpen(false)}>
                             No
                         </button>
                     </div>
                 </div>
             </Dialog>
-
-            <div className="w-full flex justify-center">
-                <button className="mt-5 p-2 bg-midnight-purple text-white rounded-lg w-32 transition hover:opacity-50 ease-in-out duration-200"
-                    onClick={closeCallback}>
-                    Close
-                </button>
-            </div>
         </div>
     );
 }
