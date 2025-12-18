@@ -501,7 +501,7 @@ export const APIProvider = ({ children }) => {
         }
     }
 
-    const getLastestUsers = async () => {
+    const getLatestUsers = async () => {
         try {
             const users = await getAllAccounts();
             users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -511,7 +511,7 @@ export const APIProvider = ({ children }) => {
         }
     }
 
-    const getLastestAlgorithms = async () => {
+    const getLatestAlgorithms = async () => {
         try {
             const algorithms = await getAllAlgorithms();
             algorithms.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -521,13 +521,23 @@ export const APIProvider = ({ children }) => {
         }
     }
 
-    const getLastestComments = async () => {
+    const getLatestComments = async () => {
         try {
             const comments = await getAllComments();
             comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             return comments.slice(0, 5);
         } catch (error) {
             console.error("Failed to fetch last 5 comments:", error);
+        }
+    }
+
+    const getLatestVisuals = async () => {
+        try {
+            const visuals = await getAllVisuals();
+            visuals.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            return visuals.slice(0, 5);
+        } catch (error) {
+            console.error("Failed to fetch last 5 visuals:", error);
         }
     }
 
@@ -604,6 +614,25 @@ export const APIProvider = ({ children }) => {
         console.log("Adding visual with form:", visualForm);
     }
 
+    const getAllVisuals = async () => {
+        const url = `${apiUrl}/visuals`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            toast.error('Failed to fetch all visuals. Please try later.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            throw error;
+        }
+    }
+
     return (
         <APIContext.Provider value={
             { 
@@ -611,8 +640,8 @@ export const APIProvider = ({ children }) => {
                 getAlgorithmComments, getTags, postAlgorithmTags, downloadAlgorithm, setAlgorithmTags,
                 getAllAccounts, getAllComments, getAllAlgorithms, getUserById, getAlgorithmById,
                 deleteComment, deleteUser, deleteAlgorithm, updateUser,
-                getLastestUsers, getLastestAlgorithms, getLastestComments, downloadVisual,
-                getVisualLinkedToAlgorithm, addVisual
+                getLatestUsers, getLatestAlgorithms, getLatestComments, downloadVisual,
+                getVisualLinkedToAlgorithm, addVisual, getAllVisuals, getLatestVisuals
             }
         }>
             {children}
