@@ -181,7 +181,7 @@ export default function Home() {
 
             {/* INFORMATION PANEL :) */}
             <div id="information-panel"
-                className="hidden flex-col w-full h-screen bg-background absolute left-0 -top-full z-10 overflow-hidden">
+                className="hidden flex-col w-full h-screen bg-background absolute left-0 -top-full z-30 overflow-hidden">
                 <Informations onCloseCallback={closeInformationPanel} algorithm={selectedAlgorithm} />
             </div>
 
