@@ -49,10 +49,10 @@ export default function AdminAlgorithm({ closeCallback }) {
     return (
         <div className="bg-background w-full h-full pt-10 px-10 flex flex-col">
             <div className="px-5">
-                <h2 className="text-2xl font-bold text-white mb-4">Algorithm Management</h2>
-                <p className="text-white">Here you can manage the algorithms used in the application.</p>
+                <h2 className="text-2xl font-bold text-text mb-4">Algorithm Management</h2>
+                <p className="text-text">Here you can manage the algorithms used in the application.</p>
             </div>
-            <Divider sx={{ my: 2, backgroundColor: 'white', height: '1px' }} flexItem />
+            <Divider sx={{ my: 2, backgroundColor: 'var(--color-text-alt)', height: '1px' }} flexItem />
 
              <div className="w-full flex flex-row justify-center">
                 <TextField label="Search Algorithm" variant="outlined" className="!w-1/5 !rounded-sm"
