@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
+import { NavigateBackContext } from "../../contexts/NavigateBackContext.jsx";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import VisualLoader from "../VisualLoader.jsx";
@@ -20,6 +21,7 @@ export default function Playground() {
         importSimulation, exportSimulation, getSimulationParameters,
         clearFrames, parameters, setParameters, importedData, setSelectedAlgorithm
     } = useContext(SimulationContext);
+    const { hideReturnButton, setReturnCallback } = useContext(NavigateBackContext);
 
     useEffect(() => {
 
@@ -46,6 +48,9 @@ export default function Playground() {
             console.error("Error fetching simulation parameters:", error);
             toast.error("Error fetching simulation parameters: " + error.message);
         }
+
+        hideReturnButton();
+        setReturnCallback(null);
         return () => {
             console.log("Cleaning up...");
             stopSimulation();
