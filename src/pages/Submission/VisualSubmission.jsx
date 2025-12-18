@@ -2,9 +2,10 @@ import React, { useEffect, useState, useContext } from "react";
 import gol from "../../../assets/images/gol2.gif";
 import { APIContext } from "../../contexts/APIContext.jsx";
 import { Dialog, DialogActions, DialogContent, DialogTitle, Chip } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export default function VisualSubmission() {
-    const { getAlgorithms } = useContext(APIContext);
+    const { getAlgorithms, addVisual } = useContext(APIContext);
     const [form, setForm] = useState({
         name: "",
         description: "",
@@ -17,6 +18,7 @@ export default function VisualSubmission() {
     const [searchedAlgorithm, setSearchedAlgorithm] = useState([]);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState([]);
     const [search, setSearch] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         const getAllAlgorithms = async () => {
@@ -73,6 +75,11 @@ export default function VisualSubmission() {
 
         toSendForm.related_algorithms = selectedAlgorithm.map((alg) => alg.automaton_id);
         console.log(toSendForm);
+        addVisual(toSendForm).then(() => {
+            navigate("/Home");
+        }).catch((error) => {
+            console.error("Error adding visual:", error);
+        });
     }
 
     return (

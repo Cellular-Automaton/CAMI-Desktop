@@ -551,6 +551,59 @@ export const APIProvider = ({ children }) => {
         }
     }
 
+    const addVisual = async (visualForm) => {
+        const visualUrl = `${apiUrl}/visuals/`;
+        const managerUrl = `${apiUrl}/plugin_manager`;
+
+        const related_algorithms = visualForm.related_algorithms;
+
+        const visualData = {
+            "visual" : {
+                "name": visualForm.name,
+                "description": visualForm.description,
+                "assets_link": visualForm.link,
+            }
+        }
+        // First, upload the visual
+        try {
+            const response = await axios.post(visualUrl, visualData);
+            console.log("Visual upload response:", response);
+            const visualId = response.data.data.id;
+
+            // Then, link the visual to the algorithms
+            related_algorithms.forEach(async (algorithmId) => {
+                await axios.post(managerUrl, {
+                    "plugin_manager": {
+                        "automaton": algorithmId,
+                        "visual": visualId
+                    }
+                });
+            });
+
+            toast.success("Visual added successfully!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        } catch (error) {
+            console.error("Error uploading visual:", error);
+            toast.error("Failed to upload visual. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            throw error;
+        }
+        console.log("Adding visual with form:", visualForm);
+    }
+
     return (
         <APIContext.Provider value={
             { 
@@ -559,7 +612,7 @@ export const APIProvider = ({ children }) => {
                 getAllAccounts, getAllComments, getAllAlgorithms, getUserById, getAlgorithmById,
                 deleteComment, deleteUser, deleteAlgorithm, updateUser,
                 getLastestUsers, getLastestAlgorithms, getLastestComments, downloadVisual,
-                getVisualLinkedToAlgorithm
+                getVisualLinkedToAlgorithm, addVisual
             }
         }>
             {children}
