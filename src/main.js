@@ -1,10 +1,14 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, protocol, WebContentsView } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
 import Store from "electron-store"
 import {load_manager} from './plugins_handling.js';
+import { load_visual_manager } from './visual_handling.js';
+import express from 'express';
 
 let mainWindow;
+let visualServer;
+let serverPort;
 
 const store = new Store();
 
@@ -20,16 +24,13 @@ const createWindow = () => {
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      webviewTag: true
     },
     autoHideMenuBar: true,
   });
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -37,9 +38,11 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   createWindow();
+  createMiniServer();
 
   // Load plugins
   await load_manager();
+  await load_visual_manager();
 
   // Handle user session
 
@@ -61,6 +64,24 @@ app.whenReady().then(async () => {
   });
 });
 
+const createMiniServer = () => {
+  visualServer = express();
+  const serverPath = app.isPackaged ? path.join(process.resourcesPath, "Visuals") : path.join(app.getAppPath(), "Visuals")
+  console.log(serverPath);
+  visualServer.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // autorise toutes les origines
+    res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    next();
+  });
+  visualServer.use(express.static(serverPath));
+
+  const server = visualServer.listen(0, () => {
+    serverPort = server.address().port;
+    console.log(`Visual server running at http://localhost:${serverPort}`);
+  });
+}
+
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
@@ -72,19 +93,17 @@ app.on("window-all-closed", () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
-ipcMain.handle('save-json', (event, data) => {
+ipcMain.handle('save-json', async (evt, data) => {
   const filePath = dialog.showSaveDialogSync(mainWindow, {
     title: 'Save Simulation',
     defaultPath: path.join(app.getPath('documents'), 'simulation.json'),
     filters: [{ name: 'JSON Files', extensions: ['json'] }]
   });
 
-  if (!filePath) {
+  if (!filePath)
     return;
-  }
 
-  const dataToText = JSON.stringify(data, null, 2);
-  fs.writeFile(filePath, dataToText, (err) => {
+  fs.writeFile(filePath, JSON.stringify(data), (err) => {
     if (err) {
       dialog.showErrorBox('Error', 'Failed to save the file.');
     } else {
@@ -124,6 +143,17 @@ ipcMain.handle('open-external', async (event, url) => {
 
 ipcMain.handle('get-os', async () => {
   return process.platform;
+});
+
+ipcMain.handle('get-server-url', async () => {
+  if (visualServer) {
+    return `http://localhost:${serverPort}/`;
+  }
+});
+
+ipcMain.handle('get-visual-folder', async () => {
+  const visualFolderPath = app.isPackaged ? path.join(process.resourcesPath, "Visuals") : path.join(app.getAppPath(), "Visuals")
+  return visualFolderPath;
 });
 
 ipcMain.handle('store-data', (event, data_name, data) => {

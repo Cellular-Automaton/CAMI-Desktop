@@ -6,7 +6,7 @@ import { Select, Box, MenuItem, Chip, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-function Submission() {
+function AlgorithmSubmission() {
     const [form, setForm] = useState({
         name: "",
         description: "",
@@ -315,4 +315,4 @@ function Submission() {
     );
 }
 
-export default Submission;
+export default AlgorithmSubmission;

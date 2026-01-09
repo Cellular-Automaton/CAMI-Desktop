@@ -1,7 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld('electron', {
-
   send: (channel, data) => { ipcRenderer.send(channel, data); },
   receive: (channel, func) => { ipcRenderer.on(channel, (event, ...args) => func(...args)); },
 
@@ -25,11 +24,24 @@ contextBridge.exposeInMainWorld('electron', {
   isAlgorithmInstalled: (params) => ipcRenderer.invoke('is-algorithm-installed', params),
   getAlgorithmParameters: (params) => ipcRenderer.invoke('get-simulation-parameters', params),
 
+  // Visual manager related IPC calls
+  isVisualInstalled: (params) => ipcRenderer.invoke('is-visual-installed', params),
+  getVisualById: (params) => ipcRenderer.invoke('get-visual-by-id', params),
+  installVisual: (url, params) => ipcRenderer.invoke('install-visual', url, params),
+  uninstallVisual: (visual_id) => ipcRenderer.invoke('uninstall-visual', visual_id),
+  installTryVisual: (visual_file) => ipcRenderer.invoke('install-try-visual', visual_file),
+  removeTryVisual: () => ipcRenderer.invoke('remove-try-visual'),
+
   // External links
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
 
   // Get OS
   getOS: () => ipcRenderer.invoke('get-os'),
+
+  // Mini server related
+  getServerURL: () => ipcRenderer.invoke('get-server-url'),
+
+  getVisualFolder: () => ipcRenderer.invoke('get-visual-folder'),
 
   // Store handling
   storeData: (data_name, data) => ipcRenderer.invoke('store-data', data_name, data),

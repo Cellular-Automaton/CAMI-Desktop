@@ -1,23 +1,30 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import SimulationPlayer from "../../components/SimulationPlayer/SimulationPlayer.jsx";
-import TwoDDisplay from "../../components/2DDisplay/2DDisplay.jsx";
+import React, { useState, useEffect, useContext } from "react";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
+import { NavigateBackContext } from "../../contexts/NavigateBackContext.jsx";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
+import VisualLoader from "../VisualLoader.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Playground() {
     const [gridSize, setGridSize] = useState(10);
+    const [visualComponent, setVisualComponent] = useState(null);
     const { state } = useLocation();
     const algorithmFromState = state ? state.algorithm : null;
+    const visualFromState = state ? state.visual : null;
+    const isTryFromState = state ? state.isTry : false;
+    const navigate = useNavigate();
 
     const { 
         startSimulation, stopSimulation, 
         isSimulationRunning, clearAll,
         importSimulation, exportSimulation, getSimulationParameters,
-        clearFrames, parameters, setParameters, importedData
+        clearFrames, parameters, setParameters, importedData, setSelectedAlgorithm
     } = useContext(SimulationContext);
+    const { hideReturnButton, setReturnCallback } = useContext(NavigateBackContext);
 
     useEffect(() => {
+
         try {
             getSimulationParameters().then((params) => {
                 const tmp = {};
@@ -33,15 +40,25 @@ export default function Playground() {
                 });
                 setParameters(tmp);
                 console.log(algorithmFromState);
+
+                // Load visual with preload and src paths
+                loadVisual();
             });
         } catch (error) {
             console.error("Error fetching simulation parameters:", error);
             toast.error("Error fetching simulation parameters: " + error.message);
         }
+
+        hideReturnButton();
+        setReturnCallback(null);
         return () => {
             console.log("Cleaning up...");
             stopSimulation();
             clearAll();
+
+            if (isTryFromState) {
+                window.electron.removeTryVisual()
+            }
         }
     }, []);
 
@@ -87,111 +104,45 @@ export default function Playground() {
         });
     }, [importedData]);
 
-    const onStartSimulation = async () => {
-        const params = Object.keys(parameters).map(key => parameters[key].value);
-        Object.keys(params).forEach(key => {
-            
-            if (key.toLowerCase() === "width" || key.toLowerCase() === "height") {
-                params[key] = gridSize;
+    const renderVisual = async () => {
+        let visualUrl;
+        const visualFolder = await window.electron.getVisualFolder();
+        const currentUrl = await window.electron.getServerURL();
+        const preloadPath = "file://" + visualFolder.replace(/\\/g, "/") + "/webview_preload.js";
+        const srcPath = currentUrl + "base.html";
+
+        if (!isTryFromState) {
+            const visualById = await window.electron.getVisualById(visualFromState.id);
+            if (!visualById) {
+                toast.error("Visual not found: " + visualFromState.name);
+                return null;
             }
-        });
-        // Check if all parameters are set
-        if (Object.values(parameters).some(param => param.value === "")) {
-            toast.error("Please fill all parameters before starting the simulation.");
-            return;
+            visualUrl = currentUrl + visualById.path.replace("Visuals/", "");
+        } else {
+            visualUrl = currentUrl + "try.js";
+            setSelectedAlgorithm(algorithmFromState);
         }
+        return (
+            <VisualLoader preloadPath={preloadPath} srcPath={srcPath} visualUrl={visualUrl} />
+        )
+    };
 
-        // Clear old frames
-        clearFrames();
-
-        // Start simulation
-        await startSimulation(gridSize, params);
-    }
-
-    const onStopSimulation = () => {
-        stopSimulation();
-    }
+    const loadVisual = async () => {
+        try {
+            const visual = await renderVisual();
+            setVisualComponent(visual);
+        } catch (error) {
+            console.error("Error loading visual:", error);
+            toast.error("An error occurred while loading the visual. Returning to home.");
+            navigate("/Home");
+        }
+    };
 
     return (
         <div id="playground" className='flex flex-col h-full w-full relative'>
-            <div className="flex flex-col justify-center absolute right-4 w-1/5 min-w-52 h-full bg-transparent z-50 pointer-events-none">
-                <div id="configuration-panel" className="flex flex-col w-full bg-midnight-opacity p-4 rounded-lg font-mono gap-4 pointer-events-auto">
-                    <div id="configurations" className="flex flex-col gap-4 ">
-                        {
-                            Object.keys(parameters).length > 0 ? (
-                                Object.keys(parameters).map((key) => {
-                                    return (
-                                        <div key={key} className="flex flex-col w-full">
-                                            <label className="text-white">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
-                                            <input
-                                                className="text-white bg-midnight-opacity rounded-md"
-                                                type={parameters[key].type.toLowerCase() === "number" ? "number" : "text"}
-                                                value={parameters[key].value}
-                                                disabled={isSimulationRunning}
-                                                onChange={(e) => {
-                                                    setParameters(prev => ({
-                                                        ...prev,
-                                                        [key]: {
-                                                            ...prev[key],
-                                                            value: e.target.value
-                                                        }
-                                                    }));
-                                                }}
-                                            />
-                                        </div>
-                                    )
-                                })
-                            ) : (
-                                <p className="text-white">Loading parameters...</p>
-                            )
-                        }
-                        <div id="size" className="flex flex-col w-full">
-                            <label className="text-white">Size</label>
-                            <input 
-                                className="text-white bg-midnight-opacity rounded-md" type="number" 
-                                max={50} min={5} value={gridSize} disabled={isSimulationRunning}
-                                onChange={(e) => {setGridSize(e.target.value)}}/>
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-2 justify-center items-center">
-                        <div id="import-export" className="flex flex-row justify-center w-full gap-2 items-center">
-                            <button className="
-                                flex flex-col justify-center items-center w-1/2 h-10 bg-primary text-white rounded-lg
-                                hover:opacity-75 transition ease-in-out duration-300"
-                                onClick={() => {importSimulation(algorithmFromState.automaton_id);}}>
-                                Import
-                            </button>
-                            <button className="
-                                flex flex-col justify-center items-center w-1/2 h-10 bg-primary text-white rounded-lg
-                                hover:opacity-75 transition ease-in-out duration-300"
-                                onClick={exportSimulation} >
-                                Export
-                            </button>
-                        </div>
-                        <div className="flex flex-row justify-center w-full gap-2 items-center">
-                            <button className="
-                                flex flex-col justify-center items-center w-full h-10 bg-midnight-red text-white rounded-lg
-                                hover:opacity-75 transition ease-in-out duration-300
-                                "
-                                onClick={() => {
-                                    stopSimulation();
-                                    clearAll();
-                                }} >
-                                Clear
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <SimulationPlayer 
-                onStartSimulation={onStartSimulation} 
-                onStopSimulation={onStopSimulation}
-                isPlaying={isSimulationRunning}
-            />
-            <TwoDDisplay
-                gridSize={gridSize}
-                setGridSize={setGridSize}
-            />
+            {
+                visualComponent
+            }
         </div>
     );
 }

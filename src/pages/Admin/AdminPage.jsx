@@ -5,6 +5,8 @@ import { Skeleton } from "@mui/material";
 import AdminUser from "./AdminUser.jsx";
 import AdminAlgorithm from "./AdminAlgorithm.jsx";
 import AdminComment from "./AdminComment.jsx";
+import AdminVisual from "./AdminVisual.jsx";
+
 import { APIContext } from "../../contexts/APIContext.jsx";
 import { formatDistance } from "date-fns";
 import { NavigateBackContext } from "../../contexts/NavigateBackContext.jsx";
@@ -15,7 +17,7 @@ export default function AdminPage() {
     const [fiveLastAlgorithms, setFiveLastAlgorithms] = useState([]);
     const [fiveLastComments, setFiveLastComments] = useState([]);
     const [fiveLastVisuals, setFiveLastVisuals] = useState([]);
-    const { getLastestUsers, getLastestAlgorithms, getLastestComments } = useContext(APIContext);
+    const { getLatestUsers, getLatestAlgorithms, getLatestComments, getLatestVisuals } = useContext(APIContext);
     const { showReturnButton, setReturnCallback } = useContext(NavigateBackContext);
 
     useEffect(() => {
@@ -23,24 +25,29 @@ export default function AdminPage() {
     }, []);
 
     const getLatest = () => {
-        getLastestUsers().then(fetchedUsers => {
+        getLatestUsers().then(fetchedUsers => {
             
             setFiveLastUsers(fetchedUsers);
         }).catch(err => {
             console.error("Failed to fetch last 5 users:", err);
         });
 
-        getLastestAlgorithms().then(fetchedAlgorithms => {
+        getLatestAlgorithms().then(fetchedAlgorithms => {
             setFiveLastAlgorithms(fetchedAlgorithms);
         }).catch(err => {
             console.error("Failed to fetch last 5 algorithms:", err);
         });
 
-        getLastestComments().then(fetchedComments => {
-            
+        getLatestComments().then(fetchedComments => {
             setFiveLastComments(fetchedComments);
         }).catch(err => {
             console.error("Failed to fetch last 5 comments:", err);
+        });
+
+        getLatestVisuals().then(fetchedVisuals => {
+            setFiveLastVisuals(fetchedVisuals);
+        }).catch(err => {
+            console.error("Failed to fetch last 5 visuals:", err);
         });
     }
 
@@ -75,6 +82,8 @@ export default function AdminPage() {
                 return <AdminAlgorithm closeCallback={closeAdminPopup} />;
             case "comment":
                 return <AdminComment closeCallback={closeAdminPopup} />;
+            case "visual":
+                return <AdminVisual closeCallback={closeAdminPopup} />;
             default:
                 return null;
         }
@@ -87,7 +96,7 @@ export default function AdminPage() {
                 <p className="text-textAlt">Welcome to the admin page. Here you can manage the application settings and user accounts.</p>
             </div>
 
-            <div id="admin-select-container" className="flex flex-col mt-10 py-10 px-10 gap-6 w-full h-full overflow-y-scroll">
+            <div id="admin-select-container" className="flex flex-col mt-10 py-10 px-20 gap-6 w-full h-full overflow-y-scroll overflow-x-hidden">
 
                 <button className="flex flex-col bg-backgroundAlt p-5 w-full h-fit 
                     text-text rounded-lg hover:scale-105 hover:ring-4 hover:ring-primary
@@ -162,6 +171,7 @@ export default function AdminPage() {
                                         <CardContent className="flex flex-col items-start text-left w-full">
                                             <p className="text-lg text-text font-bold w-full">{visual.name}</p>
                                             <p className="text-sm text-textAlt mb-2 w-full">{visual.automaton_id}</p>
+                                            <p className="text-sm text-textAlt">{visual.description}</p>
                                         </CardContent>
                                     </Card>
                                 ))

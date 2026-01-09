@@ -1,7 +1,6 @@
-import React from "react";
 import Home from "./pages/Home/Home.jsx";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { SimulationProvider, useSimulation } from "./contexts/SimulationContext.jsx";
 import { ToastContainer } from "react-toastify";
 import { ThemeManagerInstance } from "./utils/Themes.jsx";
@@ -12,11 +11,14 @@ import SimulationInformation from "./pages/SimulationInformation/SimulationInfor
 import NotFound from "./pages/NotFound/NotFound.jsx";
 import Community from "./pages/Community/Community.jsx";
 import Connection from "./pages/Connection/Connection.jsx";
-import Submission from "./pages/Submission/Submission.jsx";
+import AlgorithmSubmission from "./pages/Submission/AlgorithmSubmission.jsx";
+import SelectSubmission from "./pages/Submission/SelectSubmission.jsx";
+import VisualSubmission from "./pages/Submission/VisualSubmission.jsx";
 import AdminPage from "./pages/Admin/AdminPage.jsx";
 import SettingBar from "./components/SettingBar/SettingBar.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 import { NavigateBackProvider } from "./contexts/NavigateBackContext.jsx";
+import TryVisual from "./pages/Submission/TryVisual.jsx";
 
 export default function App() {
     // When the page is charged for the first time, it redirect to /home
@@ -67,7 +69,10 @@ export default function App() {
                                     <Route path="/Information" element={<SimulationInformation/>} />
                                     <Route path="/Community" element={<Community/>} />
                                     <Route path="/Connection" element={<Connection/>} />
-                                    <Route path="/Submission" element={<Submission/>} />
+                                    <Route path="/Submission" element={<SelectSubmission/>} />
+                            <Route path="/Submission/Algorithm" element={<AlgorithmSubmission/>} />
+                            <Route path="/Submission/Visual" element={<VisualSubmission/>} />
+                            <Route path="/Submission/Try" element={<TryVisual/>} />
                                     <Route path="/Admin" element={<AdminPage />} />
                                     <Route path="/Settings" element={<Settings />} />
                                     <Route path="/*" element={<NotFound/>}/>

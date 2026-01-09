@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <body style="margin: 0; padding: 0; overflow: hidden;">
+    <div id="root" style="margin: 0; padding: 0;"></div>
+    <script type="module">
+        window.addEventListener("message", (event) => {
+            const msg = event.data;
+
+            if (msg && msg.action === "LOAD_VISUAL") {
+                const url = msg.payload.url;
+                console.log("Loading script from URL:", url);
+
+                import(url).then((module) => {
+                    console.log("Module loaded:", module);
+                    if (module && typeof module.init === "function") {
+                        import("react").then((React) => {
+                            import("react-dom/client").then((ReactDOM) => {
+                                const root = ReactDOM.createRoot(document.getElementById("root"));
+                                root.render(React.createElement(module.default));
+                            });
+                        });
+                    } else {
+                        console.error("Module does not have an init function");
+                    }
+                }).catch((error) => {
+                    console.error("Error loading script:", error);
+                });
+            }
+        });
+    </script>
+  </body>
+</html>

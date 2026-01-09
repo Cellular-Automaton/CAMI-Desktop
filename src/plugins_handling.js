@@ -231,6 +231,7 @@ ipcMain.handle('call-plugin', async (event, params) =>{
     for (const obj of p.parameters)
         types.push(obj.split(':')[1]);
 
+    console.log("Calling plugin:", p.name, "with parameters:", rest, "and types:", types);
     for (const [i, obj] of types.entries()) {
         if (obj == "Array")
             converted.push(new Array(rest[i]))

@@ -250,6 +250,34 @@ export const APIProvider = ({ children }) => {
         }
     }
 
+    const downloadVisual = async (visualLink) => {
+        const url = visualLink;
+
+        console.log("Downloading visual from link:", url);
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    Authorization: undefined
+                }
+            });
+            const asset = response.data.assets[0];
+            if (!asset)
+                throw new Error(`No asset found for visual.`);
+            return asset.browser_download_url;
+        } catch (error) {
+            console.error("Error downloading visual:", error);
+            toast.error("Failed to download visual. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        }
+    }
+
     const setAlgorithmTags = (algorithm_id, tags) => {
         const URL = `${apiUrl}/automaton_tag`;
         const formData = new FormData();
@@ -473,7 +501,7 @@ export const APIProvider = ({ children }) => {
         }
     }
 
-    const getLastestUsers = async () => {
+    const getLatestUsers = async () => {
         try {
             const users = await getAllAccounts();
             users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -483,7 +511,7 @@ export const APIProvider = ({ children }) => {
         }
     }
 
-    const getLastestAlgorithms = async () => {
+    const getLatestAlgorithms = async () => {
         try {
             const algorithms = await getAllAlgorithms();
             algorithms.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -493,13 +521,115 @@ export const APIProvider = ({ children }) => {
         }
     }
 
-    const getLastestComments = async () => {
+    const getLatestComments = async () => {
         try {
             const comments = await getAllComments();
             comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             return comments.slice(0, 5);
         } catch (error) {
             console.error("Failed to fetch last 5 comments:", error);
+        }
+    }
+
+    const getLatestVisuals = async () => {
+        try {
+            const visuals = await getAllVisuals();
+            visuals.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            return visuals.slice(0, 5);
+        } catch (error) {
+            console.error("Failed to fetch last 5 visuals:", error);
+        }
+    }
+
+    const getVisualLinkedToAlgorithm = async (algorithmId) => {
+        const url = `${apiUrl}/plugin_manager/automaton/${algorithmId}`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            toast.error('Failed to fetch visuals linked to the algorithm. Please try later.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            throw error;
+        }
+    }
+
+    const addVisual = async (visualForm) => {
+        const visualUrl = `${apiUrl}/visuals/`;
+        const managerUrl = `${apiUrl}/plugin_manager`;
+
+        const related_algorithms = visualForm.related_algorithms;
+
+        const visualData = {
+            "visual" : {
+                "name": visualForm.name,
+                "description": visualForm.description,
+                "assets_link": visualForm.link,
+            }
+        }
+        // First, upload the visual
+        try {
+            const response = await axios.post(visualUrl, visualData);
+            console.log("Visual upload response:", response);
+            const visualId = response.data.data.id;
+
+            // Then, link the visual to the algorithms
+            related_algorithms.forEach(async (algorithmId) => {
+                await axios.post(managerUrl, {
+                    "plugin_manager": {
+                        "automaton": algorithmId,
+                        "visual": visualId
+                    }
+                });
+            });
+
+            toast.success("Visual added successfully!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        } catch (error) {
+            console.error("Error uploading visual:", error);
+            toast.error("Failed to upload visual. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            throw error;
+        }
+        console.log("Adding visual with form:", visualForm);
+    }
+
+    const getAllVisuals = async () => {
+        const url = `${apiUrl}/visuals`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data.data;
+            return data;
+        } catch (error) {
+            toast.error('Failed to fetch all visuals. Please try later.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            throw error;
         }
     }
 
@@ -510,7 +640,8 @@ export const APIProvider = ({ children }) => {
                 getAlgorithmComments, getTags, postAlgorithmTags, downloadAlgorithm, setAlgorithmTags,
                 getAllAccounts, getAllComments, getAllAlgorithms, getUserById, getAlgorithmById,
                 deleteComment, deleteUser, deleteAlgorithm, updateUser,
-                getLastestUsers, getLastestAlgorithms, getLastestComments
+                getLatestUsers, getLatestAlgorithms, getLatestComments, downloadVisual,
+                getVisualLinkedToAlgorithm, addVisual, getAllVisuals, getLatestVisuals
             }
         }>
             {children}

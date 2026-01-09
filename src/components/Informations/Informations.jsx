@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import Comment from "../Comment/Comment.jsx";
 import spinner from "../../../assets/images/spinner.svg";
+import VisualSelector from "../VisualSelector/VisualSelector.jsx";
+
 import { UserContext } from "../../contexts/UserContext.jsx";
 import { APIContext } from "../../contexts/APIContext.jsx";
 import { SimulationContext } from "../../contexts/SimulationContext.jsx";
@@ -13,6 +15,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import AddCommentIcon from '@mui/icons-material/AddComment';
 import SortIcon from '@mui/icons-material/Sort';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 
 const Informations = ({algorithm, onCloseCallback}) => {
@@ -21,6 +24,8 @@ const Informations = ({algorithm, onCloseCallback}) => {
     const [comments, setComments] = useState([]);
     const [isAlgorithmInstalled, setIsAlgorithmInstalled] = useState(false);
     const [image, setImage] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
     const [openDialog, setOpenDialog] = useState(false);
     const [commentIdToDelete, setCommentIdToDelete] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -34,7 +39,8 @@ const Informations = ({algorithm, onCloseCallback}) => {
         addAlgorithmComment,
         getAlgorithmComments,
         downloadAlgorithm,
-        deleteComment
+        deleteComment,
+        downloadVisual
     } = useContext(APIContext);
     const {
         isReturnButtonVisible,
@@ -146,21 +152,46 @@ const Informations = ({algorithm, onCloseCallback}) => {
 
     }
 
-    const handleLaunchAlgorithm = () => {
+    const handleDownloadVisual = async (visual) => {
+        toast.info(`Downloading visual "${visual.name}". This may take a while...`);
+        try {
+            const visualLink = await downloadVisual(visual.assets_link);
+            console.log("Visual download link:", visualLink);
+            await window.electron.installVisual(visualLink, visual);
+        } catch (error) {
+            console.error("Error downloading visual:", error);
+        }
+    };
+
+    const handleLaunchAlgorithm = async (visual) => {
         setSelectedAlgorithm(algorithm);
-        navigate('/Playground', { state: { algorithm } });
+        const isInstalled = await window.electron.isVisualInstalled(visual.id);
+        console.log("Launching algorithm with visual:", visual);
+        if (!isInstalled) {
+            console.log("Visual not installed, downloading...");
+            await handleDownloadVisual(visual);
+        }
+        navigate('/Playground', { state: { 
+            algorithm: algorithm,
+            visual : visual
+            }
+        });
+    };
+
+    const handleVisualization = () => {
+        setIsDialogOpen(true);
     };
 
     const handleDownloadAlgorithm = async () => {
         try {
             const response = await downloadAlgorithm(algorithm.assets_link);
-            toast.success("Algorithm downloaded successfully!");
             setIsAlgorithmInstalled(true);
 
             await window.electron.installPlugin(response, algorithm);
             window.electron.isAlgorithmInstalled([algorithm.automaton_id]).then((isInstalled) => {
             if (isInstalled) {
                 setIsAlgorithmInstalled(true);
+                toast.success("Algorithm installed successfully!");
             } else {
                 setIsAlgorithmInstalled(false);
             }
@@ -279,10 +310,10 @@ const Informations = ({algorithm, onCloseCallback}) => {
                                 },
                             }}
                             disabled={!isAlgorithmInstalled}
-                            onClick={handleLaunchAlgorithm}
+                            onClick={handleVisualization}
                         >
-                            <PlayArrowIcon sx={{ mr: 1 }} />
-                            Start {algorithm.name}
+                            <VisibilityIcon sx={{ mr: 1 }} />
+                            Select visual
                         </Button>
                     </div>
                 </div>
@@ -376,63 +407,68 @@ const Informations = ({algorithm, onCloseCallback}) => {
                         </Menu>
                     </div>
 
-                    <div id="comment-posting" className="flex flex-col w-full mb-5">
-                        <form 
-                            className="w-full"
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                const formData = new FormData(e.target);
-                                e.target.reset();
-                                onSubmitComment(formData);
-                            }}
-                        >
-                            <div className="w-full mb-2">
-                                <TextField
-                                    variant="standard"
-                                    name="comment"
-                                    placeholder="Add a comment..."
+                    {/* Must be displayed if user is connected */}
+                    {
+                        loggedIn && (
+                            <div id="comment-posting" className="flex flex-col w-full mb-5">
+                                <form 
                                     className="w-full"
-                                    sx={{
-                                        '& .MuiInputBase-input': {
-                                            color: 'var(--color-text)',
-                                            '&::placeholder': {
-                                                color: 'var(--color-text-alt)',
-                                                opacity: 0.7,
-                                            }
-                                        },
-                                        '& .MuiInput-underline:before': {
-                                            borderBottomColor: 'var(--color-text-alt)',
-                                        },
-                                        '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-                                            borderBottomColor: 'var(--color-primary)',
-                                        },
-                                        '& .MuiInput-underline:after': {
-                                            borderBottomColor: 'var(--color-primary)',
-                                        },
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        const formData = new FormData(e.target);
+                                        e.target.reset();
+                                        onSubmitComment(formData);
                                     }}
-                                />
-                            </div>
-
-                            <div className="flex flex-row w-full mb-2 justify-end">
-                                <Button
-                                    sx={{
-                                        backgroundColor: "var(--color-primary)",
-                                        color: "var(--color-text-primary)",
-                                        '&.Mui-disabled': {
-                                            backgroundColor: 'var(--color-primary)',
-                                            color: 'var(--color-text-primary)',
-                                            opacity: 0.5,
-                                        },
-                                    }}
-                                    variant="contained"
-                                    type="submit"
                                 >
-                                    <AddCommentIcon sx={{ mr: 1 }} />
-                                    Post Comment
-                                </Button>
+                                    <div className="w-full mb-2">
+                                        <TextField
+                                            variant="standard"
+                                            name="comment"
+                                            placeholder="Add a comment..."
+                                            className="w-full"
+                                            sx={{
+                                                '& .MuiInputBase-input': {
+                                                    color: 'var(--color-text)',
+                                                    '&::placeholder': {
+                                                        color: 'var(--color-text-alt)',
+                                                        opacity: 0.7,
+                                                    }
+                                                },
+                                                '& .MuiInput-underline:before': {
+                                                    borderBottomColor: 'var(--color-text-alt)',
+                                                },
+                                                '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+                                                    borderBottomColor: 'var(--color-primary)',
+                                                },
+                                                '& .MuiInput-underline:after': {
+                                                    borderBottomColor: 'var(--color-primary)',
+                                                },
+                                            }}
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-row w-full mb-2 justify-end">
+                                        <Button
+                                            sx={{
+                                                backgroundColor: "var(--color-primary)",
+                                                color: "var(--color-text-primary)",
+                                                '&.Mui-disabled': {
+                                                    backgroundColor: 'var(--color-primary)',
+                                                    color: 'var(--color-text-primary)',
+                                                    opacity: 0.5,
+                                                },
+                                            }}
+                                            variant="contained"
+                                            type="submit"
+                                        >
+                                            <AddCommentIcon sx={{ mr: 1 }} />
+                                            Post Comment
+                                        </Button>
+                                    </div>
+                                </form>
                             </div>
-                        </form>
-                    </div>
+                        )
+                    }
 
                     <div id="all-comments" className="flex flex-col w-full gap-5 mb-10">
                         {
@@ -452,6 +488,13 @@ const Informations = ({algorithm, onCloseCallback}) => {
                     </div>
                 </div>
             </div>
+        
+            <Dialog 
+                open={isDialogOpen} onClose={() => setIsDialogOpen(false)}
+                maxWidth="md" fullWidth
+            >
+                    <VisualSelector algorithmId={algorithm.automaton_id} onSelect={handleLaunchAlgorithm} />
+            </Dialog>
 
             {/* Diakog for confirm if user want to delete a comment */}
             <Dialog
