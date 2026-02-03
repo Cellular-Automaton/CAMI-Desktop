@@ -1,3 +1,11 @@
 {
-    "visuals": []
+    "visuals": [
+        {
+            "bdd_id": "234ef644-db4a-4d2d-b688-9ce2c72b1adc",
+            "name": "GameOfLifeVisual",
+            "version": "1.0.0",
+            "path": "Visuals/234ef644-db4a-4d2d-b688-9ce2c72b1adc/GameOfLifeVisual.js",
+            "author": "Unknown"
+        }
+    ]
 }

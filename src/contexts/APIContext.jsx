@@ -633,13 +633,40 @@ export const APIProvider = ({ children }) => {
         }
     }
 
+    const deleteVisual = async (visualId) => {
+        const url = `${apiUrl}/visuals/${visualId}`;
+        try {
+            const response = await axios.delete(url);
+            toast.success("Visual deleted successfully!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+            return response.data;
+        } catch (error) {
+            toast.error("Failed to delete visual. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+            });
+        }
+    }
+
     return (
         <APIContext.Provider value={
             { 
                 apiUrl, setApiUrl, login, signUp, addAlgorithm, getAlgorithms, addAlgorithmComment,
                 getAlgorithmComments, getTags, postAlgorithmTags, downloadAlgorithm, setAlgorithmTags,
                 getAllAccounts, getAllComments, getAllAlgorithms, getUserById, getAlgorithmById,
-                deleteComment, deleteUser, deleteAlgorithm, updateUser,
+                deleteComment, deleteUser, deleteAlgorithm, deleteVisual, updateUser,
                 getLatestUsers, getLatestAlgorithms, getLatestComments, downloadVisual,
                 getVisualLinkedToAlgorithm, addVisual, getAllVisuals, getLatestVisuals
             }
