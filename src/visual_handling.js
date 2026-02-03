@@ -14,7 +14,7 @@ const load_visual_manager = async () => {
         const path = get_path() + "/visuals.json";
         if (!fs.existsSync(path)) {
             // Create the file if it doesn't exist
-            fs.promises.writeFile(path, JSON.stringify({ visuals: [] }, null, 4), {flag: 'w+'});
+            await fs.promises.writeFile(path, JSON.stringify({ visuals: [] }, null, 4), {flag: 'w+'});
         }
         const files = fs.readFileSync(path);
         visualManager.visuals = JSON.parse(files).visuals;

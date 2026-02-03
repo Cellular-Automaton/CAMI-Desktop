@@ -48,27 +48,28 @@ export default function AdminVisual({ closeCallback }) {
     }
 
     const handleDeleteVisual = (visualId) => {
-        // deleteVisual(visualId).then(() => {
-        //     setVisual(visual.filter(visual => visual.id !== visualId));
-        //     setFilteredVisuals(filteredVisuals.filter(visual => visual.id !== visualId));
-        //     setSelectedVisual(null);
-        //     setIsValidationOpen(false);
-        // }).catch(err => {
-        //     console.error("Failed to delete visual:", err);
-        // });
+        console.log("Deleting visual with ID:", visualId);
+        deleteVisual(visualId).then(() => {
+            setVisual(visual.filter(visual => visual.id !== visualId));
+            setFilteredVisuals(filteredVisuals.filter(visual => visual.id !== visualId));
+            setSelectedVisual(null);
+            setIsValidationOpen(false);
+        }).catch(err => {
+            console.error("Failed to delete visual:", err);
+        });
         // Todo: Delete visual from API
     }
 
     return (
         <div className="bg-background w-full h-full pt-10 px-10 flex flex-col">
             <div className="px-5">
-                <h2 className="text-2xl font-bold text-text mb-4">Algorithm Management</h2>
-                <p className="text-text">Here you can manage the algorithms used in the application.</p>
+                <h2 className="text-2xl font-bold text-text mb-4">Visual Management</h2>
+                <p className="text-text">Here you can manage the visuals used in the application.</p>
             </div>
             <Divider sx={{ my: 2, backgroundColor: 'var(--color-text-alt)', height: '1px' }} flexItem />
 
              <div className="w-full flex flex-row justify-center">
-                <TextField label="Search Algorithm" variant="outlined" className="!w-1/5 !rounded-sm"
+                <TextField label="Search Visual" variant="outlined" className="!w-1/5 !rounded-sm"
                     sx={{ 
                         input: { color: 'var(--color-text)', backgroundColor: 'var(--color-background-alt)' },
                         label: { color: 'var(--color-text-alt)' },
@@ -143,7 +144,7 @@ export default function AdminVisual({ closeCallback }) {
                     <h2 className="text-lg font-bold pb-5">Are you sure to delete this algorithm?</h2>
                     <div className="flex flex-row-reverse gap-5 mt-5">
                         <button className="mt-5 p-2 bg-midnight-red text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
-                            onClick={() => handleDeleteVisual(selectedVisual?.automaton_id)}>
+                            onClick={() => handleDeleteVisual(selectedVisual.id)}>
                             Yes
                         </button>
                         <button className="mt-5 p-2 bg-primary text-white rounded-lg w-32 self-end hover:opacity-50 transition ease-in-out duration-200"
