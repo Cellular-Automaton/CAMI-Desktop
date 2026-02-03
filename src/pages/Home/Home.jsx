@@ -157,7 +157,7 @@ export default function Home() {
                 }
             </section>
 
-            {
+            {/* {
                 loggedIn ?
 
                 <section id="favorites" className="flex flex-col gap-2 my-3">
@@ -177,7 +177,7 @@ export default function Home() {
                 </section>
                 :
                 null
-            }
+            } */}
 
             {/* INFORMATION PANEL :) */}
             <div id="information-panel"
