@@ -23,7 +23,11 @@ export default function Navbar() {
     const navigateTo = (path) => {
         setIsReturnButtonVisible(false);
         setReturnCallback(null);
-        navigate(path);
+
+        if (window.location.hash === `#${path}`)
+            navigate(0);
+        else
+            navigate(path);
     }
 
     return (
